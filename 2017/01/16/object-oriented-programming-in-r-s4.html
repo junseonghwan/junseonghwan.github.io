@@ -113,14 +113,7 @@
 
 <h1 id="defining-a-class">Defining a class</h1>
 
-<p>Now, let’s see how we can do this in R. Declaring class  via <code class="highlighter-rouge">setClass(...)</code> method and instantiate an object using <code class="highlighter-rouge">new(...)</code>:</p>
-
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">)</span><span class="w">
-</span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
-
-<p>Currently, our class <code class="highlighter-rouge">PhyloTreeNode</code> doe snot have any field and does not offer any behavior. In R, the fields are referred to as <em>slots</em>. We will create slots <code class="highlighter-rouge">specie</code> and <code class="highlighter-rouge">sequence</code> as primitive type <code class="highlighter-rouge">character</code>. You can specify the values for these slots when you instantiate an object:</p>
+<p>Now, let’s see how we can do this in R. Declaring class  via <code class="highlighter-rouge">setClass(...)</code> method and instantiate an object using <code class="highlighter-rouge">new(...)</code>. In R, the fields are referred to as <em>slots</em>. We will create slots <code class="highlighter-rouge">specie</code> and <code class="highlighter-rouge">sequence</code> as primitive type <code class="highlighter-rouge">character</code>. You can specify the values for these slots when you instantiate an object:</p>
 
 <div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">))</span><span class="w">
 </span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">)</span><span class="w">
