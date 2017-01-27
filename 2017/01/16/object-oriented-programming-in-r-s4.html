@@ -7,8 +7,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Object oriented programming in R w/ S4</title>
-  <meta name="description" content="Introduction to Object Oriented Programming in R">
+  <meta name="description" content="This post corresponds to my presentation at the UBC statistics department student seminar that took place on January 19th.">
 
+  <link rel="stylesheet" href="github-markdown.css">
+  <style>
+      .markdown-body {
+          box-sizing: border-box;
+          min-width: 200px;
+          max-width: 980px;
+          margin: 0 auto;
+          padding: 45px;
+      }
+  </style>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="junseonghwan.github.io/2017/01/16/object-oriented-programming-in-r-s4.html">
   <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
@@ -77,15 +87,17 @@
   </header>
 
   <article class="post-content">
-    <h2 id="introduction-to-object-oriented-programming-in-r">Introduction to Object Oriented Programming in R</h2>
+    <p>This post corresponds to my presentation at the UBC statistics department student seminar that took place on January 19th.</p>
 
-<p>Numbers make up most of the data that we work with. However, there are cases where the random variable of interest take on a discrete structure for example, phylogenetics tree. How can we represent this type of structure in R? We will see one way of doing this in R using object oriented programming.</p>
+<h2 id="introduction-to-oop-in-r">Introduction to OOP in R</h2>
 
-<p>This post will illustrate four key principles of OOP: <em>encapsulation, abstraction, inheritance, and polymorphism</em>.</p>
+<p>There are situations where the latent variable of interest take on a discrete structure. How can we represent this type of structure in R? One way to do this in R is to use object oriented programming.</p>
+
+<p>This post will go over basics of S4 and in the process, cover two key principles of OOP: <strong>encapsulation</strong> and <strong>abstraction</strong>. In the next post, we will see how <em>inheritance</em> and <em>polymorphism</em> is achieved in R using S4.</p>
 
 <h2 id="phylogenetics-tree">Phylogenetics tree</h2>
 
-<p>There exists a package that allows you to build a tree in R such as <a href="https://cran.r-project.org/web/packages/data.tree/vignettes/data.tree.html"><code class="highlighter-rouge">data.tree</code></a> and <a href="https://cran.r-project.org/web/packages/phylobase/vignettes/phylobase.pdf"><code class="highlighter-rouge">phylo4</code></a>. But we will build our own so that we get to practice with S4 concepts; besides, the existing stuff may not perfectly suit our needs.</p>
+<p>We will build a phylogeneics tree using S4. Note that there already exists a package that allows you to build a tree in R such as <a href="https://cran.r-project.org/web/packages/data.tree/vignettes/data.tree.html"><code class="highlighter-rouge">data.tree</code></a> and <a href="https://cran.r-project.org/web/packages/phylobase/vignettes/phylobase.pdf"><code class="highlighter-rouge">phylo4</code></a>. But we will build our own so that we get to practice with S4 concepts.</p>
 
 <p>Let’s build a simple phylogenetics tree. We want each node of the tree to hold the name of the node (for example, the specie name) and the DNA sequence. Each node of the tree needs to keep track of its children nodes as well. In Java, we would do this via recursive class definition:</p>
 
@@ -98,7 +110,7 @@
 	<span class="kd">public</span> <span class="n">String</span> <span class="n">sequence</span><span class="o">;</span>
 
 	<span class="c1">// constructor</span>
-	<span class="kd">public</span> <span class="nf">PhyloTreeNode</span><span class="o">(</span><span class="n">Node</span> <span class="n">l</span><span class="o">,</span> <span class="n">Node</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="n">String</span> <span class="n">specie</span><span class="o">,</span> <span class="n">String</span> <span class="n">seq</span><span class="o">)</span> 
+	<span class="kd">public</span> <span class="nf">PhyloTreeNode</span><span class="o">(</span><span class="n">PhyloTreeNode</span> <span class="n">l</span><span class="o">,</span> <span class="n">PhyloTreeNode</span> <span class="n">r</span><span class="o">,</span> <span class="n">String</span> <span class="n">specie</span><span class="o">,</span> <span class="n">String</span> <span class="n">seq</span><span class="o">)</span> 
 	<span class="o">{</span>
 		<span class="k">this</span><span class="o">.</span><span class="na">left</span> <span class="o">=</span> <span class="n">l</span><span class="o">;</span>
 		<span class="k">this</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="n">r</span><span class="o">;</span>
@@ -113,29 +125,39 @@
 
 <h1 id="defining-a-class">Defining a class</h1>
 
-<p>Now, let’s see how we can do this in R. Declaring class  via <code class="highlighter-rouge">setClass(...)</code> method and instantiate an object using <code class="highlighter-rouge">new(...)</code>. In R, the fields are referred to as <em>slots</em>. We will create slots <code class="highlighter-rouge">specie</code> and <code class="highlighter-rouge">sequence</code> as primitive type <code class="highlighter-rouge">character</code>. You can specify the values for these slots when you instantiate an object:</p>
+<p>Now, let’s see how we can do this in R. Key functions:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">setClass</code></li>
+  <li><code class="highlighter-rouge">new</code></li>
+</ul>
+
+<p>We declare S4 class using <code class="highlighter-rouge">setClass(...)</code> method and instantiate an object using <code class="highlighter-rouge">new(...)</code>. In R, the fields are referred to as <em>slots</em>. We will create slots <code class="highlighter-rouge">specie</code> and <code class="highlighter-rouge">sequence</code> as primitive type <code class="highlighter-rouge">character</code>. You can specify the values for these slots when you instantiate an object:</p>
 
 <div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">))</span><span class="w">
 </span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">)</span><span class="w">
-</span><span class="n">root</span><span class="w">
 </span></code></pre>
 </div>
 
-<p>Now, we need to add the slots to keep track of the children nodes. Unfortunately, it does not seem like we can do this using recursive definition:</p>
+<p>What about the children nodes? Unfortunately, S4 does not allow for recursive class definition:</p>
 
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">removeClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">)</span><span class="w"> </span><span class="c1"># first remove the class definition from your environment
-</span><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">left</span><span class="o">=</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">right</span><span class="o">=</span><span class="s2">"PhyloTreeNode"</span><span class="p">))</span><span class="w">
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="c1"># first remove the class definition from your environment
+</span><span class="n">removeClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">)</span><span class="w"> 
+</span><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> 
+                                  </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> 
+                                  </span><span class="n">left</span><span class="o">=</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> 
+                                  </span><span class="n">right</span><span class="o">=</span><span class="s2">"PhyloTreeNode"</span><span class="p">))</span><span class="w">
 </span><span class="c1">#Warning message:
 #undefined slot classes in definition of "PhyloTreeNode": left(class "PhyloTreeNode"), right(class "PhyloTreeNode") 
 </span><span class="w">
-</span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">)</span><span class="w">
+</span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">,</span><span class="w"> </span><span class="n">left</span><span class="o">=</span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">right</span><span class="o">=</span><span class="kc">NULL</span><span class="p">)</span><span class="w">
 </span><span class="c1">#Error in validObject(.Object) : 
 #  invalid class “PhyloTreeNode” object: 1: invalid object for slot "left" in class "PhyloTreeNode": got class "NULL", should be or extend class "PhyloTreeNode"
 # invalid class “PhyloTreeNode” object: 2: invalid object for slot "right" in class "PhyloTreeNode": got class "NULL", should be or extend class "PhyloTreeNode"
 </span></code></pre>
 </div>
 
-<p>We will adopt a simple work around: represent the children as a <code class="highlighter-rouge">list</code>:</p>
+<p>One work around is to store the children as a <code class="highlighter-rouge">list</code>:</p>
 
 <div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">children</span><span class="o">=</span><span class="s2">"list"</span><span class="p">))</span><span class="w">
 </span><span class="n">human</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">)</span><span class="w">
@@ -143,10 +165,16 @@
 </span></code></pre>
 </div>
 
-<p>Now, let’s create some additional nodes and build a simple tree with three nodes, root, and two children (leaf) nodes. We will first do it in a <strong>bad</strong> way:</p>
+<p>Now, let’s create some additional nodes and build a simple tree with three nodes, root, and two children (leaf) nodes. We will first do it in a <strong>bad</strong> way (anti-OOP way):</p>
 
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">neanderthal</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo neanderthalensis"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGGT"</span><span class="p">)</span><span class="w">
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="c1"># create an ancestor specie for human
 </span><span class="n">australopithecus</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"australopithecus"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"ACACGGGT"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># create human specie
+</span><span class="n">human</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># create a sibling specie for human
+</span><span class="n">neanderthal</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo neanderthalensis"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGGT"</span><span class="p">)</span><span class="w">
 
 </span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">human</span><span class="w">
 </span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">human</span><span class="w">
@@ -154,11 +182,21 @@
 </span></code></pre>
 </div>
 
-<p>This way of directly adding the children nodes works… but it breaks an important OOP principle: encapsulation.  However, it does not seem possible in R to fully implement encapsulation because unlike in Java, keywords such as private, public, protected, etc are not offered in R. So the fields cannot be hidden away from the users. There isn’t a perfect solution, but what we can do is to provide methods (functions) for adding children nodes. We will illustrate another important OOP principle, abstraction.</p>
+<p>This way of directly adding the children nodes works… but it breaks an important OOP principle: encapsulation.  However, it does not seem possible in R to fully implement encapsulation because unlike in Java, keywords such as private, public, protected, etc are not offered in R. So the fields cannot be hidden away from the users. There isn’t a perfect solution, but what we can do is to provide methods (functions) for adding children nodes and thereby, discourage the users from needing to access the fields directly.</p>
 
 <h1 id="defining-methods-for-classes">Defining methods for classes</h1>
 
-<p>The first thing we need to do is to declare the function name and reserve the name:</p>
+<p>R functions covered:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">setGeneric</code></li>
+  <li><code class="highlighter-rouge">standardGeneric</code></li>
+  <li><code class="highlighter-rouge">setMethod</code></li>
+  <li><code class="highlighter-rouge">signature</code></li>
+  <li><code class="highlighter-rouge">showMethods</code></li>
+</ul>
+
+<p>The first thing we need to do is to declare the function name:</p>
 
 <div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setGeneric</span><span class="p">(</span><span class="s2">"addChild"</span><span class="p">,</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">child</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="nf">standardGeneric</span><span class="p">(</span><span class="s2">"addChild"</span><span class="p">)</span><span class="w">
@@ -177,15 +215,14 @@
 </span></code></pre>
 </div>
 
-<p>Note that <code class="highlighter-rouge">showMethods("addChild")</code> displays signature of the methods that implement <code class="highlighter-rouge">addChild</code>. For example, if I were to define another class, <code class="highlighter-rouge">BogusClass</code> I can provide a definition of <code class="highlighter-rouge">addChild</code> for that class and <code class="highlighter-rouge">showMethods("addChild")</code> will show the signature for the <code class="highlighter-rouge">addChild</code> method defined for <code class="highlighter-rouge">BogusClass</code>:</p>
+<p>There are few things going on here:</p>
 
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"BogusClass"</span><span class="p">)</span><span class="w">
-</span><span class="n">setMethod</span><span class="p">(</span><span class="s2">"addChild"</span><span class="p">,</span><span class="w"> </span><span class="n">signature</span><span class="p">(</span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"BogusClass"</span><span class="p">),</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">child</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-  </span><span class="n">print</span><span class="p">(</span><span class="s2">"Bogus"</span><span class="p">)</span><span class="w">
-</span><span class="p">})</span><span class="w">
-</span><span class="n">showMethods</span><span class="p">(</span><span class="s2">"addChild"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+<ol>
+  <li><code class="highlighter-rouge">setGeneric</code> declares a generic method with the name <code class="highlighter-rouge">addChild</code> (in the global environment). It calls <code class="highlighter-rouge">standardGeneric</code>, which basically handles method dispatching. For example, if there are more than one implementation of <code class="highlighter-rouge">addChild</code>, which one is to be called.</li>
+  <li><code class="highlighter-rouge">setMethod</code> defines signature for the arguments as well as the function body.</li>
+  <li>Definition of <code class="highlighter-rouge">setMethod</code> returns the <code class="highlighter-rouge">node</code> object back. This is because R, unlike Java, does not pass objects by reference so copies are made at each function calls.</li>
+  <li><code class="highlighter-rouge">showMethods("addChild")</code> displays signature of all methods that implement <code class="highlighter-rouge">addChild</code>. This will be useful when we talk about inheritance and polymorphism as there will be multiple classes implementing the same method but with different signature and hence, offering different behaviors.</li>
+</ol>
 
 <p>Now, let’s add some nodes using <code class="highlighter-rouge">addChild(...)</code>:</p>
 
@@ -199,14 +236,14 @@
 
 <h3 id="why-are-encapsulation-and-abstraction-good-practice">Why are encapsulation and abstraction good practice?</h3>
 
-<p>Imagine if you have modified the children slot directly to add children nodes. Say you have 1 million lines of such code. Now, say you decided to declare children slot as a data frame. This means that you will have to modify all 1 million lines of your code. With abstraction and encapsulation, it hides the details of your class implementation away so as long as your method signature remains unchanged, the users can continue to use your function even if you change the underlying representation of the slots. Or, imagine if you wanted to enforce the strict condition that each node to contain at most two children. All you have to do is modify your <code class="highlighter-rouge">addChild</code> method:</p>
+<p>Imagine if you have modified the children slot directly to add children nodes. Say you have 1 million lines of such code. Now, say you decided to represent the children slot using another data structure – for example, data frame.  Now you are left with the task of modifying 1 million lines of code. With abstraction and encapsulation, it hides the details of your class implementation away so as long as your method signature remains unchanged, the users can continue to use your function even if you change the underlying representation of the slots. Another use case is, imagine if you wanted to enforce the strict condition that each node to contain at most two children. All you have to do is modify your <code class="highlighter-rouge">addChild</code> method as follows,</p>
 
 <div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setMethod</span><span class="p">(</span><span class="s2">"addChild"</span><span class="p">,</span><span class="w"> </span><span class="n">signature</span><span class="p">(</span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"PhyloTreeNode"</span><span class="p">),</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">child</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
 	</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">node</span><span class="o">@</span><span class="n">children</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
   		</span><span class="n">node</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="nf">length</span><span class="p">(</span><span class="n">node</span><span class="o">@</span><span class="n">children</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">child</span><span class="w">
   		</span><span class="n">node</span><span class="w">
 	</span><span class="p">}</span><span class="w">
-	</span><span class="n">print</span><span class="p">(</span><span class="s2">"Unable to add child node: this node already has 2 children."</span><span class="p">)</span><span class="w">
+	</span><span class="n">print</span><span class="p">(</span><span class="s2">"Unable to add child node: this node already has 2 children nodes."</span><span class="p">)</span><span class="w">
 	</span><span class="n">node</span><span class="w">
 </span><span class="p">})</span><span class="w">
 
@@ -216,11 +253,93 @@
 </span></code></pre>
 </div>
 
-<p>So it’s easier to maintain your code and less chance for bug to creep in. If something doesn’t work, you can debug your function to spot the bug rather than having to go over your script line by line.</p>
+<p>So it’s easier to maintain your code and less room for bugs to creep in.</p>
 
-<h1 id="other-features-of-s4">Other features of S4</h1>
+<h3 id="r-objects-are-not-references-to-memory-locations">R objects are not references to memory locations</h3>
 
-<p>Depending on your needs, you may want to provide default values for the slots:</p>
+<p>Suppose we run the following code:</p>
+
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">australopithecus</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"australopithecus"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"ACACGGGT"</span><span class="p">)</span><span class="w">
+</span><span class="n">human</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo sapiens"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGTT"</span><span class="p">)</span><span class="w">
+</span><span class="n">neanderthal</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"homo neanderthalensis"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AACCGGGT"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">human</span><span class="w">
+</span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="o">&lt;-</span><span class="n">human</span><span class="w">
+</span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="w">
+
+</span><span class="n">watson</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"ibm"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AAAAAAAA"</span><span class="p">)</span><span class="w">
+</span><span class="n">alphago</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">specie</span><span class="o">=</span><span class="s2">"deep mind"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"CCCCCCCC"</span><span class="p">)</span><span class="w">
+</span><span class="n">human</span><span class="o">&lt;-</span><span class="n">addChild</span><span class="p">(</span><span class="n">human</span><span class="p">,</span><span class="w"> </span><span class="n">watson</span><span class="p">)</span><span class="w">
+</span><span class="n">human</span><span class="o">&lt;-</span><span class="n">addChild</span><span class="p">(</span><span class="n">human</span><span class="p">,</span><span class="w"> </span><span class="n">alphago</span><span class="p">)</span><span class="w">
+
+</span><span class="n">australopithecus</span><span class="o">@</span><span class="n">children</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>Then, we get the following output:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[[1]]
+An object of class "PhyloTreeNode"
+Slot "specie":
+[1] "homo sapiens"
+
+Slot "sequence":
+[1] "AACCGGTT"
+
+Slot "children":
+list()
+
+
+[[2]]
+An object of class "PhyloTreeNode"
+Slot "specie":
+[1] "homo sapiens"
+
+Slot "sequence":
+[1] "AACCGGTT"
+
+Slot "children":
+list()
+</code></pre>
+</div>
+
+<p><strong>Problem</strong>: Because R is not storing the reference to the <code class="highlighter-rouge">human</code> object, when we added children to human, it is not reflected in the copy held by <code class="highlighter-rouge">australopithecus</code>. The conclusion is that we cannot be representing the tree object as we do in Java (or any other programming languages with the concept of pointers and references).</p>
+
+<p><strong>Solution</strong>: One possible solution is to represent the tree class so that it has access to all of the nodes in the tree. In fact, this is how <a href="https://cran.r-project.org/web/packages/phylobase/"><code class="highlighter-rouge">phylo4</code></a> works; the below is <code class="highlighter-rouge">phylo4-class.R</code> file containing the declaration of the <code class="highlighter-rouge">phylo4</code> class:</p>
+
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"phylo4"</span><span class="p">,</span><span class="w">
+         </span><span class="n">representation</span><span class="p">(</span><span class="n">edge</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"matrix"</span><span class="p">,</span><span class="w">
+                        </span><span class="n">edge.length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"numeric"</span><span class="p">,</span><span class="w">
+                        </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"character"</span><span class="p">,</span><span class="w">
+                        </span><span class="n">edge.label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"character"</span><span class="p">,</span><span class="w">
+                        </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"character"</span><span class="p">,</span><span class="w">
+                        </span><span class="n">annote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"list"</span><span class="p">),</span><span class="w">
+         </span><span class="n">prototype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="w">
+                        </span><span class="n">edge</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">matrix</span><span class="p">(</span><span class="n">nrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">ncol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
+                            </span><span class="n">dimname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"ancestor"</span><span class="p">,</span><span class="w"> </span><span class="s2">"descendant"</span><span class="p">))),</span><span class="w">
+                        </span><span class="n">edge.length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numeric</span><span class="p">(</span><span class="m">0</span><span class="p">),</span><span class="w">
+                        </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">character</span><span class="p">(</span><span class="m">0</span><span class="p">),</span><span class="w">
+                        </span><span class="n">edge.label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">character</span><span class="p">(</span><span class="m">0</span><span class="p">),</span><span class="w">
+                        </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
+                        </span><span class="n">annote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">()</span><span class="w">
+                       </span><span class="p">),</span><span class="w">
+         </span><span class="n">validity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checkPhylo4</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>The edges of the tree are represented using matrix with two columns (one for ancestor and one for descendant) (for more details on each of these fields, see page 14 of this <a href="https://cran.r-project.org/web/packages/phylobase/vignettes/phylobase.pdf">document</a>).</p>
+
+<p>I plan to play around a bit with <code class="highlighter-rouge">phylo4</code> package. In the next post, I will post some code on how to use this package and illustrate the internal workings of this package in the hope that we can fully explore the features of S4 (including inheritance and polymorphism).</p>
+
+<h1 id="exercise-writing-a-generic-sequential-monte-carlo-sampler-with-oop">Exercise: Writing a generic sequential Monte Carlo sampler with OOP</h1>
+
+<p>Suppose we want to write a generic SMC algorithm, that can work on any state space. How can OOP be of use in this case?</p>
+
+<p>My solution to this exercise to come in the next series of posts :)</p>
+
+<h1 id="extra-other-features-of-s4">Extra: Other features of S4</h1>
+
+<p>Depending on your needs, you may want to provide default values for the slots by setting the <code class="highlighter-rouge">prototype</code> field of the <code class="highlighter-rouge">setClass</code> function as follows,</p>
 
 <div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">),</span><span class="w"> </span><span class="n">prototype</span><span class="o">=</span><span class="nf">list</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"test_specie"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"ACGT"</span><span class="p">))</span><span class="w">
 </span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">)</span><span class="w">
@@ -228,15 +347,46 @@
 </span></code></pre>
 </div>
 
-<p>Validation using <code class="highlighter-rouge">validity</code>.</p>
+<p>If upon instantiation, you want to validate that the object is constructed properly, you can define a function and specify the function in the <code class="highlighter-rouge">validity</code> field. For example, suppose we want to ensure that the specie name is always provided:</p>
 
-<p>Using <a href="http://stackoverflow.com/questions/7466388/how-to-set-default-value-of-a-slot-as-null-in-r"><code class="highlighter-rouge">setClassUnion</code></a>?</p>
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">validate_phylo_node</span><span class="o">&lt;-</span><span class="k">function</span><span class="p">(</span><span class="n">object</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">object</span><span class="o">@</span><span class="n">specie</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w">
+        </span><span class="nf">return</span><span class="p">(</span><span class="s2">"Specify specie name."</span><span class="p">)</span><span class="w">
+    </span><span class="kc">TRUE</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<h1 id="exercise-metropolis-hastings-with-oop">Exercise: Metropolis-Hastings with OOP</h1>
+</span><span class="n">setClass</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> 
+         </span><span class="n">slots</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="n">specie</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> 
+         </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span><span class="w"> </span><span class="n">children</span><span class="o">=</span><span class="s2">"list"</span><span class="p">),</span><span class="w"> 
+         </span><span class="n">validity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">validate_phylo_node</span><span class="p">)</span><span class="w">
 
-<p>Now, let’s do some statistics. Suppose we want to write a generic Metropolis-Hastings algorithm that can work on any state space. How can OOP be of use in this case? We will illustrate inheritance and polymorphism as we implement generic MH algorithm in R.</p>
+</span><span class="n">root</span><span class="o">&lt;-</span><span class="n">new</span><span class="p">(</span><span class="s2">"PhyloTreeNode"</span><span class="p">,</span><span class="w"> </span><span class="n">sequence</span><span class="o">=</span><span class="s2">"AAAAA"</span><span class="p">)</span><span class="w">
+</span><span class="c1"># Error in validObject(.Object) : 
+#  invalid class “PhyloTreeNode” object: Specify specie name. 
+</span></code></pre>
+</div>
 
-<p><strong>The solution to come in the next post :)</strong></p>
+<p>One interesting note: instantiating the object without any argument, for example, <code class="highlighter-rouge">new("PhyloTreeNode")</code> does not fire up the validation function. This may be related to the concept of virtual class (virtual class as in C++) in the sense that when we instantiate an object without any of the slots specified, it seems to be instantiating from a virtual class of the same name. But I am not 100% sure on this, so I will have to look into this a bit more.</p>
+
+<h1 id="some-useful-references">Some useful references</h1>
+
+<ul>
+  <li><a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html#Mechanics-of-S4-dispatch">R Internals: Mechanics of S4 dispatch</a></li>
+  <li>R manuals on S4:
+    <ul>
+      <li><a href="https://stat.ethz.ch/R-manual/R-devel/library/methods/html/Introduction.html">Intro</a></li>
+      <li><a href="https://stat.ethz.ch/R-manual/R-devel/library/methods/html/Methods_Details.html">Methods details</a></li>
+    </ul>
+  </li>
+  <li>Hadley Wickham’s book: Advanced R:
+    <ul>
+      <li><a href="http://adv-r.had.co.nz/S4.html">S4</a></li>
+      <li><a href="http://adv-r.had.co.nz/memory.html">Memory</a></li>
+    </ul>
+  </li>
+  <li><a href="http://stackoverflow.com/questions/7466388/how-to-set-default-value-of-a-slot-as-null-in-r"><code class="highlighter-rouge">setClassUnion</code></a>?</li>
+</ul>
 
   </article>
 
