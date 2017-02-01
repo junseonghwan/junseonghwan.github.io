@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SMC for combinatorial spaces</title>
+  <meta name="description" content="In this post, I will describe one way to build an SMC sampler for combinatorial spaces. I will consider the problem of sampling phylogenetics tree as the app...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="junseonghwan.github.io/2017/01/03/smc-for-combinatorial-spaces.html">
+  <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
+
+  
+
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!--
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>-->
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Seong-Hwan Jun</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+          <a class="page-link" href="/code/">Code</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/research/">Research</a>
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">SMC for combinatorial spaces</h1>
+    <p class="post-meta">Jan 3, 2017</p>
+  </header>
+
+  <article class="post-content">
+    <p>In this post, I will describe one way to build an SMC sampler for combinatorial spaces. I will consider the problem of sampling phylogenetics tree as the application.</p>
+
+<h1 id="smc-for-phylogenetics-tree">SMC for Phylogenetics tree</h1>
+
+<p>You are given DNA sequences for <script type="math/tex">N</script> species at the leaves, <script type="math/tex">x_1, ..., x_N</script> and you are to sample the most likely tree <script type="math/tex">t \in \mathcal{T}</script>, given these observations:</p>
+
+<p>\begin{equation}
+t \sim p(\cdot | x_1, …, x_N).
+\end{equation}</p>
+
+<p>We will sample from this conditional distribution using SMC by building the tree in a bottom-up fashion. Randomly sampling a pair of subtrees to merge at each iteration of SMC. Upon termination, we get population of phylogenetics trees. The details are non-trivial and will not be covered in this post; for example, computing the weight of each of the particles involve marginalzation over the DNA sequence for the unobserved ancestor specie (this uses an algorithm referred to as the <a href="https://en.wikipedia.org/wiki/Felsenstein's_tree-pruning_algorithm">tree pruning algorithm</a>, a form of sum-product algorithm).</p>
+
+<p>To formalize the notion, this SMC sampler is operating on the space of forest, <script type="math/tex">\mathcal{F}</script>. A forest can be understood as a collection of trees. The starting state for SMC is a forest with <script type="math/tex">N</script> disconnected trees. At each iteration, we merge a pair so the number of trees in the forest decreases by 1. This means that SMC runs for <script type="math/tex">N-1</script> iterations, at which point there will be exactly one tree left. To summarize, we built a larger state space for SMC and designed the proposal so that we arrive at the target state at the last iteration of SMC.</p>
+
+<h1 id="overcounting-problem">Overcounting problem</h1>
+
+<p>It turns out that this sampler will lead to bias estimate of the posterior distribution because some trees are overcounted. To see this, consider a tree with 4 leaf nodes, {A, B, C, D}. A balanced tree, {{A, B}, {C, D}} can be proposed in two ways:</p>
+
+<ol>
+  <li>in iteration 1, A, B are merged, in iteration 2, C, D are merged, or</li>
+  <li>in iteration 1, C, D are merged, in iteration 2, A, B are merged.</li>
+</ol>
+
+<p>On the contrary, unbalanced tree {A, {B, {C, D}}} can be proposed in exactly one way:</p>
+
+<ol>
+  <li>in iteartion 1, C,D are merged, in iteration 2, B and {C, D} are merged, in iteration 3, A and {B, {C, D}} are merged.</li>
+</ol>
+
+<p>Suppose for the moment that there is no data (no DNA sequences) so running the above SMC sampler basically samples a tree from the uniform distribution. However, the paths are overcounted and the particle population does not approximate the uniform distribution over the tree topology at all. I will post the code that illustrates this problem in the next few posts (probably write few blog posts documenting how to code SMC sampler for phylogenetics tree in R).</p>
+
+<p>This overcounting problem is an issue to be mindful of whenever using SMC for  combinatorial objects; for example, trees, graph matching, among others.</p>
+
+<h1 id="poset-smc">Poset SMC</h1>
+
+<!--Note that the proposal distribution implicity defines a partial order on the space of forest. For example, the random proposal above induces a partial order where for a state $$s \in \mathcal{S}$$ (let's represent a forest using $$\mathcal{S}$$ rather than $$\mathcal{F}$$ as we will slowly move away from forest and focus more on general combinatorial state space), the random proposal decreases the number of trees in the forest by 1. Starting from a forest with all of the species in a disconnected form, and applying the proposal $$N-1$$ times will lead to a forest with exactly one tree. It helps to label the state space with a subscript, $$\mathcal{S}_r$$ for $$r = 1, ..., N-1$$ where $$\mathcal{S}_r$$ is the space of forest that contains $$N-r$$ trees. The state space $$\mathcal{S} = \bigcup_{r=1}^{N-1} \mathcal{S}_r$$ Note that $$\mathcal{S}_{N-1} = \mathcal{T}$$, our desired target state.-->
+
+<p>The interesting observation is that this random proposal induces a partial order on the space of forests. Given any two states <script type="math/tex">s, s' \in \mathcal{F}</script>, we say that <script type="math/tex">s \prec s'</script> if and only if <script type="math/tex">s'</script> covers <script type="math/tex">s</script>. What is meant by <em>cover</em> is that if one application of proposal on <script type="math/tex">s</script> produces <script type="math/tex">s'</script>, then <script type="math/tex">s'</script> covers <script type="math/tex">s</script>. The state space, combined with the partial order yields the poset, <script type="math/tex">(\mathcal{S}, \prec)</script>. <!--This notion is formalized by assumption 1 in the [Poset SMC](http://sysbio.oxfordjournals.org/content/61/4/579.full.pdf) paper. --> The partial order can be represented by a corresponding <a href="https://en.wikipedia.org/wiki/Hasse_diagram">Hasse diagram</a>.</p>
+
+<p><a href="http://sysbio.oxfordjournals.org/content/61/4/579.full.pdf">Poset SMC</a> proposes one solution for the overcounting problem. One of the main conditions is that the Hasse diagram is a) connected and b) acyclic (this corresponds to assumption 2 in the Poset SMC paper). The connected Hasse diagram ensures that all states are reachable starting from the initial state and the acyclic part is the condition that is needed to avoid the overcounting problem. For example, the prior-prior proposal (see this <a href="https://papers.nips.cc/paper/3266-bayesian-agglomerative-clustering-with-coalescents">paper</a> for details) satisfies assumption 2 b) as the height of the forest is incremented according to the coalescent model (height of the forest is the height of the tallest tree in the forest). For phylogenetics example, this concept of increment in height is natural because of the branch lengths.  But what if we were just interested in sampling a tree topology and there is no natural concept of height or equivalent?</p>
+
+<h1 id="combinatorial-smc">Combinatorial SMC</h1>
+
+<p><a href="http://amstat.tandfonline.com/doi/abs/10.1080/01621459.2015.1054487">Combinatorial SMC</a> relaxes the acyclic assumption on the Hasse diagram. It accounts for the overcounting problem by incorporating a backward proposal with only a very weak condition. For all <script type="math/tex">s, s' \in \mathcal{S}, \nu^+_s(s') = 0 \Rightarrow \nu^-_{s'}(s) = 0</script>. Note that $\nu^+$ is the forward proposal (or just proposal as we have been referring up to this point) and $\nu^-$ is the backward proposal (see <a href="https://www.jstor.org/stable/3879283?seq=1#page_scan_tab_contents">SMC samplers</a> for more details on this concept of backward proposal). One such backward proposal that satisfies this assumption is:</p>
+
+<p>\begin{equation}
+    \nu^-_{s’}(s) = |\mathcal{Q}(s’)|^{-1} \times 1[\nu^+_s(s’) &gt; 0],
+\end{equation}</p>
+
+<p>where <script type="math/tex">\mathcal{Q}(s')</script> is equal to the number of possible parent states of <script type="math/tex">s'</script>. In essence, it amounts to counting the number of possible parent states to address the overcounting problem. To weight of each particle is computed as:</p>
+
+<p>\begin{equation}
+    w(s \to s’) = \frac{\gamma(s’) \nu^-_{s’}(s)}{\gamma(s) \nu^+{s}(s’)},
+\end{equation}</p>
+
+<p>For the binary tree topology, the number of possible parents is equal to the number of non-trivial trees in the forest. For example, if <script type="math/tex">s = \{\{A, B\}, \{C, D\}\}</script>, then the number of possible parents is equal to 2.</p>
+
+<h1 id="summary">Summary</h1>
+
+<ul>
+  <li>Enlarge the state space so that your desired target state is contained within this enlarged state. For example, <script type="math/tex">\mathcal{T} \subset \mathcal{F}</script> for phylogenetics example.</li>
+  <li>Design the forward proposal to be connected so that all states are reachable.</li>
+  <li>Design the forward proposal so that computation of the backward proposal is easy (or at least with a reasonable runtime).</li>
+  <li>Implement the weight update and run the SMC.</li>
+</ul>
+
+<!--**TODO**: Briefly go over the proof of consistency?-->
+
+<p><strong>Plan for next posts</strong>:</p>
+
+<ol>
+  <li>Post the code for sampling a phylogenetics tree from uniform distribution. Illustrate the overcounting problem and also illustrate how the backward proposal solves this problem.</li>
+  <li>Sequential graph matching using SMC and the type of proposal and overcounting problems that can arise for graph matching next post.</li>
+</ol>
+
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+<!--    <h2 class="footer-heading">Seong-Hwan Jun</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-3">
+        <ul class="contact-list">
+          <li>Address:</li>
+          <li>Seong-Hwan Jun</li>
+          <li>Department of Statistics,</li> 
+          <li>University of British Columbia,</li>
+          <li>3182 Earth Sciences Building,</li>
+          <li>2207 Main Mall,</li>
+          <li>Vancouver, BC, Canada V6T 1Z4</li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          <li>Email: seong dot jun AT stat dot ubc dot ca</li>
+
+          
+          <li>
+            <a href="https://github.com/junseonghwan">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">junseonghwan</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+<!--
+      <div class="footer-col  footer-col-3">
+        <p class="text"></p>
+      </div>
+    </div>
+-->
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
