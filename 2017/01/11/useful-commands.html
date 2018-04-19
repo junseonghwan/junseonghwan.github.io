@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Seong-Hwan Jun</title>
-  <meta name="description" content="">
+  <title>Useful commands</title>
+  <meta name="description" content="Git/Github">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="junseonghwan.github.io/">
+  <link rel="canonical" href="junseonghwan.github.io/2017/01/11/useful-commands.html">
   <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
 
   
@@ -69,31 +69,53 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
+        <div class="post">
 
-  <h1 class="page-heading">Welcome to Seong-Hwan's website.</h1>
+  <header class="post-header">
+    <h1 class="post-title">Useful commands</h1>
+    <p class="post-meta">Jan 11, 2017</p>
+  </header>
 
-<!--  <h1 class="page-heading">Posts</h1>-->
+  <article class="post-content">
+    <h1 id="gitgithub">Git/Github</h1>
 
-  <ul class="post-list">
-    
-      <li>
-        <span class="post-meta">Oct 24, 2017</span>
+<h3 id="create-github-repo-from-command-line">Create github repo from command line:</h3>
 
-        <h2>
-          <a class="post-link" href="/2017/10/24/genetics-notes.html">Genetics Notes</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jan 11, 2017</span>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>curl -u <span class="s1">'username'</span> https://api.github.com/user/repos -d <span class="s1">'{"name":"repo-name"}'</span>
+</code></pre>
+</div>
 
-        <h2>
-          <a class="post-link" href="/2017/01/11/useful-commands.html">Useful commands</a>
-        </h2>
-      </li>
-    
-  </ul>
+<p>This will prompt for password. Replace <code class="highlighter-rouge">username</code> and <code class="highlighter-rouge">reponame</code>.</p>
+
+<h1 id="r">R</h1>
+
+<h2 id="plotting">Plotting</h2>
+
+<p>To create a plot with white backgroud:</p>
+
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ggplot</span><span class="p">()</span><span class="w">
+</span><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">theme_bw</span><span class="p">()</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>To create a without legend:</p>
+
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>To add a error bar when given a standard error in the dataframe (say Normality is assumed):</p>
+
+<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">limits</span><span class="o">&lt;-</span><span class="n">aes</span><span class="p">(</span><span class="n">ymin</span><span class="o">=</span><span class="n">xbar</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1.96</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">se</span><span class="p">,</span><span class="w"> </span><span class="n">ymax</span><span class="o">=</span><span class="w"> </span><span class="n">xbar</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1.96</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">se</span><span class="p">)</span><span class="w">
+</span><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">geom_errorbar</span><span class="p">(</span><span class="n">limits</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="o">=</span><span class="m">.2</span><span class="p">,</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="n">position_dodge</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="m">.9</span><span class="p">))</span><span class="w">
+</span></code></pre>
+</div>
+
+<h2 id="sublime">Sublime</h2>
+
+<p>To surround citation by square brackets (in the current file), press command-option-f and search for \cite{[a-z,A-Z,0-9]*} and replace by [$0].</p>
+
+  </article>
 
 </div>
 
