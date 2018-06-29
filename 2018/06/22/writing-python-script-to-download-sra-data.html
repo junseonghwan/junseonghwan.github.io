@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to download large number of single cell data</title>
+  <meta name="description" content="Many researchers submit the genomics data to sequence read archive (SRA). When the study involves sequencing of many single cells, downloading all of the fil...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="junseonghwan.github.io/2018/06/22/writing-python-script-to-download-sra-data.html">
+  <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
+
+  
+
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!--
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>-->
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Seong-Hwan Jun</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+          <a class="page-link" href="/code/">Code</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/research/">Research</a>
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">How to download large number of single cell data</h1>
+    <p class="post-meta">Jun 22, 2018</p>
+  </header>
+
+  <article class="post-content">
+    <p>Many researchers submit the genomics data to sequence read archive (SRA). When the study involves sequencing of many single cells, downloading all of the files manually may be troublesome to do.</p>
+
+<p>In this post, I will describe how to write a simple Python script to download a large number of files from <a href="https://www.ebi.ac.uk/ena">European Nucleotide Archive</a>.</p>
+
+<h2 id="searching-for-the-data">Searching for the data</h2>
+
+<p>First, we need to search for the dataset using the accession number. I am interested in the dataset used by this <a href="https://www.cell.com/cell/fulltext/S0092-8674(18)30365-9">paper</a>; the accession number for the dataset is SRP114962.</p>
+
+<p>Searching for the accession number at the <a href="https://www.ebi.ac.uk/ena">ENA website</a> leads to the following screen:</p>
+
+<p><img src="/images/ena_search_result.png" alt="ena-search-result" />
+<strong><em>Figure 1</em></strong></p>
+
+<p>Click on the study, which will bring us to the page showing all of the files associated with the study:</p>
+
+<p><img src="/images/ena_data_view.png" alt="ena_data_view" />
+<strong><em>Figure 2</em></strong></p>
+
+<p>First, we will click on <code class="highlighter-rouge">Select columns</code> link (marked 1 in the above image) and enable the check box for <code class="highlighter-rouge">Library name</code> and <code class="highlighter-rouge">Fastq bytes</code>:</p>
+
+<p><img src="/images/ena_data_columns.png" alt="ena_data_columns" />
+<strong><em>Figure 3</em></strong></p>
+
+<p>Then, click on <code class="highlighter-rouge">TEXT</code> (marked 2 in Figure 2), which will prompt for download. Download the file, name it as `table.txt’.</p>
+
+<p>Open the downloaded file. It contains information associated with each file in the study. For example, FTP location for the file is under <code class="highlighter-rouge">FASTQ files (FTP)</code> column . The column <code class="highlighter-rouge">Library name</code> contains useful information for identifying the sample. For example, <code class="highlighter-rouge">KTN102Blood</code> identifies patient ID 102 and that the file corresponds to the <code class="highlighter-rouge">Blood</code> sample. The identifier used varies from dataset to dataset and the details are usually available in the paper or its supplement.</p>
+
+<p>Note that you may unselect some of the other columns if they are unnecessary for you. In this post, only the <code class="highlighter-rouge">Library name</code>, <code class="highlighter-rouge">FASTQ files (FTP)</code>, and <code class="highlighter-rouge">Fastq bytes</code> columns are required. For other dataset, you may need to select additional columns to help identify the files that you want to download.</p>
+
+<h2 id="downloading-the-data">Downloading the data</h2>
+
+<p>Most genomics data are large in size and hence, downloading all of the files in serial can take some time. Furthermore, processing of such genomics data usually takes place on a compute grid equipped with large amounts of memory and CPU cores. I will assume that the files are to be downloaded to a compute grid so that these files can be processed at a later time. Specifically, I will describe how to write a simple download script to be submitted to a grid sytem that uses job scheduler <a href="https://slurm.schedmd.com/">SLURM</a>, as is the case with <a href="http://www.uppmax.uu.se/support/user-guides/slurm-user-guide/">UPPMAX</a>.</p>
+
+<h1 id="step-1-explore-the-master-file">Step 1: Explore the master file</h1>
+
+<p>First, we need to write code to explore the master file to determine which files need to be downloaded. I have written this code using Jupyter Notebook and it is provided in a separate <a href="/2018/06/24/explore-master-file-downloaded-from-european-nucleotide-archive.html">post</a>.</p>
+
+<h1 id="step-2-preparing-a-slurm-script">Step 2: Preparing a SLURM script</h1>
+
+<p>There are two ways to submit a job. The first approach is to submit the command that you wish to execute directly using <code class="highlighter-rouge">--wrap</code> flag. For example:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>sbatch -A project_id -p core -n 1 -t 1:00:00 -J download_ena -o log.out -e log.err --wrap <span class="s2">"wget ftp_loc -O dest_file"</span>
+</code></pre>
+</div>
+
+<p>However, I think it may be better to write a separate script in case additional work is to be carried out on the downloaded file, for example, <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> for quality checking. The simplest possible script for our purpose is as follows:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash -l</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span>date<span class="k">)</span><span class="s2"> Running on: </span><span class="k">$(</span>hostname<span class="k">)</span><span class="s2">"</span>
+wget <span class="nv">$1</span> -O <span class="nv">$2</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span>date<span class="k">)</span><span class="s2"> File download complete."</span>
+</code></pre>
+</div>
+
+<p>We will pass in the source file location and destination as arguments to this script, which will be generated from Python.</p>
+
+<h1 id="step-3-writing-python-script-to-generate-job-submission-commands">Step 3: Writing Python script to generate job submission commands</h1>
+
+<p>We will write a script to read in the information in <code class="highlighter-rouge">table.txt</code> and generate job submission commands for SLURM. First, we will import the necessary libraries.</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+</code></pre>
+</div>
+
+<p>We will require the destination directory, location of the master file, patient ID to be downloaded, SLURM project ID to be provided as command line arguments. Additionally, we can require additional information such as job name, number of hours required for the job, and whether to launch the job or generate string commands for debug purposes. We will use <code class="highlighter-rouge">argparse</code> library to simplify processing of the command line arguments:</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">'Process file destination.'</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'dest'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Specify the destination directory."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'master_file'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Specify the master file downloaded from ENA."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'patient_id'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Specify the patient ID. E.g. KTN102."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'project_id'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Project ID."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--debug'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Enter yes/no. If no is provided, it will only print the command"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--time'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Number of hours per job."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"4:00:00"</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--job_name'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Job name."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"wget_sc"</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>We will now load the master file using <code class="highlighter-rouge">pandas</code>, and extract out only the records corresponding to the patient ID:</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># read in the master file and extract the files that we want</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">master_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
+<span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+
+<span class="c"># extract records corresponding to the specified patient</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">]</span>
+</code></pre>
+</div>
+
+<p>Let’s create new directories for better organization:</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># make a directory if it does not exist alrady</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
+
+<span class="c"># make a directory for patient_id if it does not exist already</span>
+<span class="n">download_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">download_dest</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">download_dest</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">download_dest</span><span class="p">)</span>
+
+<span class="c"># generate a directory to hold just the scRNA data files to be downloaded</span>
+<span class="n">rna_download_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_dest</span><span class="p">,</span> <span class="s">"scRNA"</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">)</span>
+
+<span class="c"># generate the log files for each download job</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">,</span> <span class="s">"logs"</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">logs</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Finally, generate the SLURM commands and submit the job (unless we are in a debug mode):</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># code to download all RNA data files</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">fastq_ftp_loc</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'fastq_ftp'</span><span class="p">]</span>
+    <span class="n">locs</span> <span class="o">=</span> <span class="n">fastq_ftp_loc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">";"</span><span class="p">)</span>
+    <span class="n">library_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># scRNA data are in one fastq.gz file</span>
+        <span class="n">accession_number</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">"run_accession"</span><span class="p">]</span>
+
+        <span class="c"># retrieve the file name and form the destination path</span>
+        <span class="n">loc_split</span> <span class="o">=</span> <span class="n">locs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> 
+        <span class="n">dest_file_name</span> <span class="o">=</span> <span class="n">loc_split</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">loc_split</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>        
+        <span class="n">final_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">,</span> <span class="n">dest_file_name</span><span class="p">)</span>
+
+        <span class="n">command</span> <span class="o">=</span> <span class="s">"sbatch -A </span><span class="si">%</span><span class="s">s -p core -n 1 -t </span><span class="si">%</span><span class="s">s -J </span><span class="si">%</span><span class="s">s -o </span><span class="si">%</span><span class="s">s/</span><span class="si">%</span><span class="s">s.out -e </span><span class="si">%</span><span class="s">s/</span><span class="si">%</span><span class="s">s.err worker.sbatch </span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">job_name</span><span class="p">,</span> <span class="n">logs</span><span class="p">,</span> <span class="n">accession_number</span><span class="p">,</span> <span class="n">logs</span><span class="p">,</span> <span class="n">accession_number</span><span class="p">,</span> <span class="n">locs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">final_dest</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span> <span class="o">==</span> <span class="s">"no"</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># submit the job</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">command</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>To explain, we noted in this <a href="/2018/06/24/explore-master-file-downloaded-from-european-nucleotide-archive.html">post</a> that scRNA files are stored as a single file whereas scDNA and bulk DNA files are organized into 3 files. Therefore, if a record is associated with only one file, we download the file. Note that this approach requires carefully checking over the submission file patterns in advance and the code will have to be changed for different dataset.</p>
+
+<p>The entire Python code is available <a href="/code/download_ena.py">here</a> and the SLURM script is available <a href="/code/worker.sbatch">here</a>.</p>
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+<!--    <h2 class="footer-heading">Seong-Hwan Jun</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-3">
+        <ul class="contact-list">
+          <li>Address:</li>
+          <li>Seong-Hwan Jun</li>
+          <li>Tomtebodavägen 23a</li> 
+          <li>171 65 Solna Sweden</li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          <li>Email: shjun AT kth dot se</li>
+
+          
+          <li>
+            <a href="https://github.com/junseonghwan">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">junseonghwan</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+<!--
+      <div class="footer-col  footer-col-3">
+        <p class="text"></p>
+      </div>
+    </div>
+-->
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
