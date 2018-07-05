@@ -187,11 +187,6 @@
 <p><strong>Question: why do we need to sort BAM?</strong></p>
 <ul>
   <li>Basically for faster processing down the stream. See this <a href="https://wikis.univ-lille1.fr/bilille/_media/formation_variants_reads_2017.pdf">slide</a>.</li>
-  <li>Can create index file using <code class="highlighter-rouge">samtools index sorted.bam sorted.bai</code>, this will produce an output <code class="highlighter-rouge">sorted.bai</code>.
-    <ul>
-      <li>Creating index can be performed later as we will be performing few more operations on the <code class="highlighter-rouge">sorted.bam</code>.</li>
-    </ul>
-  </li>
 </ul>
 
 <p>Some people suggest that writing raw BAM file is also a waste of space (and waste of disk I/O) so, only the sorted file should be stored in the disk. But then, some point out that piping too many commands can also create a bottleneck.</p>
@@ -229,7 +224,7 @@
 java <span class="nt">-Xmx5g</span> <span class="nt">-jar</span> <span class="k">${</span><span class="nv">PICARD</span><span class="k">}</span>/picard.jar <span class="se">\</span>
 MarkDuplicates <span class="nv">VALIDATION_STRINGENCY</span><span class="o">=</span>LENIENT <span class="se">\</span>
 <span class="nv">INPUT</span><span class="o">=</span>sorted.bam <span class="se">\</span>
-<span class="nv">OUTPUT</span><span class="o">=</span>dup_marked.bam <span class="se">\</span>
+<span class="nv">OUTPUT</span><span class="o">=</span>marked.bam.bam <span class="se">\</span>
 <span class="nv">METRICS_FILE</span><span class="o">=</span>duplicate_metric.txt 1&gt;&amp;2 2&gt; log_fix_mark.txt
 </code></pre></div></div>
 
@@ -252,6 +247,31 @@ MarkDuplicates <span class="nv">VALIDATION_STRINGENCY</span><span class="o">=</s
 <p>Note that Java is given 5GB to work with, noting that one core of Rackham comes with 6.4GB, we do not need to request for additional memory resources.</p>
 
 <p>It took about 1.5 hr to complete this task on Rackham, on the sorted BAM file.</p>
+
+<h2 id="adding-read-group">Adding read group</h2>
+<p>This step is needed because GATK does not allow BAM files that do not have read groups added. The command is as follows:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-Xmx5g</span> <span class="nt">-jar</span> <span class="k">${</span><span class="nv">PICARD</span><span class="k">}</span>/picard.jar <span class="se">\</span>
+AddOrReplaceReadGroups <span class="se">\</span>
+<span class="nv">INPUT</span><span class="o">=</span>marked.bam <span class="se">\</span>
+<span class="nv">OUTPUT</span><span class="o">=</span>fixed.bam <span class="se">\</span>
+<span class="nv">CREATE_INDEX</span><span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+<span class="nv">RGID</span><span class="o">=</span><span class="nv">$1</span> <span class="se">\</span>
+<span class="nv">RGSM</span><span class="o">=</span><span class="nv">$2</span> <span class="se">\</span>
+<span class="nv">RGLB</span><span class="o">=</span><span class="nv">$3</span> <span class="se">\</span>
+<span class="nv">RGPL</span><span class="o">=</span>ILLUMINA <span class="se">\</span>
+<span class="nv">RGPU</span><span class="o">=</span><span class="s2">"NA"</span> 1&gt;&amp;2 2&gt; log_fix_addreplace.txt
+</code></pre></div></div>
+<ul>
+  <li><code class="highlighter-rouge">CREATE_INDEX</code>: create index file while adding the read group.</li>
+  <li><code class="highlighter-rouge">RGID</code>: Read group ID. The default value is 1, and it is recommended to change this to something other than the default value. For example, 2 or if the data is triple negative breast cancer, TNBC or could be a patient ID if there are multiple patients.</li>
+  <li><code class="highlighter-rouge">RGSM</code>: Read group sample name. This can be patient ID and/or information on the sample like blood or stomach if such is available.</li>
+  <li><code class="highlighter-rouge">RGLB</code>: Read group library (library preparation method?). When unknown just fill in some default value like “NA”.</li>
+  <li><code class="highlighter-rouge">RGPL</code>: Read group (sequencing) platform. In my case, we are using ILLUMINA.</li>
+  <li><code class="highlighter-rouge">RGPU</code>: Read group platform unit. It is a required filled but I’m not sure what this is supposed to be referring to so, filled in NA.</li>
+</ul>
+
+<h3 id="creating-index-file">Creating index file</h3>
+<p>Note that alternatively, we can create index file using <code class="highlighter-rouge">samtools index marked.bam marked.bai</code>, this will produce an output <code class="highlighter-rouge">marked.bai</code> (in the order of few MBs for 8GB BAM file).</p>
 
 <h2 id="realignment">Realignment</h2>
 <p>First, some notes:</p>
@@ -276,7 +296,7 @@ MarkDuplicates <span class="nv">VALIDATION_STRINGENCY</span><span class="o">=</s
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-Xmx4g</span> <span class="nt">-Djava</span>.io.tmpdir<span class="o">=</span>/path/to/tmpdir <span class="se">\</span>
   <span class="nt">-jar</span> /path/to/GenomeAnalysisTK.jar <span class="se">\</span>
-  <span class="nt">-I</span> dup_marked.bam <span class="se">\</span>
+  <span class="nt">-I</span> fixed.bam <span class="se">\</span>
   <span class="nt">-R</span> &lt;ref.fasta&gt; <span class="se">\</span>
   <span class="nt">-T</span> IndelRealigner <span class="se">\</span>
   <span class="nt">-targetIntervals</span> /path/to/output.intervals <span class="se">\</span>
@@ -284,11 +304,11 @@ MarkDuplicates <span class="nv">VALIDATION_STRINGENCY</span><span class="o">=</s
   <span class="nt">-known</span> /path/to/indel_calls.vcf
 </code></pre></div></div>
 
-<h2 id="creating-index-file">Creating index file</h2>
-<p>We can create the index file at this point. This can be done using <code class="highlighter-rouge">samtools</code>:</p>
+<p><strong>Important</strong> If you don’t add the read groups, you will likely get the following error:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>samtools index realigned.bam  realigned.bam.bai
-</code></pre></div></div>
+<blockquote>
+  <p>Error details: SAM file doesn’t have any read groups defined in the header.  The GATK no longer supports SAM files without read groups.</p>
+</blockquote>
 
 <h2 id="additional-steps-for-cleaning">Additional steps for cleaning</h2>
 <p>These seemed less important to me, so I skipped them. But for a careful and accurate analysis, perhaps these steps should not be skipped:</p>
@@ -299,19 +319,20 @@ MarkDuplicates <span class="nv">VALIDATION_STRINGENCY</span><span class="o">=</s
     </ul>
   </li>
   <li>Additional filtering to remove low quality reads, unmapped reads, and marked duplicates</li>
-  <li>Adding read group
-    <ul>
-      <li>Provides identifiers and etc. Not sure how useful these are. It seems like they are used in variant calling?</li>
-    </ul>
-  </li>
   <li>Base quality score recalibration
     <ul>
-      <li>Uses knowledge regarding biases of sequencing platform to correct the quality scores.</li>
+      <li>Uses studies on biases of sequencing platform to correct the quality scores. Certain platforms are known to produce more G’s vs A’s for example.</li>
     </ul>
   </li>
 </ul>
 
 <p>At this point, the realigned BAM file is more or less ready for analysis such as variant calling. And perhaps even copy number analysis. These next steps will be described in the future posts.</p>
+
+<h2 id="useful-resources">Useful resources:</h2>
+<ul>
+  <li><a href="https://gatkforums.broadinstitute.org/gatk/discussion/2909#addRG">Adding read grouop</a></li>
+  <li><a href="https://gatkforums.broadinstitute.org/gatk/discussion/6747/how-to-mark-duplicates-with-markduplicates-or-markduplicateswithmatecigar">Marking duplicate</a></li>
+</ul>
 
   </article>
 
