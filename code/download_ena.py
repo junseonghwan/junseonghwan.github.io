@@ -63,7 +63,7 @@ for idx, row in df2.iterrows():
 
 		# retrieve the file name and form the destination path
 		loc_split = locs[0].split("/") 
-		dest_file_name = loc_split[len(loc_split)-1]		
+		dest_file_name = loc_split[len(loc_split)-1]
 		final_dest = os.path.join(rna_download_dest, dest_file_name)
 
 		command = "sbatch -A %s -p core -n 1 -t %s -J %s -o %s/%s.out -e %s/%s.err worker.sbatch %s %s" % (args.project_id, args.time, args.job_name, logs, accession_number, logs, accession_number, locs[0], final_dest)

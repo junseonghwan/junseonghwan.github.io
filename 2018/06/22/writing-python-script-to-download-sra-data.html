@@ -118,18 +118,16 @@
 
 <p>There are two ways to submit a job. The first approach is to submit the command that you wish to execute directly using <code class="highlighter-rouge">--wrap</code> flag. For example:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>sbatch -A project_id -p core -n 1 -t 1:00:00 -J download_ena -o log.out -e log.err --wrap <span class="s2">"wget ftp_loc -O dest_file"</span>
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sbatch <span class="nt">-A</span> project_id <span class="nt">-p</span> core <span class="nt">-n</span> 1 <span class="nt">-t</span> 1:00:00 <span class="nt">-J</span> download_ena <span class="nt">-o</span> log.out <span class="nt">-e</span> log.err <span class="nt">--wrap</span> <span class="s2">"wget ftp_loc -O dest_file"</span>
+</code></pre></div></div>
 
 <p>However, I think it may be better to write a separate script in case additional work is to be carried out on the downloaded file, for example, <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> for quality checking. The simplest possible script for our purpose is as follows:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash -l</span>
-<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span>date<span class="k">)</span><span class="s2"> Running on: </span><span class="k">$(</span>hostname<span class="k">)</span><span class="s2">"</span>
-wget <span class="nv">$1</span> -O <span class="nv">$2</span>
-<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span>date<span class="k">)</span><span class="s2"> File download complete."</span>
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash -l</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span><span class="nb">date</span><span class="k">)</span><span class="s2"> Running on: </span><span class="k">$(</span><span class="nb">hostname</span><span class="k">)</span><span class="s2">"</span>
+wget <span class="nv">$1</span> <span class="nt">-O</span> <span class="nv">$2</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span><span class="nb">date</span><span class="k">)</span><span class="s2"> File download complete."</span>
+</code></pre></div></div>
 
 <p>We will pass in the source file location and destination as arguments to this script, which will be generated from Python.</p>
 
@@ -137,19 +135,18 @@ wget <span class="nv">$1</span> -O <span class="nv">$2</span>
 
 <p>We will write a script to read in the information in <code class="highlighter-rouge">table.txt</code> and generate job submission commands for SLURM. First, we will import the necessary libraries.</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>We will require the destination directory, location of the master file, patient ID to be downloaded, SLURM project ID to be provided as command line arguments. Additionally, we can require additional information such as job name, number of hours required for the job, and whether to launch the job or generate string commands for debug purposes. We will use <code class="highlighter-rouge">argparse</code> library to simplify processing of the command line arguments:</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">'Process file destination.'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">'Process file destination.'</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'dest'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Specify the destination directory."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'master_file'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Specify the master file downloaded from ENA."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'patient_id'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Specify the patient ID. E.g. KTN102."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
@@ -158,23 +155,21 @@ wget <span class="nv">$1</span> -O <span class="nv">$2</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--time'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Number of hours per job."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"4:00:00"</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--job_name'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Job name."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"wget_sc"</span><span class="p">)</span>
 <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>We will now load the master file using <code class="highlighter-rouge">pandas</code>, and extract out only the records corresponding to the patient ID:</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># read in the master file and extract the files that we want</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># read in the master file and extract the files that we want</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">master_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
 <span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 
 <span class="c"># extract records corresponding to the specified patient</span>
 <span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">]</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Let’s create new directories for better organization:</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># make a directory if it does not exist alrady</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># make a directory if it does not exist alrady</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
 
@@ -193,12 +188,11 @@ wget <span class="nv">$1</span> -O <span class="nv">$2</span>
 <span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">,</span> <span class="s">"logs"</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">logs</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Finally, generate the SLURM commands and submit the job (unless we are in a debug mode):</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># code to download all RNA data files</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># code to download all RNA data files</span>
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
     <span class="n">fastq_ftp_loc</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'fastq_ftp'</span><span class="p">]</span>
     <span class="n">locs</span> <span class="o">=</span> <span class="n">fastq_ftp_loc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">";"</span><span class="p">)</span>
@@ -217,8 +211,7 @@ wget <span class="nv">$1</span> -O <span class="nv">$2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c"># submit the job</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">command</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>To explain, we noted in this <a href="/2018/06/24/explore-master-file-downloaded-from-european-nucleotide-archive.html">post</a> that scRNA files are stored as a single file whereas scDNA and bulk DNA files are organized into 3 files. Therefore, if a record is associated with only one file, we download the file. Note that this approach requires carefully checking over the submission file patterns in advance and the code will have to be changed for different dataset.</p>
 

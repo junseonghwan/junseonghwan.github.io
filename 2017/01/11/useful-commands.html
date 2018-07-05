@@ -79,17 +79,15 @@
   <article class="post-content">
     <h1 id="jekyll">Jekyll</h1>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>jekyll build --destination &lt;destination&gt;
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jekyll build <span class="nt">--destination</span> &lt;destination&gt;
+</code></pre></div></div>
 
 <h1 id="gitgithub">Git/Github</h1>
 
 <h3 id="create-github-repo-from-command-line">Create github repo from command line:</h3>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>curl -u <span class="s1">'username'</span> https://api.github.com/user/repos -d <span class="s1">'{"name":"repo-name"}'</span>
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-u</span> <span class="s1">'username'</span> https://api.github.com/user/repos <span class="nt">-d</span> <span class="s1">'{"name":"repo-name"}'</span>
+</code></pre></div></div>
 
 <p>This will prompt for password. Replace <code class="highlighter-rouge">username</code> and <code class="highlighter-rouge">reponame</code>.</p>
 
@@ -99,23 +97,20 @@
 
 <p>To create a plot with white backgroud:</p>
 
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ggplot</span><span class="p">()</span><span class="w">
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ggplot</span><span class="p">()</span><span class="w">
 </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">theme_bw</span><span class="p">()</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>To create a without legend:</p>
 
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
 
 <p>To add a error bar when given a standard error in the dataframe (say Normality is assumed):</p>
 
-<div class="language-R highlighter-rouge"><pre class="highlight"><code><span class="n">limits</span><span class="o">&lt;-</span><span class="n">aes</span><span class="p">(</span><span class="n">ymin</span><span class="o">=</span><span class="n">xbar</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1.96</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">se</span><span class="p">,</span><span class="w"> </span><span class="n">ymax</span><span class="o">=</span><span class="w"> </span><span class="n">xbar</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1.96</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">se</span><span class="p">)</span><span class="w">
+<div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">limits</span><span class="o">&lt;-</span><span class="n">aes</span><span class="p">(</span><span class="n">ymin</span><span class="o">=</span><span class="n">xbar</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1.96</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">se</span><span class="p">,</span><span class="w"> </span><span class="n">ymax</span><span class="o">=</span><span class="w"> </span><span class="n">xbar</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1.96</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">se</span><span class="p">)</span><span class="w">
 </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">geom_errorbar</span><span class="p">(</span><span class="n">limits</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="o">=</span><span class="m">.2</span><span class="p">,</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="n">position_dodge</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="m">.9</span><span class="p">))</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="sublime">Sublime</h2>
 

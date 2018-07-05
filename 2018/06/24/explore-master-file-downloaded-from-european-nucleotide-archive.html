@@ -85,50 +85,43 @@
 
 <p>The file is available for download as notebook <a href="/code/ena_explore.ipynb">here</a>.</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">file_name</span> <span class="o">=</span> <span class="s">"table.txt"</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">file_name</span> <span class="o">=</span> <span class="s">"table.txt"</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="c"># check the column names, we want library_name to be there!</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>Index(['study_accession', 'sample_accession', 'secondary_sample_accession',
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Index(['study_accession', 'sample_accession', 'secondary_sample_accession',
        'experiment_accession', 'run_accession', 'tax_id', 'scientific_name',
        'instrument_model', 'library_name', 'library_layout', 'fastq_bytes',
        'fastq_ftp'],
       dtype='object')
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 <span class="n">patients</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">patient_ids</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">patients</span><span class="p">))</span> 
 <span class="c"># there are 21 patients, but there are supposed to be only 20 patients according to the paper</span>
 <span class="c"># KTN609 does not appear in the appendix of the paper: https://www.cell.com/cms/attachment/2119295259/2091819478/mmc1.pdf</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>['KTN102', 'KTN115', 'KTN126', 'KTN129', 'KTN132', 'KTN134', 'KTN147', 'KTN152', 'KTN155', 'KTN206', 'KTN210', 'KTN215', 'KTN302', 'KTN304', 'KTN310', 'KTN316', 'KTN317', 'KTN501', 'KTN609', 'KTN612', 'KTN615']
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['KTN102', 'KTN115', 'KTN126', 'KTN129', 'KTN132', 'KTN134', 'KTN147', 'KTN152', 'KTN155', 'KTN206', 'KTN210', 'KTN215', 'KTN302', 'KTN304', 'KTN310', 'KTN316', 'KTN317', 'KTN501', 'KTN609', 'KTN612', 'KTN615']
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># how many data files are there associated with patient KTN102?</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># how many data files are there associated with patient KTN102?</span>
 <span class="n">patient_id</span> <span class="o">=</span> <span class="s">'KTN102'</span>
 <span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">))</span> <span class="c"># there are 511 files associated with this patient</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>511
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>511
+</code></pre></div></div>
 
 <p>For this dataset, there are</p>
 <ul>
@@ -138,12 +131,11 @@
 
 <p>Let’s extract out the file name patterns.</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">]</span>
 <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]))</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>['KTN1020',
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['KTN1020',
  'KTN1020cells1',
  'KTN1020cells10',
  'KTN1020cells11',
@@ -654,8 +646,7 @@
  'KTN102_OP_8',
  'KTN102_OP_9',
  'KTN102_OP_Pop']
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Based on quick browsing of the values, it seems like the library names have the following patterns:</p>
 <ul>
@@ -673,14 +664,13 @@
   </li>
 </ul>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># let's check the data sizes for the files to find the bulk samples</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># let's check the data sizes for the files to find the bulk samples</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">";"</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="s">'fastq_bytes'</span><span class="p">])))</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
 <span class="n">ret2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">ret</span><span class="p">))</span> <span class="c"># in GB</span>
 <span class="n">ret2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ret2</span><span class="p">)</span>
 <span class="n">df2</span><span class="p">[</span><span class="n">ret2</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <div>
 <style scoped="">
@@ -779,26 +769,22 @@
 </table>
 </div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">ret2</span><span class="p">[</span><span class="n">ret2</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="c"># large files probably correspond to bulk, matching our intuition</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ret2</span><span class="p">[</span><span class="n">ret2</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="c"># large files probably correspond to bulk, matching our intuition</span>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>array([ 7.03764995,  6.86045598,  5.55781087,  7.13270929])
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([ 7.03764995,  6.86045598,  5.55781087,  7.13270929])
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># let's check the number of files associated with each row</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># let's check the number of files associated with each row</span>
 <span class="n">num_files</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ret</span><span class="p">)))</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">s1</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s1</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s1</span><span class="p">))</span> <span class="c"># 143</span>
 <span class="n">s1</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>143
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>143
 
 
 
@@ -947,16 +933,14 @@
  'KTN102_OP_8',
  'KTN102_OP_9',
  'KTN102_OP_Pop']
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">s2</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">2</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s2</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">2</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s2</span><span class="p">))</span> <span class="c"># 275</span>
 <span class="n">s2</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>275
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>275
 
 
 
@@ -1237,16 +1221,14 @@
  'KTN102OPcells97',
  'KTN102OPcells98',
  'KTN102OPcells99']
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">s3</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">3</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s3</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">3</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s3</span><span class="p">))</span> <span class="c"># 93</span>
 <span class="n">s3</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>93
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>93
 
 
 
@@ -1345,14 +1327,27 @@
  'KTN102_2_7_B2',
  'KTN102_2_8_B2',
  'KTN102_2_9_B2']
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Rows that are associated with single file seem to be for scRNA</li>
   <li>Rows associated with two files seem to be for scDNA</li>
   <li>Rows associated with three files seem to be for bulk and/or single cell data (this will have to be determined by reading the paper) but it’s clear from the size of the files, which ones correspond to bulk data.</li>
 </ul>
+
+<h1 id="details-from-the-paper">Details from the paper</h1>
+
+<p>The goal of this paper is to study the resistance to chemotherapy in triple negative breast cancer. To that end, they applied scDNA, scRNA, and bulk exome sequencing to profile longitudinal samples from 20 TNBC patients during chemotherapy.</p>
+
+<p>Deep exome sequencing revealed chemo led to clonal extinction (removal of cancer clone) for 10 patients and 10 patients where clone persisted after chemo. In 8 patients, more detailed study was carried out using scDNA-seq to analyze 900 cells and scRNA-seq to analyze 6,862 cells.</p>
+
+<p>An excerpt from the paper:</p>
+
+<blockquote>
+  <p>… single-nucleus RNA-sequencing (SNRS) method. SNRS performs automated imaging and selection of up to 1,800 single nuclei in parallel for <strong>3’ mRNA profiling</strong>. We profiled the transcriptomes of 3,370 single nuclei isolated from two matched longitudinal samples per patient from the four clonal extinction patients (P1, P2, P6, P9).</p>
+</blockquote>
+
+<p>From this excerpt, it appears that RNA sequencing produces sequencing from only 3’ end, which supports the suspicion that records associated with a single file are RNA-seq data.</p>
 
   </article>
 
