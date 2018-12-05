@@ -304,20 +304,26 @@ AddOrReplaceReadGroups <span class="se">\</span>
   <span class="nt">-known</span> /path/to/indel_calls.vcf
 </code></pre></div></div>
 
-<p><strong>Important</strong> If you don’t add the read groups, you will likely get the following error:</p>
+<p><strong>Note 1</strong> If you don’t add the read groups, you will likely get the following error:</p>
 
 <blockquote>
   <p>Error details: SAM file doesn’t have any read groups defined in the header.  The GATK no longer supports SAM files without read groups.</p>
 </blockquote>
 
+<p><strong>Note 2</strong> Error regarding incompatible contigs</p>
+
+<p>It can happen when the names of the chromosome used in the reads differ from the names of the chromosomes used in the reference file. For example, in my case, the reads referred to them as 1, 2, …, 22 but in the reference, they were labelled chr1, chr2, … chr22.</p>
+
+<p>This problem and the possible solutions are laid out in this <a href="https://software.broadinstitute.org/gatk/documentation/article?id=63">post</a>.</p>
+
+<p>Chances are, people in your lab have experienced this issue before and a compatible file format is available somewhere in Uppmax. This is how I solved this issue.</p>
+
+<p>It took about 9.5 hours (single core) on 8GB BAM file.</p>
+
 <h2 id="additional-steps-for-cleaning">Additional steps for cleaning</h2>
 <p>These seemed less important to me, so I skipped them. But for a careful and accurate analysis, perhaps these steps should not be skipped:</p>
 <ul>
-  <li><code class="highlighter-rouge">samtools flagstat</code>
-    <ul>
-      <li>Collects stats</li>
-    </ul>
-  </li>
+  <li><code class="highlighter-rouge">samtools flagstat</code></li>
   <li>Additional filtering to remove low quality reads, unmapped reads, and marked duplicates</li>
   <li>Base quality score recalibration
     <ul>
