@@ -159,49 +159,49 @@ wget <span class="nv">$1</span> <span class="nt">-O</span> <span class="nv">$2</
 
 <p>We will now load the master file using <code class="highlighter-rouge">pandas</code>, and extract out only the records corresponding to the patient ID:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># read in the master file and extract the files that we want</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">master_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># read in the master file and extract the files that we want
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">master_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
 <span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 
-<span class="c"># extract records corresponding to the specified patient</span>
-<span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">]</span>
+<span class="c1"># extract records corresponding to the specified patient
+</span><span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">]</span>
 </code></pre></div></div>
 
 <p>Let’s create new directories for better organization:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># make a directory if it does not exist alrady</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># make a directory if it does not exist alrady
+</span><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
 
-<span class="c"># make a directory for patient_id if it does not exist already</span>
-<span class="n">download_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">)</span>
+<span class="c1"># make a directory for patient_id if it does not exist already
+</span><span class="n">download_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dest</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">download_dest</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">download_dest</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">download_dest</span><span class="p">)</span>
 
-<span class="c"># generate a directory to hold just the scRNA data files to be downloaded</span>
-<span class="n">rna_download_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_dest</span><span class="p">,</span> <span class="s">"scRNA"</span><span class="p">)</span>
+<span class="c1"># generate a directory to hold just the scRNA data files to be downloaded
+</span><span class="n">rna_download_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">download_dest</span><span class="p">,</span> <span class="s">"scRNA"</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">)</span>
 
-<span class="c"># generate the log files for each download job</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">,</span> <span class="s">"logs"</span><span class="p">)</span>
+<span class="c1"># generate the log files for each download job
+</span><span class="n">logs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">,</span> <span class="s">"logs"</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">logs</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>Finally, generate the SLURM commands and submit the job (unless we are in a debug mode):</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># code to download all RNA data files</span>
-<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># code to download all RNA data files
+</span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df2</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
     <span class="n">fastq_ftp_loc</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'fastq_ftp'</span><span class="p">]</span>
     <span class="n">locs</span> <span class="o">=</span> <span class="n">fastq_ftp_loc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">";"</span><span class="p">)</span>
     <span class="n">library_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># scRNA data are in one fastq.gz file</span>
-        <span class="n">accession_number</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">"run_accession"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">locs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># scRNA data are in one fastq.gz file
+</span>        <span class="n">accession_number</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">"run_accession"</span><span class="p">]</span>
 
-        <span class="c"># retrieve the file name and form the destination path</span>
-        <span class="n">loc_split</span> <span class="o">=</span> <span class="n">locs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> 
+        <span class="c1"># retrieve the file name and form the destination path
+</span>        <span class="n">loc_split</span> <span class="o">=</span> <span class="n">locs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> 
         <span class="n">dest_file_name</span> <span class="o">=</span> <span class="n">loc_split</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">loc_split</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>        
         <span class="n">final_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rna_download_dest</span><span class="p">,</span> <span class="n">dest_file_name</span><span class="p">)</span>
 
@@ -209,8 +209,8 @@ wget <span class="nv">$1</span> <span class="nt">-O</span> <span class="nv">$2</
         <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span> <span class="o">==</span> <span class="s">"no"</span><span class="p">):</span>
             <span class="k">print</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c"># submit the job</span>
-            <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">command</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="c1"># submit the job
+</span>            <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">command</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>To explain, we noted in this <a href="/2018/06/24/explore-master-file-downloaded-from-european-nucleotide-archive.html">post</a> that scRNA files are stored as a single file whereas scDNA and bulk DNA files are organized into 3 files. Therefore, if a record is associated with only one file, we download the file. Note that this approach requires carefully checking over the submission file patterns in advance and the code will have to be changed for different dataset.</p>
