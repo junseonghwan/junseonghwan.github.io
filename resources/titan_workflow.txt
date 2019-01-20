@@ -1,0 +1,80 @@
+library(TitanCNA)
+library(HMMcopy)
+
+min_depth <- 10
+
+infile <- "~/Dropbox/Research/single-cell-research/scripts/TNBC/KTN126/Blood/allele_counts.txt"
+normal_data <- read.csv(infile, header=T, sep="\t")
+
+infile <- "~/Dropbox/Research/single-cell-research/scripts/TNBC/KTN126/KTN1260/allele_counts.txt"
+tumor_data <- read.csv(infile, header=T, sep="\t")
+head(normal_data)
+head(tumor_data)
+
+# combine the two data sources
+data <- data.frame(chr=normal_data$chr, posn=normal_data$posn, normalDepth=normal_data$refCount + normal_data$nonRefCount, tumorDepth=tumor_data$refCount + tumor_data$nonRefCount)
+dim(data)
+head(data)
+data <- subset(data, normalDepth >= min_depth & tumorDepth >= min_depth)
+dim(data)
+head(data)
+min(data$normalDepth)
+min(data$tumorDepth)
+data$logR <- log(data$tumorDepth/data$normalDepth, 2)
+hist(data$logR, breaks = 30)
+plot(1:length(data$logR), data$logR, type='l')
+
+titan_data <- loadAlleleCounts(tumor_data)
+dim(titan_data)
+titan_data<-subset(titan_data, chr %in% data$chr & posn %in% data$posn)
+dim(titan_data)
+dim(data)
+titan_data$logR <- data$logR
+titan_data <- filterData(titan_data, 1:24, minDepth = 10, maxDepth = 200, map = NULL)
+
+numClusters <- 1
+params <- loadDefaultParameters(copyNumber = 8,
+                                numberClonalClusters = numClusters, 
+                                skew = 0.1)
+
+K <- length(params$genotypeParams$alphaKHyper)
+params$genotypeParams$alphaKHyper <- rep(500, K)
+params$ploidyParams$phi_0 <- 1.5
+convergeParams <- runEMclonalCN(titan_data, params,
+                                maxiter = 20, maxiterUpdate = 500,
+                                txnExpLen = 1e9, txnZstrength = 1e9,
+                                useOutlierState = FALSE,
+                                normalEstimateMethod = "map",
+                                estimateS = TRUE, estimatePloidy = TRUE)
+
+optimalPath <- viterbiClonalCN(titan_data, convergeParams)
+unique(optimalPath)
+results <- outputTitanResults(titan_data, convergeParams, optimalPath,
+                              filename = NULL, posteriorProbs = FALSE,
+                              subcloneProfiles = TRUE,
+                              is.haplotypeData = FALSE,
+                              correctResults = TRUE,
+                              proportionThreshold = 0.05,
+                              proportionThresholdClonal = 0.05)
+
+convergeParams <- results$convergeParams
+results <- results$corrResults
+
+segs <- outputTitanSegments(results, id = "test", convergeParams,
+                            filename = NULL, igvfilename = NULL)
+head(subset(segs, Chromosome == 1), 20)
+norm <- tail(convergeParams$n, 1)
+ploidy <- tail(convergeParams$phi, 1)
+
+par(mfrow=c(1,1))
+chromosome <- 2
+title <- paste("Chr", chromosome)
+plotCNlogRByChr(results, chr = chromosome, segs = segs, ploidy = ploidy, normal = norm, geneAnnot = NULL, ylim = c(-2, 2), cex = 0.5, xlab = "", main = title)
+plotAllelicRatio(results, chr = chromosome, geneAnnot = NULL, ylim = c(0, 1), cex = 0.5,
+                 xlab = "", main = title)
+plotClonalFrequency(results, chr = chromosome, normal = norm, geneAnnot = NULL,
+                    ylim = c(0, 1), cex = 0.5, xlab = "", main = title)
+plotSubcloneProfiles(results, chr = chromosome, cex = 2, main = title)
+plotSegmentMedians(segs, chr=chromosome, resultType = "LogRatio", plotType = "CopyNumber",
+                   plot.new = TRUE, ylim = c(0, 8), main = title)
+
