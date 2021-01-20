@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Seong-Hwan Jun</title>
-  <meta name="description" content="">
+  <title>Ascat</title>
+  <meta name="description" content="I use the pipeline developed at SciLifeLab called Sarek, which uses nextflow and performs the standard processing on NGS data as recommended by GATK best pra...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="junseonghwan.github.io/">
+  <link rel="canonical" href="junseonghwan.github.io/2019/07/08/ascat.html">
   <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
 
   
@@ -65,47 +65,40 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <!-- <table border="0">
-	<tr>
-		<td width="200"><img src="/images/profile-picture0.png" class="pull-left" width="200" height="220">
-		</td>
-		<td>
-			<span style="font-family:Times New Roman">
-			<p>I am a postdoctoral researcher at Fred Hutchinson Cancer Research Center in Seattle. 
-			I completed Ph.D. in Statistics at the University of British Columbia in Vancouver. My PhD advisors were <a href="http://www.stat.ubc.ca/~bouchard/">Prof. Alexandre Bouchard-C&ocirc;t&eacute;</a> and <a href="https://www.stat.ubc.ca/users/james-v-zidek-frsc-oc">Prof. Jim Zidek</a>.
-			</p>
-			</span>
-		</td>
-	</tr>
-</table>
-<br/>
- -->
-<p><img src="/images/profile-picture0.png" alt="profile_pic" style="float: left;margin-right: 30px;margin-top: 7px; height=&quot;150px" width="150px" /></p>
+        <div class="post">
 
-<p>I am a postdoctoral researcher at Fred Hutchinson Cancer Research Center in Seattle. 
-I completed Ph.D. in Statistics at the University of British Columbia in Vancouver. My Ph.D. advisors were <a href="http://www.stat.ubc.ca/~bouchard/">Prof. Alexandre Bouchard-Côté</a> and <a href="https://www.stat.ubc.ca/users/james-v-zidek-frsc-oc">Prof. Jim Zidek</a></p>
+  <header class="post-header">
+    <h1 class="post-title">Ascat</h1>
+    <p class="post-meta">Jul 8, 2019</p>
+  </header>
 
-<p><br /></p>
+  <article class="post-content">
+    <p>I use the pipeline developed at SciLifeLab called <a href="https://github.com/SciLifeLab/Sarek">Sarek</a>, which uses nextflow and performs the standard processing on NGS data as recommended by <a href="https://software.broadinstitute.org/gatk/best-practices/">GATK best practices</a>. This produces BAM files for tumor and normal samples.</p>
 
-<p><br /></p>
+<p>One of the important steps in analyzing tumor NGS data is copy number calling. Sarek ships with ascat and it provides details on how to use it on NGS data <a href="https://github.com/SciLifeLab/Sarek/blob/master/docs/ASCAT.md">here</a>. This post describes the steps that I took to run ascat on ALL data published with this <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4273416/">paper</a>.</p>
 
-<h3 id="research-interest">Research interest</h3>
+<h1 id="identifying-snp-positions">Identifying SNP positions</h1>
+<p>It appears that ascat was originally developed for SNP array data. Ascat analyzes logR and BAF values at the positions probed using the SNP array. But the data that we will analyze is NGS data from tumor and normal samples so we need to compute these values and specify the positions that we will analyze.</p>
 
-<p>I am interested in computational statistics, specifically Monte Carlo methods, as a means to achieve Bayesian inference. I develop Bayesian models and inference methods to solve problems from computational oncology, which includes integration of bulk genomics with single-cell transcriptomics and single-cell multi-modal data.</p>
+<p>Fortunately, this step has already been done for us by SciLifeLab team. A position is chosen if it is <a href="https://gatkforums.broadinstitute.org/gatk/discussion/6455/biallelic-vs-multiallelic-sites">bi-allelic</a> and if minor allele frequencies is greater than 0.3 (see <a href="https://github.com/SciLifeLab/Sarek/blob/master/docs/ASCAT.md#loci-file">here</a>).</p>
 
-<h3 id="education">Education</h3>
-<ul>
-  <li>Sep 2013 - Feb 2018: Ph.D. in Statistics, University of British Columbia.</li>
-  <li>Sep 2011 - Aug 2013: M.Sc. in Statistics, University of British Columbia.</li>
-  <li>Jan 2004 - May 2009: Bachelor of Mathematics, Computer Science major with Co-op, University of Waterloo.</li>
-</ul>
+<h1 id="counting-a-and-b-alleles">Counting A and B alleles</h1>
+<p>The next step is to count up the number of major and minor alleles at each of the identified positions. For this, we can use <a href="https://github.com/cancerit/alleleCount">alleleCount</a>. It is already installed on Uppmax</p>
 
-<!--
-+ <span style="font-family:Times New Roman; font-size:
-12pt;">2013-Current: PhD in Statistics, University of British Columbia.</span>
-+ <span style="font-family:Times New Roman">2011-2013: Master of Science in Statistics, University of British Columbia.</span>
-+ <span style="font-family:Times New Roman">2004-2009: Bachelor of Mathematics, Computer Science major with Co-op, University of Waterloo.</span>
--->
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module load bioinfo-tools alleleCount
+alleleCounter -l [path_to_loci_file] -r [path_to_human_ref_genome] -b path_to_tumor.bam -o output.allecount
+</code></pre></div></div>
+
+<p>The two input files are the loci file, the SNP positions identified in the previous step and the path to reference human genome.</p>
+
+<h1 id="ascat-si">Ascat SI</h1>
+<p>I had to stare at Eq. S5 in the SI for quite some time: <script type="math/tex">b_i = \frac{1 - \rho + \rho n_B}{2 (1 - \rho) + \rho (n_A + n_B)}</script>. Here <script type="math/tex">\rho</script> refers to tumor fraction and <script type="math/tex">n_A, n_B</script> denote the true number of major and minor alleles. The observed data <script type="math/tex">\hat{b}_i = n_B/(n_A + n_B)</script> is a noisy version of the true value <script type="math/tex">b_i</script>.</p>
+
+<p>This expression makes sense once we realize that this is an SNP position that is heterozygous (i.e., germline variant). Therefore, <script type="math/tex">(1-\rho)</script> comes from having one copy of the minor allele since this is the fraction that are healthy (one of major and one of minor copy). The other term, <script type="math/tex">\rho n_B</script> is more straight forward, as it refers to the number of copies of minor allele in the tumor population.</p>
+
+  </article>
+
+</div>
 
       </div>
     </div>

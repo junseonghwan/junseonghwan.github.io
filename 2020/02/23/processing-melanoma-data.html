@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Processing Melanoma Data</title>
+  <meta name="description" content="Single cell RNA-seq">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="junseonghwan.github.io/2020/02/23/processing-melanoma-data.html">
+  <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
+
+  
+
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!--
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>-->
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Seong-Hwan Jun</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/code/">Code</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/research/">Research</a>
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Processing Melanoma Data</h1>
+    <p class="post-meta">Feb 23, 2020</p>
+  </header>
+
+  <article class="post-content">
+    <h2 id="single-cell-rna-seq">Single cell RNA-seq</h2>
+
+<p>We tried our best to follow the <a href="https://science.sciencemag.org/content/suppl/2016/04/07/352.6282.189.DC1?_ga=2.247210436.1169919621.1582511002-207121023.1581138353">supplementary materials</a> towards analyzing scRNA-seq.</p>
+
+<h1 id="softwares">Softwares</h1>
+<ul>
+  <li>You can get bowtie using conda: <code class="highlighter-rouge">conda install -c bioconda bowtie</code>.
+    <ul>
+      <li>You can also download a pre-built package from <a href="https://sourceforge.net/projects/bowtie-bio/files/bowtie/1.2.3/">here</a>. Make sure to update <code class="highlighter-rouge">PATH</code> to point to install location.</li>
+      <li>Make sure to get the latest version, 1.2.3. I tried using 1.0.0 but it doesn’t seem to work with <code class="highlighter-rouge">fastq.gz</code>.</li>
+    </ul>
+  </li>
+  <li>We also need <code class="highlighter-rouge">samtools</code> to generate BAM files as well as for sorting and indexing: <code class="highlighter-rouge">conda install -c bioconda samtools</code>.</li>
+  <li>We will use <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-12-323">RSEM</a>, which is available <a href="https://github.com/deweylab/RSEM">here</a>.</li>
+</ul>
+
+<h1 id="aligning-scrna-seq">Aligning scRNA-seq</h1>
+<p>In the supp, the authors indcitate that they “mapped to the UCSC hg19 human <strong>transcriptome</strong> using Bowtie.” It turns out that we don’t need to run bowtie as RSEM can align and output BAM files.</p>
+
+<h1 id="using-rsem-to-align-and-calculate-tpm">Using RSEM to align and calculate TPM</h1>
+<p>It turns out that RSEM will do quite a few things for us.
+First, RSEM requires you to build references. The instructions are available on their Github page. The bulk data that I received from the authors came with the reference hg19 that they used for processing.
+Using the same reference file turned out to be important for running Strelka to call variants from single cell RNA-seq using matching normal bulk.
+We still need to download the GTF file. I chose GRCh37.75:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz
+</code></pre></div></div>
+<p>I have the GTF file as well as the hg19 in a common directory, call it, <code class="highlighter-rouge">&lt;REF_LOC&gt;</code>.
+Using <code class="highlighter-rouge">gunzip</code> to decompress the files and excute a script containing the following command:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsem-prepare-reference <span class="nt">--gtf</span> &lt;REF_LOC&gt;/Homo_sapiens.GRCh37.75.gtf <span class="se">\</span>
+               <span class="nt">--bowtie</span> <span class="se">\</span>
+               &lt;REF_LOC&gt;/Homo_sapiens_assembly19.fasta <span class="se">\</span>
+               &lt;REF_LOC&gt;/bowtie/human_ensembl
+</code></pre></div></div>
+<p>Note:</p>
+<ul>
+  <li>You will need to create a destination directory <code class="highlighter-rouge">&lt;REF_LOC&gt;/bowtie</code>.</li>
+  <li>This command builds Bowtie index, which we are going to use for aligning single cells.</li>
+  <li>I ran this command in the interactive mode, i.e., did not submit it as a job. It didn’t take too long, roughly about 10-15 minutes. Depending on your compute cluster rules, you may need to submit it as job.</li>
+  <li>You may need to specify path to <code class="highlighter-rouge">bowtie</code> using the option <code class="highlighter-rouge">--bowtie-path</code> if <code class="highlighter-rouge">bowtie</code> is not in your search path.</li>
+  <li>Option <code class="highlighter-rouge">-p</code> can be used if you desire to use multiple cores.</li>
+  <li>Full set of options are available <a href="https://deweylab.github.io/RSEM/rsem-prepare-reference.html">here</a>.</li>
+</ul>
+
+<p>To calculate the expression values, we use the command <code class="highlighter-rouge">rsem-calculate-expression</code> (<a href="http://deweylab.biostat.wisc.edu/rsem/rsem-calculate-expression.html">documentation</a>):</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsem-calculate-expression --output-genome-bam \
+                          --phred33-quals \
+                          --bowtie-n 1 \
+                          --bowtie-e 99999999 \
+                          --bowtie-m 15 \
+                          --seed-length 25 \
+                          --fragment-length-min 1 \
+                          --fragment-length-max 2000 \
+                          -p 1 \
+                          --paired-end \
+                          &lt;fastq1&gt; \
+                          &lt;fastq2&gt; \
+                          &lt;REF_LOC&gt;/human_ensembl \
+                          &lt;OUTPUT_NAME&gt;
+</code></pre></div></div>
+
+<p>Compare the above to the options used to run bowtie in Tirosh et al:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-q --phred33-quals -n 1 -e 99999999 -m 15 -l 25 -I 1 -X 2000 -a -S -p 6
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">-q</code>: This option indicates that the input files are in fastq. The single cells are in <code class="highlighter-rouge">fastq.gz</code>, so I thought we need to specify <code class="highlighter-rouge">--gzipped-read-file</code> but it seems to work without it.</li>
+  <li><code class="highlighter-rouge">--phred33-quals, -n, -e, -m</code> are matched in both commands straightforwardly.</li>
+  <li><code class="highlighter-rouge">-l</code>: corresponds to <code class="highlighter-rouge">--seed-length</code>. The default value is 25 so we actually do not need to specify it but we do so anyways for completeness.</li>
+  <li><code class="highlighter-rouge">-I</code>: corresponds to <code class="highlighter-rouge">--fragment-length-min</code>. The default value is 1 for <code class="highlighter-rouge">rsem-calculate-expression</code> so we actually don’t need to specify it (do it for completeness).</li>
+  <li><code class="highlighter-rouge">-X</code>: corresponds to <code class="highlighter-rouge">--fragment-length-max</code>. The default value is 1,000 so we definitely need to specify its value as 2,000 to match Tirosh et al.</li>
+  <li><code class="highlighter-rouge">-a</code>: The <a href="http://bowtie-bio.sourceforge.net/manual.shtml#bowtie-options-a">default value</a> is <em>off</em> for Bowtie. I wasn’t able to find the corresponding option for <code class="highlighter-rouge">rsem-calculate-expression</code>.</li>
+  <li><code class="highlighter-rouge">-S</code>: Indicates that the output will be in SAM format. This option is irrelevant to us since <code class="highlighter-rouge">rsem-calculate-expression</code> will output BAM files directly specified using <code class="highlighter-rouge">--output-genome-bam</code> option.</li>
+  <li><code class="highlighter-rouge">-p</code>: Indicates the number of threads to use. As I’m submitting one job, each allocated 1 core for each cell, I chose to specify 1 thread.</li>
+</ul>
+
+<p>Because the single cells are small in size, the processing time was rather fast. Even for a cell with size about 200MB, I think it took only about 15 minutes.</p>
+
+<h2 id="bulk-wes-seq">Bulk WES-seq</h2>
+<p>We were able to acquire the bulk WES and scRNA data for a handful of melanoma patients analyzed in Tirosh et al: mel78, mel79, mel81, and mel82.
+The bulk WES for each patient was shared as BAM file  and each tumor sample was accompanied by matching normal sample. 
+By checking the header file, the BAM files appeared ready to be analyzed.
+Because we are given already aligned BAM files, it is important that we use hg19 (GRCh37) for aligning single cells (later).</p>
+
+<p>We are going to call somatic and germline variants and copy numbers.</p>
+
+<h1 id="softwares-1">Softwares</h1>
+<ul>
+  <li><a href="https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2">MuTect2</a>.
+    <ul>
+      <li>You can get GATK <a href="https://github.com/broadinstitute/gatk/releases">here</a>, which includes MuTect2 among other useful tools.</li>
+    </ul>
+  </li>
+  <li><a href="https://github.com/Illumina/strelka">Strelka</a>.</li>
+  <li><a href="https://gatk.broadinstitute.org/hc/en-us/articles/360037225632-HaplotypeCaller">HaplotypeCaller</a>.</li>
+  <li><a href="https://github.com/BoevaLab/FREEC">FREEC</a>.
+    <ul>
+      <li><a href="https://lomereiter.github.io/sambamba/">sambamba</a>.</li>
+      <li><a href="https://bedtools.readthedocs.io/en/latest/content/installation.html">bedtools</a>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="mutect2">MuTect2</h1>
+<p>The manual for MuTect2 is found <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2">here</a>.
+Note: we did not use panel of normal.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gatk --java-options "-Xmx16g" Mutect2 \
+  -R &lt;REF_LOC&gt;/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa  \
+  -I ${SAMPLE_DIR}/${TUMOR_SAMPLE}.bam \
+  -tumor ${TUMOR_SAMPLE} \
+  -I ${SAMPLE_DIR}/${NORMAL_SAMPLE}.bam \
+  -normal ${NORMAL_SAMPLE} \
+  -O ${SAMPLE_DIR}/somatic.vcf.gz \
+  --f1r2-tar-gz ${SAMPLE_DIR}/f1r2.mutect2.tar.gz
+</code></pre></div></div>
+
+<h1 id="strelka">Strelka</h1>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strelka-2.9.2.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py \
+    --normalBam &lt;NORMAL_BAM&gt; \
+    --tumorBam &lt;TUMOR_BAM&gt; \
+    --referenceFasta &lt;REF_LOC&gt;/Homo_sapiens_assembly19.fasta \
+    --runDir &lt;RUN_DIR&gt; \
+    --exome
+</code></pre></div></div>
+
+<h1 id="haplotypecaller">HaplotypeCaller</h1>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gatk --java-options "-Xmx16g" HaplotypeCaller \
+  -R &lt;REF_LOC&gt;/Homo_sapiens_assembly19.fasta \
+  -I ${SAMPLE_DIR}/${SAMPLE_NAME}.bam \
+  -O ${SAMPLE_DIR}/${SAMPLE_NAME}.germline.vcf.gz \
+  -ERC GVCF
+</code></pre></div></div>
+
+<h1 id="freec">FREEC</h1>
+<p>Although FREEC supports inferring copy number per exon, I was not able to get it to run. 
+The error messages were rather cryptic, for example,</p>
+<blockquote>
+  <p>out of range error: Terminate called after throwing an instance of ‘std::out_of_range` what():  basic_string::substr: __pos (which is 43690) &gt; this-&gt;size() (which is 0).</p>
+</blockquote>
+
+<p>My previous experience was FREEC was rather smooth when analyzing WGS so I decided to try to use it without exon option, which basically amounts to specifying suitable window and step size. After a bit of a trial-and-error, I settled on using window size of 100 and step size of 50. I did a quick visualization check using IGV to verify that the results seemed reasonable.</p>
+
+<h2 id="preparation">Preparation</h2>
+<p>FREEC requires various files to be available:</p>
+<ul>
+  <li>GRCh37 reference split by chromosomes and</li>
+  <li>file containing lengths for each chromosomes.</li>
+</ul>
+
+<p>We already have access to GRCh37 from RSEM step. We can find GRCh37 split by chromosome on Ensembl FTP. 
+For example release-75 is available <a href="ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/">here</a>.
+We can simply use <code class="highlighter-rouge">wget</code> to get the files we need. 
+For example,</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget -r -A 'Homo_sapiens.GRCh37.75.dna.chromosome.*.fa.gz' ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/
+</code></pre></div></div>
+<p>will retrieve all chromosome files we need.</p>
+
+<!--**Note**: Freec requires the chromosome file names to be of the form chr[0-9]+.fa, chr[X|Y|MT].fa or without chr prefix like 1.fa, 2.fa, and etc.
+You can write a simple script to do this or do it manually (tedious but there are only 22 + 3 files).-->
+
+<p>Chromsome length can be obtained using <code class="highlighter-rouge">samtools</code>:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>samtools faidx Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
+</code></pre></div></div>
+
+<h2 id="run-freec">Run FREEC</h2>
+<p>The configuration file to run FREEC is available <a href="/resources/ConfigGenome.txt">here</a>, which mostly uses default values.
+The following fields need to be modified the sample being analyzed:</p>
+<ul>
+  <li>general
+    <ul>
+      <li>outputDir</li>
+      <li>sex: {78: M, 79: M, 81: F, 82: M}.</li>
+    </ul>
+  </li>
+  <li>sample: mateFile</li>
+  <li>control: mateFile</li>
+</ul>
+
+<h1 id="identify-somatic-snvs-for-analysis">Identify somatic SNVs for analysis</h1>
+<p>A commonly adopted practice is to consider SNVs that are in both of these variant callers.
+Furthermore, we will focus on somatic SNVs that fall on an exon. 
+To that end, I downloaded <a href="http://genome.ucsc.edu/cgi-bin/hgTables?db=hg19&amp;hgta_group=genes&amp;hgta_track=refSeqComposite&amp;hgta_table=refGene&amp;hgta_doSchema=describe+table+schema">refGene.txt</a> and wrote an R script that finds intersection of the MuTect2, Strelka, and exons found in refGene.txt.</p>
+
+<!-- 
+The config file is shared [here](). -->
+<!--We used [SnpEff]() to annotate the somatic VCF file.
+It revealed that there was not a mutation in the NRAS gene, which was contrary to what is reported in the supplement of Tirosh et al.
+Turns out that it was structural variant, that is the region containing NRAS gene seems to have been deleted as was seen through CNV analysis and visually by IGV (no reads mapped to NRAS gene).
+-->
+
+<!--[Cosmic](https://cancer.sanger.ac.uk/jbrowse/index.html?data=data%2Fjson%2Fgrch38%2Fv90%2Fcosmic&loc=1%3A114713871..114713945&tracks=cosmic_genes%2Cmutations%2Cbreakpoints&highlight=) seems like a nice tool.
+-->
+
+<!--* If you are missing one, you can download from many sources including GATK's resource bundle. See this [page](https://gatk.broadinstitute.org/hc/en-us/articles/360036212652-Resource-Bundle), instructions for FTP access is given near the bottom of the page.
+        - For example, you can do `wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/Homo_sapiens* .
+        `
+        to get files starting with prefix Homo_sapiens, which includes `Homo_sapiens_assembly38.fasta.gz` and `Homo_sapiens_assembly38.fai`.-->
+
+<!-- In my case, the compute cluster that I'm using wasn't equipped with the hg reference so I downloaded them from UCSC.
+        - For the concatenated hg:
+    `wget ftp://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz`
+        - The files splitted by chromosome are available [here](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/).
+        - I also got the chromosome sizes:
+        `wget ftp://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes`
+    * FREEC also requires the SNP locations. I couldn't find them on UCSC (I probably didn't search hard enough) so I downloaded one provided via [GATK resource bundle](https://gatk.broadinstitute.org/hc/en-us/articles/360036212652-Resource-Bundle). For example:
+    `wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp*`
+-->
+
+<!--
+
+
+If not, you can download them from Ensembl, UCSC, or GATK resource bundle etc. 
+I assume that these files are pretty much standard and does not matter where you download them from.
+
+For instance, GATK shares hg19 as public resource [here](https://console.cloud.google.com/storage/browser/genomics-public-data/references/hg19/?pli=1) (if you have `gsutil`).
+They also have the resources available via FTP download if you prefer to do `wget`. 
+See this [page](https://gatk.broadinstitute.org/hc/en-us/articles/360036212652-Resource-Bundle), instructions for FTP are near the bottom of the page.
+Ensembl also has them and they are available for example, [here](ftp://ftp.ensembl.org/pub/release-83/fasta/homo_sapiens/dna/).
+
+Second, we need concatenated hg19 reference as well as the lengths of each of the chromosome.
+Note that we got these files when we were processing scRNA-seq using RSEM.
+But you can find these files in various places for example, UCSC offers them [here](ftp://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/) with the file names `hg19.fa.gz` and `hg19.chrom.sizes`.
+-->
+
+<!-- Then, we need to download known SNP positions and to create a bed file. 
+For example, I downloaded `dbsnp_138.hg19.vcf.gz` from [here](ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/) and -->
+
+<!-- Executed the following command provided in FREEC manual to get it as a BED file:
+```
+gunzip -c Homo_sapiens.vcf.gz | awk {'printf ("%s\t%s\t%s\n", $1,$2-1,$2)'} > Homo_sapiens.SingleDiNucl.1based.bed
+```
+This command takes about 5-10 minutes to run.
+-->
+
+<!--
+    Final piece of preparation needed is to obtain a BED file listing the locations of the exome (genes).
+This was a step that I wasn't too sure how to do at first so I started random Google search.
+It led me to this [post](https://www.biostars.org/p/113100/#113137) on biostars:
+
+>UCSC's annotations are kind of a mess. You'll find genes with the same ID on multiple strand and multiple chromosomes, which makes them a bit useless. Ensembl's annotations typically contain more features than UCSC (so a bit more noise), but they're otherwise much better put together (e.g., you'll never find a gene ID on different strand or different chromosomes) and their IDs are typically easier to map to other things (e.g., gene names, GO and pathway memberships). Ensembl also updates its annotation fairly often and versions everything nicely, so it's quite convenient to report what version you used in a paper (reproducibility is always a good thing). Given the choice, use the Ensembl annotation.
+
+So at this point, I know that I want to get the exome locations from Ensembl but I wasn't sure how and where to get them.
+Then, I realized that when processing single cells above, we downloaded `Homo_sapiens.GRCh38.83.gtf` from Ensembl.
+This file lists the locations of genes, transcripts, and exons so it should have the information that we need.
+FREEC manual indicates
+
+>read counts are calculated by exon and not per window (set "window=0").
+
+So perhaps, we should filter this file for exons?
+I tried to find a tool that can convert GTF to BED and found [GFFUtils](https://github.com/fls-bioinformatics-core/GFFUtils)
+It only support Python 2, so I created conda environment that uses Python 2.7 first.
+To install GFFUtils, I followed the instructions on their README.md.
+The  following command looks only for `gene`:
+
+```
+GTF_extract -f gene --fields=chrom,start,end Homo_sapiens.GRCh38.83.gtf > Homo_sapiens.GRCh38.83.gene.bed
+```
+
+It took about 15-20 minutes to complete. 
+The output is tab separated file with three columns, chrom, start, and end, which is the minimal information needed to form a BED file.
+FREEC requires this file be sorted, which can be achieved by using `bedtools`:
+
+```
+bedtools sort -i Homo_sapiens.GRCh38.83.gene.bed > Homo_sapiens.GRCh38.83.gene.sorted.bed
+```
+
+FREEC complains about duplicates,
+
+>Error: your BED file with coordinates of targeted regions may contain duplicates
+
+>Check chromosome 1
+
+>Exit Control-FREEC: before reruning sort the BED file with coordinates of the targeted regions and REMOVE DUPLICATED REGIONS
+
+, so I decided to keep only the unique ones:
+
+```
+uniq Homo_sapiens.GRCh38.83.gene.sorted.bed > Homo_sapiens.GRCh38.83.gene.sorted.unique.bed 
+```
+# Generate pileup files
+
+We are going to run `samtools mpileup` to first generate pileup files for both the normal and tumor samples.
+
+```bash
+samtools mpileup -f <path/to/hg19> \
+                 <path/to/bam>.bam | bgzip > <path/to/bam>.pileup.gz
+```
+
+# Expression level analysis
+Two things are checked for each cell:
+1. Number of genes for which at least one read was mapped. If the number of genes is less than 1,700, then the cell is dropped from further analysis.
+2. Average expression level of a curated list of housekeeping genes, available [here](https://science.sciencemag.org/highwire/filestream/677381/field_highwire_adjunct_files/5/aad0501_Table_S16.xlsx). If the average expression of these genes is less than 3, the cell is dropped from further analysis.
+
+This code is relatively easy to write once you have the output from the previous step. 
+Denote the set of cells that passed the above filters by I.
+
+Then, to select the genes to analyze, the authors compute Ep, pooled expression level for each gene, defined as, $$E_p(I) = log_2(TPM(I) + 1)$$.
+This definition was a bit confusing to me. 
+First, there wasn't any notation for gene and yet, this computation is taking place for each gene as evident by the quote
+
+>For the remaining cells, we calculated the pooled expression of each gene as (Ep)...
+
+Second, I was not able to find the definition for $$TPM(I)$$, so I assumed that it is equal to the sum of the expression for a gene over the cells in $$I$$.
+
+The script for performing this step is available [here]().
+For mel78, we ended up with 133 cells out of 288 cells and 29,961 genes out of 60,675 genes.
+
+**TODO: Relative expression analysis and plots.**
+
+-->
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+<!--    <h2 class="footer-heading">Seong-Hwan Jun</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-3">
+        <ul class="contact-list">
+          <li>Address:</li>
+          <li>Seong-Hwan Jun</li>
+          <li>1100 Fairview Ave. N S2-140</li>
+          <li>Seattle, WA 98109</li> 
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          <li>Email: sjun2 AT fredhutch dot org</li>
+
+          
+          <li>
+            <a href="https://github.com/junseonghwan">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">junseonghwan</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+<!--
+      <div class="footer-col  footer-col-3">
+        <p class="text"></p>
+      </div>
+    </div>
+-->
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

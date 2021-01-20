@@ -1,0 +1,30 @@
+###For more options see: http://boevalab.com/FREEC/tutorial.html#CONFIG ###
+
+[general]
+bedtools = /home/x_seoju/bedtools2/bin/bedtools
+breakPointThreshold = 0.6
+breakPointType = 2
+chrFiles = /proj/sc_ml/regev/reference/GRCh37/Ensembl/chromosomes/
+chrLenFile = /proj/sc_ml/regev/reference/GRCh37/Ensembl/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa.fai
+maxThreads=8
+outputDir = /proj/sc_ml/regev/bulk-wes/CY79/
+ploidy = 2
+printNA=FALSE
+#readCountThreshold = 50
+sambamba = /home/x_seoju/sambamba/bin/sambamba-0.7.1
+samtools = /home/x_seoju/bin/samtools-1.3/samtools
+sex = XY
+step = 50
+window = 100
+
+[sample]
+
+mateFile = /proj/sc_ml/regev/bulk-wes/CY79/79_Tumor.bam
+inputFormat = bam
+mateOrientation = FR
+
+[control]
+
+mateFile = /proj/sc_ml/regev/bulk-wes/CY79/79_Normal.bam
+inputFormat = bam
+mateOrientation = FR

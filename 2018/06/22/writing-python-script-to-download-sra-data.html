@@ -44,10 +44,6 @@
       <div class="trigger">
         
           
-          <a class="page-link" href="/about/">About</a>
-          
-        
-          
           <a class="page-link" href="/code/">Code</a>
           
         
@@ -124,9 +120,9 @@
 <p>However, I think it may be better to write a separate script in case additional work is to be carried out on the downloaded file, for example, <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> for quality checking. The simplest possible script for our purpose is as follows:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash -l</span>
-<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span><span class="nb">date</span><span class="k">)</span><span class="s2"> Running on: </span><span class="k">$(</span><span class="nb">hostname</span><span class="k">)</span><span class="s2">"</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">date</span><span class="si">)</span><span class="s2"> Running on: </span><span class="si">$(</span><span class="nb">hostname</span><span class="si">)</span><span class="s2">"</span>
 wget <span class="nv">$1</span> <span class="nt">-O</span> <span class="nv">$2</span>
-<span class="nb">echo</span> <span class="s2">"</span><span class="k">$(</span><span class="nb">date</span><span class="k">)</span><span class="s2"> File download complete."</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">date</span><span class="si">)</span><span class="s2"> File download complete."</span>
 </code></pre></div></div>
 
 <p>We will pass in the source file location and destination as arguments to this script, which will be generated from Python.</p>
@@ -235,14 +231,14 @@ wget <span class="nv">$1</span> <span class="nt">-O</span> <span class="nv">$2</
         <ul class="contact-list">
           <li>Address:</li>
           <li>Seong-Hwan Jun</li>
-          <li>Tomtebodavägen 23a</li> 
-          <li>171 65 Solna Sweden</li>
+          <li>1100 Fairview Ave. N S2-140</li>
+          <li>Seattle, WA 98109</li> 
         </ul>
       </div>
 
       <div class="footer-col  footer-col-3">
         <ul class="social-media-list">
-          <li>Email: shjun AT kth dot se</li>
+          <li>Email: sjun2 AT fredhutch dot org</li>
 
           
           <li>
