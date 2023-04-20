@@ -6,12 +6,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Ascat</title>
-  <meta name="description" content="I use the pipeline developed at SciLifeLab called Sarek, which uses nextflow and performs the standard processing on NGS data as recommended by GATK best pra...">
+  <title>R package notes</title>
+  <meta name="description" content="Notes on making an R package  library(devtools) and load_all() will load your package.  All your library imports should go under imports section in DESCRIPTI...">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="canonical" href="junseonghwan.github.io/2019/07/08/ascat.html">
+  <link rel="canonical" href="junseonghwan.github.io/2021/02/04/r-package-notes.html">
   <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
 
   
@@ -69,33 +69,17 @@
         <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Ascat</h1>
-    <p class="post-meta">Jul 8, 2019</p>
+    <h1 class="post-title">R package notes</h1>
+    <p class="post-meta">Feb 4, 2021</p>
   </header>
 
   <article class="post-content">
-    <p>I use the pipeline developed at SciLifeLab called <a href="https://github.com/SciLifeLab/Sarek">Sarek</a>, which uses nextflow and performs the standard processing on NGS data as recommended by <a href="https://software.broadinstitute.org/gatk/best-practices/">GATK best practices</a>. This produces BAM files for tumor and normal samples.</p>
-
-<p>One of the important steps in analyzing tumor NGS data is copy number calling. Sarek ships with ascat and it provides details on how to use it on NGS data <a href="https://github.com/SciLifeLab/Sarek/blob/master/docs/ASCAT.md">here</a>. This post describes the steps that I took to run ascat on ALL data published with this <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4273416/">paper</a>.</p>
-
-<h1 id="identifying-snp-positions">Identifying SNP positions</h1>
-<p>It appears that ascat was originally developed for SNP array data. Ascat analyzes logR and BAF values at the positions probed using the SNP array. But the data that we will analyze is NGS data from tumor and normal samples so we need to compute these values and specify the positions that we will analyze.</p>
-
-<p>Fortunately, this step has already been done for us by SciLifeLab team. A position is chosen if it is <a href="https://gatkforums.broadinstitute.org/gatk/discussion/6455/biallelic-vs-multiallelic-sites">bi-allelic</a> and if minor allele frequencies is greater than 0.3 (see <a href="https://github.com/SciLifeLab/Sarek/blob/master/docs/ASCAT.md#loci-file">here</a>).</p>
-
-<h1 id="counting-a-and-b-alleles">Counting A and B alleles</h1>
-<p>The next step is to count up the number of major and minor alleles at each of the identified positions. For this, we can use <a href="https://github.com/cancerit/alleleCount">alleleCount</a>. It is already installed on Uppmax</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module load bioinfo-tools alleleCount
-alleleCounter -l [path_to_loci_file] -r [path_to_human_ref_genome] -b path_to_tumor.bam -o output.allecount
-</code></pre></div></div>
-
-<p>The two input files are the loci file, the SNP positions identified in the previous step and the path to reference human genome.</p>
-
-<h1 id="ascat-si">Ascat SI</h1>
-<p>I had to stare at Eq. S5 in the SI for quite some time: \(b_i = \frac{1 - \rho + \rho n_B}{2 (1 - \rho) + \rho (n_A + n_B)}\). Here \(\rho\) refers to tumor fraction and \(n_A, n_B\) denote the true number of major and minor alleles. The observed data \(\hat{b}_i = n_B/(n_A + n_B)\) is a noisy version of the true value \(b_i\).</p>
-
-<p>This expression makes sense once we realize that this is an SNP position that is heterozygous (i.e., germline variant). Therefore, \((1-\rho)\) comes from having one copy of the minor allele since this is the fraction that are healthy (one of major and one of minor copy). The other term, \(\rho n_B\) is more straight forward, as it refers to the number of copies of minor allele in the tumor population.</p>
+    <h1 id="notes-on-making-an-r-package">Notes on making an R package</h1>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">library(devtools)</code> and <code class="language-plaintext highlighter-rouge">load_all()</code> will load your package.</li>
+  <li>All your library imports should go under <code class="language-plaintext highlighter-rouge">imports</code> section in <code class="language-plaintext highlighter-rouge">DESCRIPTION</code>.</li>
+  <li>To actually use the functions from other packages, need to tag the function with <code class="language-plaintext highlighter-rouge">@importfrom</code></li>
+</ul>
 
   </article>
 

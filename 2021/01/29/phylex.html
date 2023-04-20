@@ -92,14 +92,16 @@ We performed Smart-seq3, a sequencing method that performs full-length sequencin
 
 <p>PhylEx showed high-concordance to the ground truth tree (Figure 1A-B).
 The clone ABCD and its descendants are from the primary region, whereas clones EFGHI and EF are from the metastatic region in Figure 1A.
-Aside from merging EFGHI and EF clones, PhylEx reconstructs the tree topology correctly.
-We performed dimensionality reduction using the zero-inflated negative binomial model (ZINB-WaVE) on the raw expression counts.
+Aside from merging EFGHI and EF clones, PhylEx reconstructs the tree topology correctly.</p>
+
+<p>We performed dimensionality reduction using the zero-inflated negative binomial model (ZINB-WaVE) on the raw expression counts.
 Then, we performed pseudo-time trajectory analysis on the reduced dimension using Slingshot; to that end, we first assigned cells to clones by matching the cells’ observed genotypes to the genotypes of the clones based on the SNVs assigned to each clone.
 As pseudo-time trajectory analysis attempts to reconstruct the clones’ temporal ordering from the single-cell gene expression data, it serves as a useful comparison.
 We found that the trajectory inferred was generally incorrect (Figure 1C); in particular, cells assigned to clone CD were inferred as a <em>sibling</em> to ABCD clone. 
 Furthermore, if model-based clustering was applied to label the cells before performing Slingshot, the cells were grouped arbitrarily based on expression profile. Hence, the trajectory analysis did not yield any meaningful results.
-We have performed gene set enrichment analysis using the MSigDB Gene ontology set to compare the clones [3].
-Our results show that cells in the metastatic region were found to down-regulate pathways related to the immune system (Table 1).
+We have performed gene set enrichment analysis using the MSigDB Gene ontology set to compare the clones [3].</p>
+
+<p>Our results show that cells in the metastatic region were found to down-regulate pathways related to the immune system (Table 1).
 Together, these analysis demonstrate that reconstructing the evolutionary path taken by the cells can reveal insights that would otherwise be unavailable using only the gene expression data.</p>
 
 <p><em>Table 1: Top 10 down-regulated pathways in the metastatic region compared to the primary region.</em></p>

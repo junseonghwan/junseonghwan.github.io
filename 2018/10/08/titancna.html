@@ -77,7 +77,7 @@
     <p>TitanCNA ships with various workflows that seem rather easy to configure and run. But as a newbie in bioinformatics, I consider it to be a valuable exercise to configure and get tools working from ground up. This post assumes the following starting point:</p>
 <ol>
   <li>BAM files for Normal and Tumor samples that have been through the standard pre-processing pipeline, i.e., mapping, sorting, marking duplicate, adding read groups, and indel realignment.</li>
-  <li>Germline SNP calling using <a href="https://software.broadinstitute.org/gatk/documentation/tooldocs/3.8-0/org_broadinstitute_gatk_tools_walkers_haplotypecaller_HaplotypeCaller.php"><code class="highlighter-rouge">HaplotypeCaller</code></a>.</li>
+  <li>Germline SNP calling using <a href="https://software.broadinstitute.org/gatk/documentation/tooldocs/3.8-0/org_broadinstitute_gatk_tools_walkers_haplotypecaller_HaplotypeCaller.php"><code class="language-plaintext highlighter-rouge">HaplotypeCaller</code></a>.</li>
   <li>Softwares:
     <ul>
       <li><a href="https://github.com/cancerit/alleleCount">alleleCount</a>.</li>
@@ -90,32 +90,32 @@
 
 <h2 id="analysis-workflow">Analysis workflow</h2>
 <ol>
-  <li>Identify germline SNP positions <script type="math/tex">L = \{ t_i\}_{i=1}^{T}</script>, where <script type="math/tex">T</script> denotes the total number of germline SNP positions. We want to extract loci.
+  <li>Identify germline SNP positions \(L = \{ t_i\}_{i=1}^{T}\), where \(T\) denotes the total number of germline SNP positions. We want to extract loci.
     <ul>
       <li>Input: BAM file for normal sample.</li>
       <li>Output:
         <ol>
-          <li>Loci file, which is a tab separated file with two columns, <code class="highlighter-rouge">chr</code>, <code class="highlighter-rouge">posn</code>. The file is not to contain any header.</li>
-          <li>TSV file with four columns, <code class="highlighter-rouge">chr</code>, <code class="highlighter-rouge">posn</code>, <code class="highlighter-rouge">ref</code>, <code class="highlighter-rouge">nonRef</code>.</li>
+          <li>Loci file, which is a tab separated file with two columns, <code class="language-plaintext highlighter-rouge">chr</code>, <code class="language-plaintext highlighter-rouge">posn</code>. The file is not to contain any header.</li>
+          <li>TSV file with four columns, <code class="language-plaintext highlighter-rouge">chr</code>, <code class="language-plaintext highlighter-rouge">posn</code>, <code class="language-plaintext highlighter-rouge">ref</code>, <code class="language-plaintext highlighter-rouge">nonRef</code>.</li>
         </ol>
       </li>
     </ul>
   </li>
-  <li>Get allelic counts from normal and tumor samples. We will use <code class="highlighter-rouge">alleleCount</code> program, which accepts tab separated file <code class="highlighter-rouge">chr</code> and <code class="highlighter-rouge">posn</code> (without column header).
+  <li>Get allelic counts from normal and tumor samples. We will use <code class="language-plaintext highlighter-rouge">alleleCount</code> program, which accepts tab separated file <code class="language-plaintext highlighter-rouge">chr</code> and <code class="language-plaintext highlighter-rouge">posn</code> (without column header).
     <ul>
       <li>Input: Output of Step 1.</li>
-      <li>Output: Data file containing six columns, <code class="highlighter-rouge">chr</code>, <code class="highlighter-rouge">posn</code>, <code class="highlighter-rouge">ref</code>, <code class="highlighter-rouge">refCount</code>, <code class="highlighter-rouge">nonRef</code>, <code class="highlighter-rouge">nonRefCount</code>. Output name: <code class="highlighter-rouge">Normal/allele_counts.txt</code>, <code class="highlighter-rouge">Tumor/allele_counts.txt</code>.</li>
+      <li>Output: Data file containing six columns, <code class="language-plaintext highlighter-rouge">chr</code>, <code class="language-plaintext highlighter-rouge">posn</code>, <code class="language-plaintext highlighter-rouge">ref</code>, <code class="language-plaintext highlighter-rouge">refCount</code>, <code class="language-plaintext highlighter-rouge">nonRef</code>, <code class="language-plaintext highlighter-rouge">nonRefCount</code>. Output name: <code class="language-plaintext highlighter-rouge">Normal/allele_counts.txt</code>, <code class="language-plaintext highlighter-rouge">Tumor/allele_counts.txt</code>.</li>
     </ul>
   </li>
-  <li>Correction for GC content and mappability biases. The raw counts and depths may be biased due to GC content. This is where <code class="highlighter-rouge">HMMcopy_util</code> will be useful.
+  <li>Correction for GC content and mappability biases. The raw counts and depths may be biased due to GC content. This is where <code class="language-plaintext highlighter-rouge">HMMcopy_util</code> will be useful.
     <ul>
       <li>Input: BAM file for Normal and Tumor samples</li>
-      <li>Output: WIG file for read counts computed by binning Normal and Tumor samples at 1000kb. Output names: <code class="highlighter-rouge">Normal/readcounts.seg</code>, <code class="highlighter-rouge">Tumor/readcounts.seg</code>.</li>
+      <li>Output: WIG file for read counts computed by binning Normal and Tumor samples at 1000kb. Output names: <code class="language-plaintext highlighter-rouge">Normal/readcounts.seg</code>, <code class="language-plaintext highlighter-rouge">Tumor/readcounts.seg</code>.</li>
     </ul>
   </li>
   <li>Perform CNA.
     <ul>
-      <li>Input: <code class="highlighter-rouge">Tumor/allele_counts.txt</code>, <code class="highlighter-rouge">Normal/readcounts.seg</code>, <code class="highlighter-rouge">Tumor/readcounts.seg</code>.</li>
+      <li>Input: <code class="language-plaintext highlighter-rouge">Tumor/allele_counts.txt</code>, <code class="language-plaintext highlighter-rouge">Normal/readcounts.seg</code>, <code class="language-plaintext highlighter-rouge">Tumor/readcounts.seg</code>.</li>
       <li>Output: Data file containing copy number profile intervals.</li>
     </ul>
   </li>
@@ -125,10 +125,10 @@
 <h3 id="step-1-identify-germline-snp-positions-from-normal-sample">Step 1: Identify germline SNP positions from normal sample</h3>
 <ul>
   <li><strong>Input</strong>: BAM file for normal sample.</li>
-  <li><strong>Output</strong>: To produce file with two columns, <code class="highlighter-rouge">chr</code>, <code class="highlighter-rouge">posn</code> and another file with four columns <code class="highlighter-rouge">chr</code>, <code class="highlighter-rouge">posn</code>, <code class="highlighter-rouge">ref</code>, <code class="highlighter-rouge">alt</code>.</li>
+  <li><strong>Output</strong>: To produce file with two columns, <code class="language-plaintext highlighter-rouge">chr</code>, <code class="language-plaintext highlighter-rouge">posn</code> and another file with four columns <code class="language-plaintext highlighter-rouge">chr</code>, <code class="language-plaintext highlighter-rouge">posn</code>, <code class="language-plaintext highlighter-rouge">ref</code>, <code class="language-plaintext highlighter-rouge">alt</code>.</li>
 </ul>
 
-<p>We essentially need to write a simple Python script to process the output of <code class="highlighter-rouge">HaplotypeCaller</code>. Essentially, reading each line and retrieving the <code class="highlighter-rouge">chr</code> and <code class="highlighter-rouge">posn</code> of germline SNP. Python code for this procedure is avilable on <a href="https://github.com/junseonghwan/scripts">my Github</a>.</p>
+<p>We essentially need to write a simple Python script to process the output of <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code>. Essentially, reading each line and retrieving the <code class="language-plaintext highlighter-rouge">chr</code> and <code class="language-plaintext highlighter-rouge">posn</code> of germline SNP. Python code for this procedure is avilable on <a href="https://github.com/junseonghwan/scripts">my Github</a>.</p>
 
 <h4 id="notes">Notes</h4>
 <ul>
@@ -143,97 +143,97 @@
 <h3 id="step-2-extract-read-depth-from-tumorand-normal-samples">Step 2: Extract read depth from tumor and normal samples</h3>
 <ul>
   <li><strong>Input</strong>: loci file from Step 1.</li>
-  <li><strong>Output</strong>: A file containing six columns: <code class="highlighter-rouge">chr, posn, ref, refOriginal, nonRef, tumDepth</code>, for normal and tumor sample.</li>
+  <li><strong>Output</strong>: A file containing six columns: <code class="language-plaintext highlighter-rouge">chr, posn, ref, refOriginal, nonRef, tumDepth</code>, for normal and tumor sample.</li>
 </ul>
 
-<p>We will use <code class="highlighter-rouge">alleleCounter</code> to obtain the count at each of the locus. This is just a one line script (assuming alleleCounter is installed),</p>
+<p>We will use <code class="language-plaintext highlighter-rouge">alleleCounter</code> to obtain the count at each of the locus. This is just a one line script (assuming alleleCounter is installed),</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>alleleCounter <span class="nt">-l</span> path/to/loci_file_from_step1 <span class="nt">-r</span> path/to/hg/ <span class="nt">-b</span> <span class="nv">$1</span>/indel_realigned.bam <span class="nt">-o</span> <span class="nv">$1</span>/sample.allelecount
 </code></pre></div></div>
-<p>where <code class="highlighter-rouge">$1</code> indicates the directory containing the BAM file and where the output is to be stored.</p>
+<p>where <code class="language-plaintext highlighter-rouge">$1</code> indicates the directory containing the BAM file and where the output is to be stored.</p>
 
-<p>The output of <code class="highlighter-rouge">alleleCounter</code> needs to be further processed to form the desired output containing 6 columns. To do so, we will use the second output from Step 1 (i.e., the larger file containing 4 columns). I have written a simple script that does this. It requires <code class="highlighter-rouge">helper_functions.py</code>, which is available <a href="https://github.com/junseonghwan/scripts/blob/master/pipeline4/helper_functions.py">here</a>.</p>
+<p>The output of <code class="language-plaintext highlighter-rouge">alleleCounter</code> needs to be further processed to form the desired output containing 6 columns. To do so, we will use the second output from Step 1 (i.e., the larger file containing 4 columns). I have written a simple script that does this. It requires <code class="language-plaintext highlighter-rouge">helper_functions.py</code>, which is available <a href="https://github.com/junseonghwan/scripts/blob/master/pipeline4/helper_functions.py">here</a>.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">argparse</span>
+<span class="kn">import</span> <span class="n">os</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
 
-<span class="kn">import</span> <span class="nn">helper_functions</span> <span class="k">as</span> <span class="n">helpers</span>
+<span class="kn">import</span> <span class="n">helper_functions</span> <span class="k">as</span> <span class="n">helpers</span>
 
-<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">'Generate input file for TitanCNA.'</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'study_dir'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Name of the directory containing the data files for a study. E.g., TNBC"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"TNBC"</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'patient_id'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Patient ID. E.g., KTN126"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--data_dir'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Data directory."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"/proj/uppstore2018155/"</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--sample_name'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Name of the directory containing the sample to be processed. E.g., KTN1260."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">""</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--germline_snv_file'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Name of the germline SNV file."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"germline_snvs.tsv"</span><span class="p">)</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="nc">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">'Generate input file for TitanCNA.'</span><span class="p">)</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="s">'study_dir'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Name of the directory containing the data files for a study. E.g., TNBC"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"TNBC"</span><span class="p">)</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="s">'patient_id'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Patient ID. E.g., KTN126"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="s">'--data_dir'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Data directory."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"/proj/uppstore2018155/"</span><span class="p">)</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="s">'--sample_name'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Name of the directory containing the sample to be processed. E.g., KTN1260."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">""</span><span class="p">)</span>
+<span class="n">parser</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="s">'--germline_snv_file'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">"Name of the germline SNV file."</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">"germline_snvs.tsv"</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="nf">parse_args</span><span class="p">()</span>
 
-<span class="n">patient_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">study_dir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">patient_id</span><span class="p">)</span>
-<span class="n">common_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">patient_dir</span><span class="p">,</span> <span class="s">"common"</span><span class="p">)</span>
-<span class="n">file_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">common_dir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">germline_snv_file</span><span class="p">),</span> <span class="s">'r'</span><span class="p">)</span>
-<span class="nb">next</span><span class="p">(</span><span class="n">file_handle</span><span class="p">)</span>
-<span class="n">loci_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">patient_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">args</span><span class="p">.</span><span class="n">study_dir</span><span class="p">,</span> <span class="n">args</span><span class="p">.</span><span class="n">patient_id</span><span class="p">)</span>
+<span class="n">common_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">patient_dir</span><span class="p">,</span> <span class="s">"common"</span><span class="p">)</span>
+<span class="n">file_handle</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">common_dir</span><span class="p">,</span> <span class="n">args</span><span class="p">.</span><span class="n">germline_snv_file</span><span class="p">),</span> <span class="s">'r'</span><span class="p">)</span>
+<span class="nf">next</span><span class="p">(</span><span class="n">file_handle</span><span class="p">)</span>
+<span class="n">loci_dict</span> <span class="o">=</span> <span class="nf">dict</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_handle</span><span class="p">:</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s">"_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">loci_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s">"_"</span> <span class="o">+</span> <span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">loci_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nf">strip</span><span class="p">(),</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="nf">strip</span><span class="p">())</span>
 
-<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">sample_name</span> <span class="o">==</span> <span class="s">""</span><span class="p">:</span>
-    <span class="n">samples</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">patient_dir</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">args</span><span class="p">.</span><span class="n">sample_name</span> <span class="o">==</span> <span class="s">""</span><span class="p">:</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="nf">listdir</span><span class="p">(</span><span class="n">patient_dir</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">sample_name</span><span class="p">]</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="p">.</span><span class="n">sample_name</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">sample</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">"."</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sample</span> <span class="o">==</span> <span class="s">"common"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">sample</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="s">"."</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sample</span> <span class="o">==</span> <span class="s">"common"</span><span class="p">:</span>
         <span class="k">continue</span>
-    <span class="n">sample_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">patient_dir</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-    <span class="n">count_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sample_dir</span><span class="p">,</span> <span class="s">"sample.allelecount"</span><span class="p">)</span>
-    <span class="n">file_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">count_file</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span>
-    <span class="n">dat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="nb">next</span><span class="p">(</span><span class="n">file_handle</span><span class="p">)</span>
+    <span class="n">sample_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">patient_dir</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+    <span class="n">count_file</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">sample_dir</span><span class="p">,</span> <span class="s">"sample.allelecount"</span><span class="p">)</span>
+    <span class="n">file_handle</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="n">count_file</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="nf">list</span><span class="p">()</span>
+    <span class="nf">next</span><span class="p">(</span><span class="n">file_handle</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_handle</span><span class="p">:</span>
-        <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s">"_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s">"_"</span> <span class="o">+</span> <span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loci_dict</span><span class="p">:</span>
             <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">loci_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">alt</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">ref</span><span class="p">.</span><span class="nf">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nf">len</span><span class="p">(</span><span class="n">alt</span><span class="p">.</span><span class="nf">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">ref_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span> <span class="o">+</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_idx</span><span class="p">(</span><span class="n">ref</span><span class="p">)])</span>
-            <span class="n">alt_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span> <span class="o">+</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_idx</span><span class="p">(</span><span class="n">alt</span><span class="p">)])</span>
-            <span class="n">dat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">ref</span><span class="p">,</span> <span class="n">ref_count</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">ref_count</span> <span class="o">+</span> <span class="n">alt_count</span><span class="p">))</span>
+            <span class="n">ref_count</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span> <span class="o">+</span> <span class="n">helpers</span><span class="p">.</span><span class="nf">get_idx</span><span class="p">(</span><span class="n">ref</span><span class="p">)])</span>
+            <span class="n">alt_count</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span> <span class="o">+</span> <span class="n">helpers</span><span class="p">.</span><span class="nf">get_idx</span><span class="p">(</span><span class="n">alt</span><span class="p">)])</span>
+            <span class="n">dat</span><span class="p">.</span><span class="nf">append</span><span class="p">((</span><span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nf">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">ref</span><span class="p">,</span> <span class="n">ref_count</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">ref_count</span> <span class="o">+</span> <span class="n">alt_count</span><span class="p">))</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'chr'</span><span class="p">,</span> <span class="s">'posn'</span><span class="p">,</span> <span class="s">'ref'</span><span class="p">,</span> <span class="s">'refOriginal'</span><span class="p">,</span> <span class="s">'nonRef'</span><span class="p">,</span> <span class="s">'tumDepth'</span><span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nc">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'chr'</span><span class="p">,</span> <span class="s">'posn'</span><span class="p">,</span> <span class="s">'ref'</span><span class="p">,</span> <span class="s">'refOriginal'</span><span class="p">,</span> <span class="s">'nonRef'</span><span class="p">,</span> <span class="s">'tumDepth'</span><span class="p">])</span>
     <span class="c1"># save to file
-</span>    <span class="n">dest_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sample_dir</span><span class="p">,</span> <span class="s">"allele_counts.txt"</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">dest_file_name</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">"</span><span class="se">\t</span><span class="s">"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</span>    <span class="n">dest_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">sample_dir</span><span class="p">,</span> <span class="s">"allele_counts.txt"</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">.</span><span class="nf">to_csv</span><span class="p">(</span><span class="n">dest_file_name</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">"</span><span class="se">\t</span><span class="s">"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h4 id="notes-1">Notes</h4>
 <ul>
-  <li>Out of curiosity, I wanted to compare the output of <code class="highlighter-rouge">HaplotypeCaller</code> to the counts retrieved by <a href="https://pysam.readthedocs.io/en/latest/api.html">pysam</a> and <code class="highlighter-rouge">alleleCount</code>.
+  <li>Out of curiosity, I wanted to compare the output of <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code> to the counts retrieved by <a href="https://pysam.readthedocs.io/en/latest/api.html">pysam</a> and <code class="language-plaintext highlighter-rouge">alleleCount</code>.
     <ul>
-      <li>Note that <code class="highlighter-rouge">HaplotypeCaller</code> performs indel realignment internally. To ensure there is as little discrepancy as possible, we should use the BAM file with indel realignment.</li>
-      <li>I chose <code class="highlighter-rouge">pysam</code> because it seemed easy to set up and use and I have been told that it is pretty fast.</li>
+      <li>Note that <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code> performs indel realignment internally. To ensure there is as little discrepancy as possible, we should use the BAM file with indel realignment.</li>
+      <li>I chose <code class="language-plaintext highlighter-rouge">pysam</code> because it seemed easy to set up and use and I have been told that it is pretty fast.</li>
     </ul>
   </li>
 </ul>
 
 <p>To retrieve the reads at a specific loci, one can use following code:</p>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pysam</span>
-<span class="n">bamfile</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="s">"path/to/bam"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">pysam</span>
+<span class="n">bamfile</span> <span class="o">=</span> <span class="n">pysam</span><span class="p">.</span><span class="nc">AlignmentFile</span><span class="p">(</span><span class="s">"path/to/bam"</span><span class="p">)</span>
 <span class="c1"># Example: to get the reads at 1:949597
 </span><span class="n">chromosome</span> <span class="o">=</span> <span class="s">'1'</span>
 <span class="n">start</span> <span class="o">=</span> <span class="mi">949597</span>
 <span class="n">ref</span> <span class="o">=</span> <span class="s">'C'</span>
 <span class="n">alt</span> <span class="o">=</span> <span class="s">'T'</span>
-<span class="n">bamfile</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'1'</span><span class="p">,</span> <span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+<span class="n">bamfile</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="s">'1'</span><span class="p">,</span> <span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
 <span class="n">ref_count</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">alt_count</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">other_count</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">for</span> <span class="n">read</span> <span class="ow">in</span> <span class="n">bamfile</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="s">'1'</span><span class="p">,</span> <span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
-    <span class="n">seq</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">get_forward_sequence</span><span class="p">()</span>
-    <span class="n">quals</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">get_forward_qualities</span><span class="p">()</span>
-    <span class="n">pos</span> <span class="o">=</span> <span class="n">start</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">read</span><span class="o">.</span><span class="n">reference_start</span>
+<span class="k">for</span> <span class="n">read</span> <span class="ow">in</span> <span class="n">bamfile</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="s">'1'</span><span class="p">,</span> <span class="n">start</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">read</span><span class="p">.</span><span class="nf">get_forward_sequence</span><span class="p">()</span>
+    <span class="n">quals</span> <span class="o">=</span> <span class="n">read</span><span class="p">.</span><span class="nf">get_forward_qualities</span><span class="p">()</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">start</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">read</span><span class="p">.</span><span class="n">reference_start</span>
     <span class="k">if</span> <span class="n">quals</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">40</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">seq</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">==</span> <span class="n">ref</span><span class="p">:</span>
             <span class="n">ref_count</span> <span class="o">=</span> <span class="n">ref_count</span> <span class="o">+</span> <span class="mi">1</span>
@@ -243,43 +243,43 @@
             <span class="c1">#print("%s, %i" % (seq[pos], quals[pos]))
 </span>        <span class="k">else</span><span class="p">:</span>
             <span class="n">other_count</span> <span class="o">=</span> <span class="n">other_count</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="si">%</span><span class="s">i, </span><span class="si">%</span><span class="s">i, </span><span class="si">%</span><span class="s">i"</span> <span class="o">%</span> <span class="p">(</span><span class="n">ref_count</span><span class="p">,</span> <span class="n">alt_count</span><span class="p">,</span> <span class="n">other_count</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"%i, %i, %i"</span> <span class="o">%</span> <span class="p">(</span><span class="n">ref_count</span><span class="p">,</span> <span class="n">alt_count</span><span class="p">,</span> <span class="n">other_count</span><span class="p">))</span>
 <span class="c1"># Output:
 # 33, 15, 10
 </span></code></pre></div></div>
-<p>Running the above code produced 33, 15, 10 as the output for the reference, alternate, and other bases. On the contrary, VCF file produced by <code class="highlighter-rouge">HaplotypeCaller</code> for chromosome 1 had 16 and 13 as counts for reference and alternate alleles. The discrepancy in the counts is too large to be ignored, prompting <a href="https://gatkforums.broadinstitute.org/gatk/discussion/6694/determining-read-depth-from-bam-file-4-methods-3-different-results">further investigation</a>.</p>
+<p>Running the above code produced 33, 15, 10 as the output for the reference, alternate, and other bases. On the contrary, VCF file produced by <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code> for chromosome 1 had 16 and 13 as counts for reference and alternate alleles. The discrepancy in the counts is too large to be ignored, prompting <a href="https://gatkforums.broadinstitute.org/gatk/discussion/6694/determining-read-depth-from-bam-file-4-methods-3-different-results">further investigation</a>.</p>
 <ul>
-  <li>In short, it can be due to the duplicates, which are marked but may not have been removed by GATK/Picard tool. <code class="highlighter-rouge">HaplotypeCaller</code> knows to ignore them, but <code class="highlighter-rouge">pysam</code> may not.</li>
-  <li>Not satisfied, I used <code class="highlighter-rouge">alleleCounter</code> to compute the counts at loci identified by <code class="highlighter-rouge">HaplotypeCaller</code>. It gave counts that were very close to HaplotypeCaller. For example, at position 949597, I got 16 and 12 as counts for reference and alternate allele compared to 16 and 13 from HaplotypeCaller. In general, the counts were more or less similar at different locations as well.</li>
-  <li><strong>Conclusion:</strong> I decided to go with <code class="highlighter-rouge">alleleCounter</code>.
+  <li>In short, it can be due to the duplicates, which are marked but may not have been removed by GATK/Picard tool. <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code> knows to ignore them, but <code class="language-plaintext highlighter-rouge">pysam</code> may not.</li>
+  <li>Not satisfied, I used <code class="language-plaintext highlighter-rouge">alleleCounter</code> to compute the counts at loci identified by <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code>. It gave counts that were very close to HaplotypeCaller. For example, at position 949597, I got 16 and 12 as counts for reference and alternate allele compared to 16 and 13 from HaplotypeCaller. In general, the counts were more or less similar at different locations as well.</li>
+  <li><strong>Conclusion:</strong> I decided to go with <code class="language-plaintext highlighter-rouge">alleleCounter</code>.
     <ul>
-      <li>Disclaimer: I’m not advocating for or against any tool. I’m sure there must be a way to configure <code class="highlighter-rouge">pysam</code> to behave in the desired way. It’s just that I didn’t investigate and I was satisfied with <code class="highlighter-rouge">alleleCounter</code>.</li>
+      <li>Disclaimer: I’m not advocating for or against any tool. I’m sure there must be a way to configure <code class="language-plaintext highlighter-rouge">pysam</code> to behave in the desired way. It’s just that I didn’t investigate and I was satisfied with <code class="language-plaintext highlighter-rouge">alleleCounter</code>.</li>
     </ul>
   </li>
 </ul>
 
 <h3 id="step-3-correction-for-gc-content-and-mappability-biases">Step 3: Correction for GC content and mappability biases</h3>
-<p><code class="highlighter-rouge">HMMcopy</code> is a package developed for correcting for GC content and mappability biases. As per TitanCNA vignette, TitanCNA seems to work extensively with WIG file formats:</p>
+<p><code class="language-plaintext highlighter-rouge">HMMcopy</code> is a package developed for correcting for GC content and mappability biases. As per TitanCNA vignette, TitanCNA seems to work extensively with WIG file formats:</p>
 
 <p>“For TITAN, the user will need to generate the read depth files for the tumour and normal samples in the form of WIG files.”</p>
 
-<p>We will use <code class="highlighter-rouge">HMMcopy_util</code> to obtain the read depth files for tumour and normal samples in WIG format.</p>
+<p>We will use <code class="language-plaintext highlighter-rouge">HMMcopy_util</code> to obtain the read depth files for tumour and normal samples in WIG format.</p>
 
-<h3 id="step-3-1-hmmcopy_util">Step 3-1: <code class="highlighter-rouge">HMMcopy_util</code></h3>
-<p>Clone <code class="highlighter-rouge">HMMcopy_util</code> via command <code class="highlighter-rouge">git clone https://github.com/shahcompbio/hmmcopy_utils</code>.  Follow <a href="https://github.com/shahcompbio/hmmcopy_utils">instructions</a> to compile the program. This requires <code class="highlighter-rouge">cmake</code>, which you can get using <code class="highlighter-rouge">brew</code> on OSX and <code class="highlighter-rouge">make</code>, which should be available as long as you have installed Xcode. There are 3 programs in <code class="highlighter-rouge">HMMcopy_utils</code>:</p>
+<h3 id="step-3-1-hmmcopy_util">Step 3-1: <code class="language-plaintext highlighter-rouge">HMMcopy_util</code></h3>
+<p>Clone <code class="language-plaintext highlighter-rouge">HMMcopy_util</code> via command <code class="language-plaintext highlighter-rouge">git clone https://github.com/shahcompbio/hmmcopy_utils</code>.  Follow <a href="https://github.com/shahcompbio/hmmcopy_utils">instructions</a> to compile the program. This requires <code class="language-plaintext highlighter-rouge">cmake</code>, which you can get using <code class="language-plaintext highlighter-rouge">brew</code> on OSX and <code class="language-plaintext highlighter-rouge">make</code>, which should be available as long as you have installed Xcode. There are 3 programs in <code class="language-plaintext highlighter-rouge">HMMcopy_utils</code>:</p>
 <ul>
-  <li><code class="highlighter-rouge">bin/readCounter</code> produces WIG file from your (tumor and normal) BAM file. Use the window size of 1,000 (this is the recommended option). I added the <code class="highlighter-rouge">hmmcopy_utils/bin/</code> to <code class="highlighter-rouge">PATH</code> in <code class="highlighter-rouge">.bashrc</code>. With that, I can issue the following command,
+  <li><code class="language-plaintext highlighter-rouge">bin/readCounter</code> produces WIG file from your (tumor and normal) BAM file. Use the window size of 1,000 (this is the recommended option). I added the <code class="language-plaintext highlighter-rouge">hmmcopy_utils/bin/</code> to <code class="language-plaintext highlighter-rouge">PATH</code> in <code class="language-plaintext highlighter-rouge">.bashrc</code>. With that, I can issue the following command,
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>readCounter <span class="nt">-w</span> 1000 path/to/normal/indel_realigned.bam <span class="o">&gt;</span> path/to/normal/readcounts.seg
 readCounter <span class="nt">-w</span> 1000 path/to/tumor/indel_realigned.bam <span class="o">&gt;</span> path/to/tumor/readcounts.seg
 </code></pre></div>    </div>
   </li>
-  <li><code class="highlighter-rouge">bin/gcCounter</code> produces WIG file from reference human genome <code class="highlighter-rouge">fasta</code> file. The HG file should be the same one that we have been using in the pre-processing steps.</li>
-  <li><code class="highlighter-rouge">bin/mapCounter</code> produces WIG file. It accepts BigWig file format for the reference hg file.</li>
+  <li><code class="language-plaintext highlighter-rouge">bin/gcCounter</code> produces WIG file from reference human genome <code class="language-plaintext highlighter-rouge">fasta</code> file. The HG file should be the same one that we have been using in the pre-processing steps.</li>
+  <li><code class="language-plaintext highlighter-rouge">bin/mapCounter</code> produces WIG file. It accepts BigWig file format for the reference hg file.</li>
 </ul>
 
 <h4 id="notes-2">Notes</h4>
 <ul>
-  <li><code class="highlighter-rouge">HMMcopy_util</code> seems to ship GC and Mappability WIG files generated with window size of 1,000. Therefore,<code class="highlighter-rouge">bin/gcCounter</code> and <code class="highlighter-rouge">bin/mapCounter</code> need not be run unless one wishes to use different window size.</li>
+  <li><code class="language-plaintext highlighter-rouge">HMMcopy_util</code> seems to ship GC and Mappability WIG files generated with window size of 1,000. Therefore,<code class="language-plaintext highlighter-rouge">bin/gcCounter</code> and <code class="language-plaintext highlighter-rouge">bin/mapCounter</code> need not be run unless one wishes to use different window size.</li>
   <li>Question: how does one obtain BigWig file from HG18/19?
     <ul>
       <li>Some hint <a href="https://github.com/broadinstitute/ichorCNA/issues/29">here</a>?</li>
@@ -287,8 +287,8 @@ readCounter <span class="nt">-w</span> 1000 path/to/tumor/indel_realigned.bam <s
   </li>
 </ul>
 
-<h3 id="step-3-2-hmmcopy">Step 3-2: <code class="highlighter-rouge">HMMcopy</code></h3>
-<p>This step can be skipped since TitanCNA has a wrapper function that calls the functions in <code class="highlighter-rouge">HMMcopy</code> but it is nice to try out the package to see exactly what it does and to catch any problems that may have occurred up to this point in the processing steps. They have a nice <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/HMMcopy/inst/doc/HMMcopy.pdf">vignette</a> that is easy to follow, which I paste below:</p>
+<h3 id="step-3-2-hmmcopy">Step 3-2: <code class="language-plaintext highlighter-rouge">HMMcopy</code></h3>
+<p>This step can be skipped since TitanCNA has a wrapper function that calls the functions in <code class="language-plaintext highlighter-rouge">HMMcopy</code> but it is nice to try out the package to see exactly what it does and to catch any problems that may have occurred up to this point in the processing steps. They have a nice <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/HMMcopy/inst/doc/HMMcopy.pdf">vignette</a> that is easy to follow, which I paste below:</p>
 <div class="language-R highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">HMMcopy</span><span class="p">)</span><span class="w">
 </span><span class="n">readfile</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"path/to/output/of/readCounter"</span><span class="w">
 </span><span class="n">gcfile</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"path/to/hmmcopy_utils/data/gc_hg19.wig"</span><span class="w">
@@ -309,13 +309,13 @@ readCounter <span class="nt">-w</span> 1000 path/to/tumor/indel_realigned.bam <s
 
 <h4 id="notes-3">Notes</h4>
 <ul>
-  <li>For TNBC data (exome data), I was not able to generate a nice figure as is given in the <code class="highlighter-rouge">HMMcopy</code> vignette. This is because there are many regions with little or no reads and the scale for the figure is exorted as a result.</li>
+  <li>For TNBC data (exome data), I was not able to generate a nice figure as is given in the <code class="language-plaintext highlighter-rouge">HMMcopy</code> vignette. This is because there are many regions with little or no reads and the scale for the figure is exorted as a result.</li>
 </ul>
 
 <p><img src="/images/hmmcopy_Rplot.png" alt="HMMcopy Bias plot" /></p>
 
 <h3 id="step-4-titancna">Step 4: TitanCNA</h3>
-<p>** Input: <code class="highlighter-rouge">Normal/allele_counts.txt</code> and <code class="highlighter-rouge">Tumor/allele_counts.txt</code> from Step 2.
+<p>** Input: <code class="language-plaintext highlighter-rouge">Normal/allele_counts.txt</code> and <code class="language-plaintext highlighter-rouge">Tumor/allele_counts.txt</code> from Step 2.
 ** Output: Data file of copy number profile.</p>
 
 <p>The steps for using TitanCNA are described in Section 5 of the vignette [2]. I have adapted this code for analysis of TNBC data. The complete code is available <a href="/resources/titan_workflow.txt">here</a>. Here, I will briefly describe the steps that I have taken to prepare the input data. I chose not to perform GC correction for the time being.</p>
@@ -359,7 +359,7 @@ readCounter <span class="nt">-w</span> 1000 path/to/tumor/indel_realigned.bam <s
 </span><span class="n">titan_data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">filterData</span><span class="p">(</span><span class="n">titan_data</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="m">24</span><span class="p">,</span><span class="w"> </span><span class="n">minDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min_depth</span><span class="p">,</span><span class="w"> </span><span class="n">maxDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_depth</span><span class="p">,</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>The inline comments describe the code in sufficient detail. But basically, I’m computing <script type="math/tex">log_2(N^T/N^N)</script>, where <script type="math/tex">N^T, N^N</script> denote depth for tumour and normal samples respectively.</p>
+<p>The inline comments describe the code in sufficient detail. But basically, I’m computing \(log_2(N^T/N^N)\), where \(N^T, N^N\) denote depth for tumour and normal samples respectively.</p>
 
 <h4 id="notes-4">Notes</h4>
 <ul>

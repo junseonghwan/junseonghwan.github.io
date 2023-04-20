@@ -77,10 +77,10 @@
     <h2 id="re-starting-a-workflow">Re-starting a workflow</h2>
 <p>To start a workflow from the beginning, first delete all outputs related to that workflow. 
 For example,</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>snakemake -s &lt;workflow.snakefile&gt; --delete-all-output --dry-run --cores 1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>snakemake -s &lt;workflow.snakefile&gt; --delete-all-output --dry-run --cores 1
 </code></pre></div></div>
 <p>The above command will list the files that are going to be deleted but it will not actually delete those files.
-Remove the option <code class="highlighter-rouge">--dry-run</code> to actually excute the deletion.</p>
+Remove the option <code class="language-plaintext highlighter-rouge">--dry-run</code> to actually excute the deletion.</p>
 
 <ul>
   <li><a href="https://snakemake.readthedocs.io/en/stable/project_info/faq.html#how-do-i-remove-all-files-created-by-snakemake-i-e-like-make-clean">Reference</a>.</li>

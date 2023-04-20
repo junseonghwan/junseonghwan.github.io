@@ -82,21 +82,21 @@
 
 <p>The paired-end sequencing produces reads from both ends of a DNA fragment (one starting from the 3’ end and the other one starting from the 5’ end). Since DNA fragment is usually longer than the read length, the reads will cover different segments of the fragment, although for short reads, it may be possible for the two reads to overlap.</p>
 
-<p>The main benefit of paired-end sequencing compared to single-end sequencing is that it increases confidence in mapping to the reference genome. The paired-end sequencing usually produces two fastq.gz files, <code class="highlighter-rouge">xxx_1.fastq.gz</code> and <code class="highlighter-rouge">xxx_2.fastq.gz</code>, where <code class="highlighter-rouge">xxx</code> refers to file identifer. These two files should have same number of lines, which can be checked via the following command:</p>
+<p>The main benefit of paired-end sequencing compared to single-end sequencing is that it increases confidence in mapping to the reference genome. The paired-end sequencing usually produces two fastq.gz files, <code class="language-plaintext highlighter-rouge">xxx_1.fastq.gz</code> and <code class="language-plaintext highlighter-rouge">xxx_2.fastq.gz</code>, where <code class="language-plaintext highlighter-rouge">xxx</code> refers to file identifer. These two files should have same number of lines, which can be checked via the following command:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">gunzip</span> <span class="nt">-c</span> xxx_1.fastq.gz | <span class="nb">wc</span> <span class="nt">-l</span>
 <span class="nb">gunzip</span> <span class="nt">-c</span> xxx_2.fastq.gz | <span class="nb">wc</span> <span class="nt">-l</span>
 </code></pre></div></div>
-<p>Note that this may take some time depending on the size of the file. Make sure that the number of lines match in both files. At times, there will be third file, <code class="highlighter-rouge">xxx.fastq.gz</code>, this file seems to contain unpaired reads but some claim that it may contain barcodes. [Source: this <a href="https://www.biostars.org/p/16859/">discussion</a> on biostars.org].</p>
+<p>Note that this may take some time depending on the size of the file. Make sure that the number of lines match in both files. At times, there will be third file, <code class="language-plaintext highlighter-rouge">xxx.fastq.gz</code>, this file seems to contain unpaired reads but some claim that it may contain barcodes. [Source: this <a href="https://www.biostars.org/p/16859/">discussion</a> on biostars.org].</p>
 
 <p><strong>TODO: write a post on sequencing technology and refer to that post here. Discuss about RNA-seq technology. Is paired-end sequencing possible for RNA?</strong></p>
 
 <h2 id="checking-the-quality-of-data">Checking the quality of data</h2>
 
-<p>A first step is to ensure the quality of data, which can be carried out using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">fastqc</a>. This program generates an HTML report to help the user identify poor data quality. An example of such report is available <a href="/resources/fastqc_1.html">here</a> and <a href="/resources/fastqc_2.html">here</a>. Here are some notes on how to run <code class="highlighter-rouge">fastqc</code>:</p>
+<p>A first step is to ensure the quality of data, which can be carried out using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">fastqc</a>. This program generates an HTML report to help the user identify poor data quality. An example of such report is available <a href="/resources/fastqc_1.html">here</a> and <a href="/resources/fastqc_2.html">here</a>. Here are some notes on how to run <code class="language-plaintext highlighter-rouge">fastqc</code>:</p>
 <ul>
-  <li>Run a separate fastqc for each file: <code class="highlighter-rouge">fastqc xxx_1.fastq.gz -o output_dir</code>. This will generate the report (in the HTML format) to the <code class="highlighter-rouge">output_dir</code>.</li>
-  <li>It took me about 1 hour for 3GB <code class="highlighter-rouge">fastq.gz</code> file on Uppmax cluster (Rackham) and 3 hours for 30GB file on Uppmax cluster (Bianca). Make sure to allocate about 4-6 hours of computing time.</li>
-  <li>There doesn’t seem to be any multi-threading support for <code class="highlighter-rouge">fastqc</code> so when requesting computing resources, single core will suffice. Doing so will allow the job to be scheduled faster.</li>
+  <li>Run a separate fastqc for each file: <code class="language-plaintext highlighter-rouge">fastqc xxx_1.fastq.gz -o output_dir</code>. This will generate the report (in the HTML format) to the <code class="language-plaintext highlighter-rouge">output_dir</code>.</li>
+  <li>It took me about 1 hour for 3GB <code class="language-plaintext highlighter-rouge">fastq.gz</code> file on Uppmax cluster (Rackham) and 3 hours for 30GB file on Uppmax cluster (Bianca). Make sure to allocate about 4-6 hours of computing time.</li>
+  <li>There doesn’t seem to be any multi-threading support for <code class="language-plaintext highlighter-rouge">fastqc</code> so when requesting computing resources, single core will suffice. Doing so will allow the job to be scheduled faster.</li>
   <li>For details on how to read the report generated, refer to the <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">documentation</a>.</li>
 </ul>
 
@@ -107,7 +107,7 @@
 
 <p><strong>TODO: explain how the adapters arise in another post.</strong></p>
 
-<p>The tool that we will use for carrying out this task is <code class="highlighter-rouge">cutadapt</code>. However, this tool does more than just remove adapters. Some of its capabilities include:</p>
+<p>The tool that we will use for carrying out this task is <code class="language-plaintext highlighter-rouge">cutadapt</code>. However, this tool does more than just remove adapters. Some of its capabilities include:</p>
 <ol>
   <li>Adapter removal
     <ul>
@@ -116,12 +116,12 @@
   </li>
   <li>Quality trimming
     <ul>
-      <li>Example: <code class="highlighter-rouge">-q 20</code> will remove the bases with quality score below 20. Similarly, <code class="highlighter-rouge">-q 20,15</code> for paired reads will remove bases with quality score below 20 from 5’ end reads and 15 from 3’ end reads. If only one value is specified but the reads are paired, then only 3’ reads will be processed according to the documentation.</li>
+      <li>Example: <code class="language-plaintext highlighter-rouge">-q 20</code> will remove the bases with quality score below 20. Similarly, <code class="language-plaintext highlighter-rouge">-q 20,15</code> for paired reads will remove bases with quality score below 20 from 5’ end reads and 15 from 3’ end reads. If only one value is specified but the reads are paired, then only 3’ reads will be processed according to the documentation.</li>
     </ul>
   </li>
   <li>Filtering by read length:
     <ul>
-      <li>Q: When filtering reads based on length via <code class="highlighter-rouge">-m l</code>, if a read from 3’ has length shorter than <code class="highlighter-rouge">l</code>, then the corresponding read in 5’ end will also be discarded even though the corresponding read is longer than <code class="highlighter-rouge">l</code>?</li>
+      <li>Q: When filtering reads based on length via <code class="language-plaintext highlighter-rouge">-m l</code>, if a read from 3’ has length shorter than <code class="language-plaintext highlighter-rouge">l</code>, then the corresponding read in 5’ end will also be discarded even though the corresponding read is longer than <code class="language-plaintext highlighter-rouge">l</code>?</li>
       <li><strong>TODO: run it with a very small file and see how it behaves.</strong></li>
     </ul>
   </li>
@@ -130,48 +130,48 @@
 
 <h3 id="notes">Notes:</h3>
 <ol>
-  <li>Many of these operations are performed on both reads; therefore, the two files need to be processed (specified to <code class="highlighter-rouge">cutadapt</code>) together.</li>
-  <li>Pipelining the output of <code class="highlighter-rouge">cutadapt</code> to the next step is possible and may be a good idea when storage is a concern. However, it may be of interest to run <code class="highlighter-rouge">fastqc</code> again on the trimmed data just to ensure that everything looks good after trimming.</li>
-  <li>Q: <code class="highlighter-rouge">cutadapt</code> is written in Python. Are there better choices for this task?</li>
+  <li>Many of these operations are performed on both reads; therefore, the two files need to be processed (specified to <code class="language-plaintext highlighter-rouge">cutadapt</code>) together.</li>
+  <li>Pipelining the output of <code class="language-plaintext highlighter-rouge">cutadapt</code> to the next step is possible and may be a good idea when storage is a concern. However, it may be of interest to run <code class="language-plaintext highlighter-rouge">fastqc</code> again on the trimmed data just to ensure that everything looks good after trimming.</li>
+  <li>Q: <code class="language-plaintext highlighter-rouge">cutadapt</code> is written in Python. Are there better choices for this task?</li>
   <li>There are some discussions on whether this step is even necessary. For example, see this <a href="https://gatkforums.broadinstitute.org/gatk/discussion/9921/trimming-of-adapter-sequence">discussion</a> and <a href="https://www.ecseq.com/support/ngs/trimming-adapter-sequences-is-it-necessary">this</a>).</li>
   <li>This step can be parallelized so request large number of cores. Using 4 cores, it took me about 11 hours to process 20GB file.</li>
 </ol>
 
 <h2 id="mapping-to-reference-and-sorting-the-bam-file">Mapping to reference and sorting the BAM file</h2>
-<p>For reference mapping task there seem to be two popular choices: <code class="highlighter-rouge">BWA-mem</code> and <code class="highlighter-rouge">bowtie2</code>. I will discuss <code class="highlighter-rouge">bowtie2</code> here. The output of these tools is in SAM (sequence alignment map) file format. A potential problem is that the output file can get rather big and hence, the recommended practice is to pipe the output of <code class="highlighter-rouge">bowtie2</code> to <code class="highlighter-rouge">samtools</code> to produce the BAM (binary alignment map) files.</p>
+<p>For reference mapping task there seem to be two popular choices: <code class="language-plaintext highlighter-rouge">BWA-mem</code> and <code class="language-plaintext highlighter-rouge">bowtie2</code>. I will discuss <code class="language-plaintext highlighter-rouge">bowtie2</code> here. The output of these tools is in SAM (sequence alignment map) file format. A potential problem is that the output file can get rather big and hence, the recommended practice is to pipe the output of <code class="language-plaintext highlighter-rouge">bowtie2</code> to <code class="language-plaintext highlighter-rouge">samtools</code> to produce the BAM (binary alignment map) files.</p>
 
 <p>Note: BAM file format is a compressed version of SAM file format.</p>
 
-<p>Running <code class="highlighter-rouge">bowtie2</code> can be accomlished by issueing the following command:</p>
+<p>Running <code class="language-plaintext highlighter-rouge">bowtie2</code> can be accomlished by issueing the following command:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bowtie2 <span class="nt">--maxins</span> 2000 <span class="nt">--threads</span> 16 <span class="nt">-1</span> xxx_1.fastq.gz <span class="nt">-2</span> xxx_2.fastq.gz <span class="nt">-x</span> /path/to/reference <span class="nt">-S</span> <span class="nv">$4</span>
 </code></pre></div></div>
 
 <p>Here is description of each of the options:</p>
 <ul>
-  <li><code class="highlighter-rouge">-1</code>: file name of first of the two paired-end sequencing</li>
-  <li><code class="highlighter-rouge">-2</code>: the second of the two files</li>
-  <li><code class="highlighter-rouge">-x</code>: the location of the reference genome. Note that these are platform specific. For Uppmax, use the following path: <code class="highlighter-rouge">/sw/data/uppnex/reference/Homo_sapiens/GRCh37/program_files/bowtie2/concat</code></li>
-  <li><code class="highlighter-rouge">--minins</code> or <code class="highlighter-rouge">-I</code>: specifies the minimum gap between the location of the first and the second pair. Default value is 0.</li>
-  <li><code class="highlighter-rouge">--maxins</code> or <code class="highlighter-rouge">-X</code>: specifies the maximum gap between the location of the first and the second pair. The default value is 500.</li>
-  <li><code class="highlighter-rouge">--threads</code> or <code class="highlighter-rouge">-p</code>: number of threads to use</li>
-  <li><code class="highlighter-rouge">-S</code>: output file (<strong>but not recommended to output SAM file</strong>)</li>
+  <li><code class="language-plaintext highlighter-rouge">-1</code>: file name of first of the two paired-end sequencing</li>
+  <li><code class="language-plaintext highlighter-rouge">-2</code>: the second of the two files</li>
+  <li><code class="language-plaintext highlighter-rouge">-x</code>: the location of the reference genome. Note that these are platform specific. For Uppmax, use the following path: <code class="language-plaintext highlighter-rouge">/sw/data/uppnex/reference/Homo_sapiens/GRCh37/program_files/bowtie2/concat</code></li>
+  <li><code class="language-plaintext highlighter-rouge">--minins</code> or <code class="language-plaintext highlighter-rouge">-I</code>: specifies the minimum gap between the location of the first and the second pair. Default value is 0.</li>
+  <li><code class="language-plaintext highlighter-rouge">--maxins</code> or <code class="language-plaintext highlighter-rouge">-X</code>: specifies the maximum gap between the location of the first and the second pair. The default value is 500.</li>
+  <li><code class="language-plaintext highlighter-rouge">--threads</code> or <code class="language-plaintext highlighter-rouge">-p</code>: number of threads to use</li>
+  <li><code class="language-plaintext highlighter-rouge">-S</code>: output file (<strong>but not recommended to output SAM file</strong>)</li>
   <li>Refer to the <a href="http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-aligner">manual</a> for complete list of options.</li>
 </ul>
 
-<p>Note that larger the gap between <code class="highlighter-rouge">-I</code> and <code class="highlighter-rouge">-X</code>, slower the mapping process. If you have good understanding of the sequencing technology that is used, then specifying accurate values for <code class="highlighter-rouge">-I,-Z</code> will shorten the mapping time.</p>
+<p>Note that larger the gap between <code class="language-plaintext highlighter-rouge">-I</code> and <code class="language-plaintext highlighter-rouge">-X</code>, slower the mapping process. If you have good understanding of the sequencing technology that is used, then specifying accurate values for <code class="language-plaintext highlighter-rouge">-I,-Z</code> will shorten the mapping time.</p>
 
-<p>The recommended tool for compressing to BAM file is <code class="highlighter-rouge">samtools</code>. It is a collection of tools that are frequently used in analyzing SAM/BAM files. Mapping and piping can be accomplished by,</p>
+<p>The recommended tool for compressing to BAM file is <code class="language-plaintext highlighter-rouge">samtools</code>. It is a collection of tools that are frequently used in analyzing SAM/BAM files. Mapping and piping can be accomplished by,</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bowtie2 <span class="nt">--maxins</span> 2000 <span class="nt">--threads</span> 16 <span class="nt">-1</span> xxx_1.fastq.gz <span class="nt">-2</span> xxx_2.fastq.gz <span class="nt">-x</span> /path/to/reference | samtools view <span class="nt">-h</span> <span class="nt">-b</span> - <span class="o">&gt;</span> mapped.bam
 </code></pre></div></div>
 
 <ul>
-  <li><code class="highlighter-rouge">view</code>: program name,</li>
-  <li><code class="highlighter-rouge">-b</code>: convert to BAM format</li>
-  <li><code class="highlighter-rouge">-h</code>: output the header in the BAM file</li>
-  <li><code class="highlighter-rouge">-</code>: the dash is telling <code class="highlighter-rouge">samtools</code> that the input is coming from standard input (coming from pipeline).</li>
-  <li>It seems like multi-threading is available via <code class="highlighter-rouge">@ num_threads</code> option but some people have reported that it can be unstable.</li>
+  <li><code class="language-plaintext highlighter-rouge">view</code>: program name,</li>
+  <li><code class="language-plaintext highlighter-rouge">-b</code>: convert to BAM format</li>
+  <li><code class="language-plaintext highlighter-rouge">-h</code>: output the header in the BAM file</li>
+  <li><code class="language-plaintext highlighter-rouge">-</code>: the dash is telling <code class="language-plaintext highlighter-rouge">samtools</code> that the input is coming from standard input (coming from pipeline).</li>
+  <li>It seems like multi-threading is available via <code class="language-plaintext highlighter-rouge">@ num_threads</code> option but some people have reported that it can be unstable.</li>
   <li>The manual is available <a href="http://www.htslib.org/doc/samtools.html">here</a>.</li>
 </ul>
 
@@ -193,7 +193,7 @@
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bowtie2 <span class="nt">--maxins</span> 2000 <span class="nt">--threads</span> 16 <span class="nt">-1</span> xxx_1.fastq.gz <span class="nt">-2</span> xxx_2.fastq.gz <span class="nt">-x</span> /path/to/reference | samtools view <span class="nt">-h</span> <span class="nt">-b</span> - | samtools <span class="nb">sort</span> <span class="nt">-o</span> sorted.bam
 </code></pre></div></div>
 
-<p>And also, try with <code class="highlighter-rouge">@16</code> to see if multi-threading makes a difference.</p>
+<p>And also, try with <code class="language-plaintext highlighter-rouge">@16</code> to see if multi-threading makes a difference.</p>
 
 <p>Better yet, it is possible to bypass the step of converting SAM to BAM and just jump straight to sorted BAM:</p>
 
@@ -215,7 +215,7 @@
 
 <p><strong>TODO: read up on the sequencing technologies to try and understand why this happens.</strong></p>
 
-<p>The tool that we will use for marking duplicates is <code class="highlighter-rouge">picard</code>.</p>
+<p>The tool that we will use for marking duplicates is <code class="language-plaintext highlighter-rouge">picard</code>.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># requiring 5GB of memory, for Rackham, each core comes with 6.4GB so we should be OK without additional request for memory</span>
 java <span class="nt">-Xmx5g</span> <span class="nt">-jar</span> <span class="k">${</span><span class="nv">PICARD</span><span class="k">}</span>/picard.jar <span class="se">\</span>
@@ -225,7 +225,7 @@ MarkDuplicates <span class="nv">VALIDATION_STRINGENCY</span><span class="o">=</s
 <span class="nv">METRICS_FILE</span><span class="o">=</span>duplicate_metric.txt 1&gt;&amp;2 2&gt; log_fix_mark.txt
 </code></pre></div></div>
 
-<p>This script requires to provide the location of <code class="highlighter-rouge">picard.jar</code> and the input BAM file. The <code class="highlighter-rouge">METRICS_FILE</code> points to the file that will contain the duplication statistics. And the last bit is just to redirect the output to a log file.</p>
+<p>This script requires to provide the location of <code class="language-plaintext highlighter-rouge">picard.jar</code> and the input BAM file. The <code class="language-plaintext highlighter-rouge">METRICS_FILE</code> points to the file that will contain the duplication statistics. And the last bit is just to redirect the output to a log file.</p>
 
 <p><strong>TODO: add a bit more on how to read and interpret the metrics file.</strong></p>
 
@@ -259,21 +259,21 @@ AddOrReplaceReadGroups <span class="se">\</span>
 <span class="nv">RGPU</span><span class="o">=</span><span class="s2">"NA"</span> 1&gt;&amp;2 2&gt; log_fix_addreplace.txt
 </code></pre></div></div>
 <ul>
-  <li><code class="highlighter-rouge">CREATE_INDEX</code>: create index file while adding the read group.</li>
-  <li><code class="highlighter-rouge">RGID</code>: Read group ID. The default value is 1, and it is recommended to change this to something other than the default value. For example, 2 or if the data is triple negative breast cancer, TNBC or could be a patient ID if there are multiple patients.</li>
-  <li><code class="highlighter-rouge">RGSM</code>: Read group sample name. This can be patient ID and/or information on the sample like blood or stomach if such is available.</li>
-  <li><code class="highlighter-rouge">RGLB</code>: Read group library (library preparation method?). When unknown just fill in some default value like “NA”.</li>
-  <li><code class="highlighter-rouge">RGPL</code>: Read group (sequencing) platform. In my case, we are using ILLUMINA.</li>
-  <li><code class="highlighter-rouge">RGPU</code>: Read group platform unit. It is a required filled but I’m not sure what this is supposed to be referring to so, filled in NA.</li>
+  <li><code class="language-plaintext highlighter-rouge">CREATE_INDEX</code>: create index file while adding the read group.</li>
+  <li><code class="language-plaintext highlighter-rouge">RGID</code>: Read group ID. The default value is 1, and it is recommended to change this to something other than the default value. For example, 2 or if the data is triple negative breast cancer, TNBC or could be a patient ID if there are multiple patients.</li>
+  <li><code class="language-plaintext highlighter-rouge">RGSM</code>: Read group sample name. This can be patient ID and/or information on the sample like blood or stomach if such is available.</li>
+  <li><code class="language-plaintext highlighter-rouge">RGLB</code>: Read group library (library preparation method?). When unknown just fill in some default value like “NA”.</li>
+  <li><code class="language-plaintext highlighter-rouge">RGPL</code>: Read group (sequencing) platform. In my case, we are using ILLUMINA.</li>
+  <li><code class="language-plaintext highlighter-rouge">RGPU</code>: Read group platform unit. It is a required filled but I’m not sure what this is supposed to be referring to so, filled in NA.</li>
 </ul>
 
 <h3 id="creating-index-file">Creating index file</h3>
-<p>Note that alternatively, we can create index file using <code class="highlighter-rouge">samtools index marked.bam marked.bai</code>, this will produce an output <code class="highlighter-rouge">marked.bai</code> (in the order of few MBs for 8GB BAM file).</p>
+<p>Note that alternatively, we can create index file using <code class="language-plaintext highlighter-rouge">samtools index marked.bam marked.bai</code>, this will produce an output <code class="language-plaintext highlighter-rouge">marked.bai</code> (in the order of few MBs for 8GB BAM file).</p>
 
 <h2 id="realignment">Realignment</h2>
 <p>First, some notes:</p>
 <ul>
-  <li>Genome analysis toolkit (GATK) can be used. But this step seems to be optional if using <code class="highlighter-rouge">MuTect2</code> and <code class="highlighter-rouge">HaplotypeCaller</code>.</li>
+  <li>Genome analysis toolkit (GATK) can be used. But this step seems to be optional if using <code class="language-plaintext highlighter-rouge">MuTect2</code> and <code class="language-plaintext highlighter-rouge">HaplotypeCaller</code>.</li>
   <li>Do not do this step for amplicon sequencing (i.e., targeted sequencing data).</li>
   <li>I think it’s case-by-case. If the producer of the data did this step, then do it. Otherwise, it is optional and depends on the variant calling tool that you are using.</li>
 </ul>
@@ -320,7 +320,7 @@ AddOrReplaceReadGroups <span class="se">\</span>
 <h2 id="additional-steps-for-cleaning">Additional steps for cleaning</h2>
 <p>These seemed less important to me, so I skipped them. But for a careful and accurate analysis, perhaps these steps should not be skipped:</p>
 <ul>
-  <li><code class="highlighter-rouge">samtools flagstat</code></li>
+  <li><code class="language-plaintext highlighter-rouge">samtools flagstat</code></li>
   <li>Additional filtering to remove low quality reads, unmapped reads, and marked duplicates</li>
   <li>Base quality score recalibration
     <ul>

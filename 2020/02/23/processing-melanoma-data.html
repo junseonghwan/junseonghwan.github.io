@@ -80,13 +80,13 @@
 
 <h1 id="softwares">Softwares</h1>
 <ul>
-  <li>You can get bowtie using conda: <code class="highlighter-rouge">conda install -c bioconda bowtie</code>.
+  <li>You can get bowtie using conda: <code class="language-plaintext highlighter-rouge">conda install -c bioconda bowtie</code>.
     <ul>
-      <li>You can also download a pre-built package from <a href="https://sourceforge.net/projects/bowtie-bio/files/bowtie/1.2.3/">here</a>. Make sure to update <code class="highlighter-rouge">PATH</code> to point to install location.</li>
-      <li>Make sure to get the latest version, 1.2.3. I tried using 1.0.0 but it doesn’t seem to work with <code class="highlighter-rouge">fastq.gz</code>.</li>
+      <li>You can also download a pre-built package from <a href="https://sourceforge.net/projects/bowtie-bio/files/bowtie/1.2.3/">here</a>. Make sure to update <code class="language-plaintext highlighter-rouge">PATH</code> to point to install location.</li>
+      <li>Make sure to get the latest version, 1.2.3. I tried using 1.0.0 but it doesn’t seem to work with <code class="language-plaintext highlighter-rouge">fastq.gz</code>.</li>
     </ul>
   </li>
-  <li>We also need <code class="highlighter-rouge">samtools</code> to generate BAM files as well as for sorting and indexing: <code class="highlighter-rouge">conda install -c bioconda samtools</code>.</li>
+  <li>We also need <code class="language-plaintext highlighter-rouge">samtools</code> to generate BAM files as well as for sorting and indexing: <code class="language-plaintext highlighter-rouge">conda install -c bioconda samtools</code>.</li>
   <li>We will use <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-12-323">RSEM</a>, which is available <a href="https://github.com/deweylab/RSEM">here</a>.</li>
 </ul>
 
@@ -100,8 +100,8 @@ Using the same reference file turned out to be important for running Strelka to 
 We still need to download the GTF file. I chose GRCh37.75:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz
 </code></pre></div></div>
-<p>I have the GTF file as well as the hg19 in a common directory, call it, <code class="highlighter-rouge">&lt;REF_LOC&gt;</code>.
-Using <code class="highlighter-rouge">gunzip</code> to decompress the files and excute a script containing the following command:</p>
+<p>I have the GTF file as well as the hg19 in a common directory, call it, <code class="language-plaintext highlighter-rouge">&lt;REF_LOC&gt;</code>.
+Using <code class="language-plaintext highlighter-rouge">gunzip</code> to decompress the files and excute a script containing the following command:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsem-prepare-reference <span class="nt">--gtf</span> &lt;REF_LOC&gt;/Homo_sapiens.GRCh37.75.gtf <span class="se">\</span>
                <span class="nt">--bowtie</span> <span class="se">\</span>
                &lt;REF_LOC&gt;/Homo_sapiens_assembly19.fasta <span class="se">\</span>
@@ -109,17 +109,17 @@ Using <code class="highlighter-rouge">gunzip</code> to decompress the files and 
 </code></pre></div></div>
 <p>Note:</p>
 <ul>
-  <li>You will need to create a destination directory <code class="highlighter-rouge">&lt;REF_LOC&gt;/bowtie</code>.</li>
+  <li>You will need to create a destination directory <code class="language-plaintext highlighter-rouge">&lt;REF_LOC&gt;/bowtie</code>.</li>
   <li>This command builds Bowtie index, which we are going to use for aligning single cells.</li>
   <li>I ran this command in the interactive mode, i.e., did not submit it as a job. It didn’t take too long, roughly about 10-15 minutes. Depending on your compute cluster rules, you may need to submit it as job.</li>
-  <li>You may need to specify path to <code class="highlighter-rouge">bowtie</code> using the option <code class="highlighter-rouge">--bowtie-path</code> if <code class="highlighter-rouge">bowtie</code> is not in your search path.</li>
-  <li>Option <code class="highlighter-rouge">-p</code> can be used if you desire to use multiple cores.</li>
+  <li>You may need to specify path to <code class="language-plaintext highlighter-rouge">bowtie</code> using the option <code class="language-plaintext highlighter-rouge">--bowtie-path</code> if <code class="language-plaintext highlighter-rouge">bowtie</code> is not in your search path.</li>
+  <li>Option <code class="language-plaintext highlighter-rouge">-p</code> can be used if you desire to use multiple cores.</li>
   <li>Full set of options are available <a href="https://deweylab.github.io/RSEM/rsem-prepare-reference.html">here</a>.</li>
 </ul>
 
-<p>To calculate the expression values, we use the command <code class="highlighter-rouge">rsem-calculate-expression</code> (<a href="http://deweylab.biostat.wisc.edu/rsem/rsem-calculate-expression.html">documentation</a>):</p>
+<p>To calculate the expression values, we use the command <code class="language-plaintext highlighter-rouge">rsem-calculate-expression</code> (<a href="http://deweylab.biostat.wisc.edu/rsem/rsem-calculate-expression.html">documentation</a>):</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsem-calculate-expression --output-genome-bam \
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsem-calculate-expression --output-genome-bam \
                           --phred33-quals \
                           --bowtie-n 1 \
                           --bowtie-e 99999999 \
@@ -136,18 +136,18 @@ Using <code class="highlighter-rouge">gunzip</code> to decompress the files and 
 </code></pre></div></div>
 
 <p>Compare the above to the options used to run bowtie in Tirosh et al:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-q --phred33-quals -n 1 -e 99999999 -m 15 -l 25 -I 1 -X 2000 -a -S -p 6
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-q --phred33-quals -n 1 -e 99999999 -m 15 -l 25 -I 1 -X 2000 -a -S -p 6
 </code></pre></div></div>
 
 <ul>
-  <li><code class="highlighter-rouge">-q</code>: This option indicates that the input files are in fastq. The single cells are in <code class="highlighter-rouge">fastq.gz</code>, so I thought we need to specify <code class="highlighter-rouge">--gzipped-read-file</code> but it seems to work without it.</li>
-  <li><code class="highlighter-rouge">--phred33-quals, -n, -e, -m</code> are matched in both commands straightforwardly.</li>
-  <li><code class="highlighter-rouge">-l</code>: corresponds to <code class="highlighter-rouge">--seed-length</code>. The default value is 25 so we actually do not need to specify it but we do so anyways for completeness.</li>
-  <li><code class="highlighter-rouge">-I</code>: corresponds to <code class="highlighter-rouge">--fragment-length-min</code>. The default value is 1 for <code class="highlighter-rouge">rsem-calculate-expression</code> so we actually don’t need to specify it (do it for completeness).</li>
-  <li><code class="highlighter-rouge">-X</code>: corresponds to <code class="highlighter-rouge">--fragment-length-max</code>. The default value is 1,000 so we definitely need to specify its value as 2,000 to match Tirosh et al.</li>
-  <li><code class="highlighter-rouge">-a</code>: The <a href="http://bowtie-bio.sourceforge.net/manual.shtml#bowtie-options-a">default value</a> is <em>off</em> for Bowtie. I wasn’t able to find the corresponding option for <code class="highlighter-rouge">rsem-calculate-expression</code>.</li>
-  <li><code class="highlighter-rouge">-S</code>: Indicates that the output will be in SAM format. This option is irrelevant to us since <code class="highlighter-rouge">rsem-calculate-expression</code> will output BAM files directly specified using <code class="highlighter-rouge">--output-genome-bam</code> option.</li>
-  <li><code class="highlighter-rouge">-p</code>: Indicates the number of threads to use. As I’m submitting one job, each allocated 1 core for each cell, I chose to specify 1 thread.</li>
+  <li><code class="language-plaintext highlighter-rouge">-q</code>: This option indicates that the input files are in fastq. The single cells are in <code class="language-plaintext highlighter-rouge">fastq.gz</code>, so I thought we need to specify <code class="language-plaintext highlighter-rouge">--gzipped-read-file</code> but it seems to work without it.</li>
+  <li><code class="language-plaintext highlighter-rouge">--phred33-quals, -n, -e, -m</code> are matched in both commands straightforwardly.</li>
+  <li><code class="language-plaintext highlighter-rouge">-l</code>: corresponds to <code class="language-plaintext highlighter-rouge">--seed-length</code>. The default value is 25 so we actually do not need to specify it but we do so anyways for completeness.</li>
+  <li><code class="language-plaintext highlighter-rouge">-I</code>: corresponds to <code class="language-plaintext highlighter-rouge">--fragment-length-min</code>. The default value is 1 for <code class="language-plaintext highlighter-rouge">rsem-calculate-expression</code> so we actually don’t need to specify it (do it for completeness).</li>
+  <li><code class="language-plaintext highlighter-rouge">-X</code>: corresponds to <code class="language-plaintext highlighter-rouge">--fragment-length-max</code>. The default value is 1,000 so we definitely need to specify its value as 2,000 to match Tirosh et al.</li>
+  <li><code class="language-plaintext highlighter-rouge">-a</code>: The <a href="http://bowtie-bio.sourceforge.net/manual.shtml#bowtie-options-a">default value</a> is <em>off</em> for Bowtie. I wasn’t able to find the corresponding option for <code class="language-plaintext highlighter-rouge">rsem-calculate-expression</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">-S</code>: Indicates that the output will be in SAM format. This option is irrelevant to us since <code class="language-plaintext highlighter-rouge">rsem-calculate-expression</code> will output BAM files directly specified using <code class="language-plaintext highlighter-rouge">--output-genome-bam</code> option.</li>
+  <li><code class="language-plaintext highlighter-rouge">-p</code>: Indicates the number of threads to use. As I’m submitting one job, each allocated 1 core for each cell, I chose to specify 1 thread.</li>
 </ul>
 
 <p>Because the single cells are small in size, the processing time was rather fast. Even for a cell with size about 200MB, I think it took only about 15 minutes.</p>
@@ -180,7 +180,7 @@ Because we are given already aligned BAM files, it is important that we use hg19
 <h1 id="mutect2">MuTect2</h1>
 <p>The manual for MuTect2 is found <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2">here</a>.
 Note: we did not use panel of normal.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gatk --java-options "-Xmx16g" Mutect2 \
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gatk --java-options "-Xmx16g" Mutect2 \
   -R &lt;REF_LOC&gt;/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa  \
   -I ${SAMPLE_DIR}/${TUMOR_SAMPLE}.bam \
   -tumor ${TUMOR_SAMPLE} \
@@ -191,7 +191,7 @@ Note: we did not use panel of normal.</p>
 </code></pre></div></div>
 
 <h1 id="strelka">Strelka</h1>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strelka-2.9.2.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py \
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>strelka-2.9.2.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py \
     --normalBam &lt;NORMAL_BAM&gt; \
     --tumorBam &lt;TUMOR_BAM&gt; \
     --referenceFasta &lt;REF_LOC&gt;/Homo_sapiens_assembly19.fasta \
@@ -201,7 +201,7 @@ Note: we did not use panel of normal.</p>
 
 <h1 id="haplotypecaller">HaplotypeCaller</h1>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gatk --java-options "-Xmx16g" HaplotypeCaller \
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gatk --java-options "-Xmx16g" HaplotypeCaller \
   -R &lt;REF_LOC&gt;/Homo_sapiens_assembly19.fasta \
   -I ${SAMPLE_DIR}/${SAMPLE_NAME}.bam \
   -O ${SAMPLE_DIR}/${SAMPLE_NAME}.germline.vcf.gz \
@@ -226,17 +226,17 @@ The error messages were rather cryptic, for example,</p>
 
 <p>We already have access to GRCh37 from RSEM step. We can find GRCh37 split by chromosome on Ensembl FTP. 
 For example release-75 is available <a href="ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/">here</a>.
-We can simply use <code class="highlighter-rouge">wget</code> to get the files we need. 
+We can simply use <code class="language-plaintext highlighter-rouge">wget</code> to get the files we need. 
 For example,</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget -r -A 'Homo_sapiens.GRCh37.75.dna.chromosome.*.fa.gz' ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget -r -A 'Homo_sapiens.GRCh37.75.dna.chromosome.*.fa.gz' ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/
 </code></pre></div></div>
 <p>will retrieve all chromosome files we need.</p>
 
 <!--**Note**: Freec requires the chromosome file names to be of the form chr[0-9]+.fa, chr[X|Y|MT].fa or without chr prefix like 1.fa, 2.fa, and etc.
 You can write a simple script to do this or do it manually (tedious but there are only 22 + 3 files).-->
 
-<p>Chromsome length can be obtained using <code class="highlighter-rouge">samtools</code>:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>samtools faidx Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
+<p>Chromsome length can be obtained using <code class="language-plaintext highlighter-rouge">samtools</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>samtools faidx Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
 </code></pre></div></div>
 
 <h2 id="run-freec">Run FREEC</h2>
