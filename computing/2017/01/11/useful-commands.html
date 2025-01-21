@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Useful commands</title>
-  <meta name="description" content="Jekyll">
+  <meta name="description" content="Slurm">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/bootstrap.css">
@@ -54,7 +54,7 @@
       <div class="trigger">
         
           
-          <a class="page-link" href="/code/">Code</a>
+            <a class="page-link" href="/code/">Code</a>
           
         
           
@@ -62,11 +62,17 @@
           
         
           
-          <a class="page-link" href="/research/">Research</a>
+        
+          
+            <a class="page-link" href="/research/">Research</a>
           
         
           
-          <a class="page-link" href="/scribbles/">Scribbles</a>
+            <a class="page-link" href="/scribbles/">Scribbles</a>
+          
+        
+          
+            <a class="page-link" href="/teaching/">Teaching</a>
           
         
       </div>
@@ -87,7 +93,15 @@
   </header>
 
   <article class="post-content">
-    <h1 id="jekyll">Jekyll</h1>
+    <h1 id="slurm">Slurm</h1>
+
+<p>Allocate interactive GPU node and then run bash on it to get on the node:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salloc <span class="nt">--partition</span><span class="o">=</span>gpu-interactive <span class="nt">--nodes</span><span class="o">=</span>1 <span class="nt">--ntasks</span><span class="o">=</span>1 <span class="nt">--gres</span><span class="o">=</span>gpu:1 <span class="nt">--time</span><span class="o">=</span>02:00:00 <span class="nt">--mem</span><span class="o">=</span>8G
+srun <span class="nt">--pty</span> bash
+</code></pre></div></div>
+
+<h1 id="jekyll">Jekyll</h1>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jekyll build <span class="nt">--destination</span> &lt;destination&gt;
 </code></pre></div></div>

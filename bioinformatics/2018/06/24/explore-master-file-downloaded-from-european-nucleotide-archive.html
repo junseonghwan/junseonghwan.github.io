@@ -54,7 +54,7 @@
       <div class="trigger">
         
           
-          <a class="page-link" href="/code/">Code</a>
+            <a class="page-link" href="/code/">Code</a>
           
         
           
@@ -62,11 +62,17 @@
           
         
           
-          <a class="page-link" href="/research/">Research</a>
+        
+          
+            <a class="page-link" href="/research/">Research</a>
           
         
           
-          <a class="page-link" href="/scribbles/">Scribbles</a>
+            <a class="page-link" href="/scribbles/">Scribbles</a>
+          
+        
+          
+            <a class="page-link" href="/teaching/">Teaching</a>
           
         
       </div>
@@ -100,9 +106,9 @@
 
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">file_name</span> <span class="o">=</span> <span class="s">"table.txt"</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">file_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">table.txt</span><span class="sh">"</span>
 
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_table</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_table</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="sh">'</span><span class="se">\t</span><span class="sh">'</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span> <span class="c1"># check the column names, we want library_name to be there!
 </span>
 </code></pre></div></div>
@@ -114,7 +120,7 @@
       dtype='object')
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">).</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">patient_ids</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sh">'</span><span class="s">library_name</span><span class="sh">'</span><span class="p">].</span><span class="nf">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">).</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 <span class="n">patients</span> <span class="o">=</span> <span class="nf">set</span><span class="p">(</span><span class="n">patient_ids</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="nf">sorted</span><span class="p">(</span><span class="n">patients</span><span class="p">))</span> 
 <span class="c1"># there are 21 patients, but there are supposed to be only 20 patients according to the paper
@@ -125,7 +131,7 @@
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># how many data files are there associated with patient KTN102?
-</span><span class="n">patient_id</span> <span class="o">=</span> <span class="s">'KTN102'</span>
+</span><span class="n">patient_id</span> <span class="o">=</span> <span class="sh">'</span><span class="s">KTN102</span><span class="sh">'</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">))</span> <span class="c1"># there are 511 files associated with this patient
 </span>
 </code></pre></div></div>
@@ -142,7 +148,7 @@
 <p>Let’s extract out the file name patterns.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">patient_ids</span> <span class="o">==</span> <span class="n">patient_id</span><span class="p">]</span>
-<span class="nf">sorted</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="s">'library_name'</span><span class="p">]))</span>
+<span class="nf">sorted</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="sh">'</span><span class="s">library_name</span><span class="sh">'</span><span class="p">]))</span>
 </code></pre></div></div>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['KTN1020',
@@ -675,7 +681,7 @@
 </ul>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># let's check the data sizes for the files to find the bulk samples
-</span><span class="n">ret</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="nf">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="nf">asarray</span><span class="p">(</span><span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">).</span><span class="nf">split</span><span class="p">(</span><span class="s">";"</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="nf">list</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="s">'fastq_bytes'</span><span class="p">])))</span>
+</span><span class="n">ret</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="nf">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="nf">asarray</span><span class="p">(</span><span class="nf">str</span><span class="p">(</span><span class="n">row</span><span class="p">).</span><span class="nf">split</span><span class="p">(</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="nf">list</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="sh">'</span><span class="s">fastq_bytes</span><span class="sh">'</span><span class="p">])))</span>
 <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">asarray</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
 <span class="n">ret2</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="nf">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="p">.</span><span class="nf">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">ret</span><span class="p">))</span> <span class="c1"># in GB
 </span><span class="n">ret2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">asarray</span><span class="p">(</span><span class="n">ret2</span><span class="p">)</span>
@@ -789,7 +795,7 @@
 </span><span class="n">num_files</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ret</span><span class="p">)))</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s1</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s1</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="sh">"</span><span class="s">library_name</span><span class="sh">"</span><span class="p">])</span>
 <span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">s1</span><span class="p">))</span> <span class="c1"># 143
 </span><span class="n">s1</span>
 </code></pre></div></div>
@@ -945,7 +951,7 @@
  'KTN102_OP_Pop']
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s2</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">2</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s2</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">2</span><span class="p">][</span><span class="sh">"</span><span class="s">library_name</span><span class="sh">"</span><span class="p">])</span>
 <span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">s2</span><span class="p">))</span> <span class="c1"># 275
 </span><span class="n">s2</span>
 </code></pre></div></div>
@@ -1233,7 +1239,7 @@
  'KTN102OPcells99']
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s3</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">3</span><span class="p">][</span><span class="s">"library_name"</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">s3</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="n">df2</span><span class="p">[</span><span class="n">num_files</span> <span class="o">==</span> <span class="mi">3</span><span class="p">][</span><span class="sh">"</span><span class="s">library_name</span><span class="sh">"</span><span class="p">])</span>
 <span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">s3</span><span class="p">))</span> <span class="c1"># 93
 </span><span class="n">s3</span>
 </code></pre></div></div>
