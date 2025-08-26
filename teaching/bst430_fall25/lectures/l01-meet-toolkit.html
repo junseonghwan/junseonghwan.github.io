@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BST430 Lecture 01</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Seong-Hwan Jun, based on the notes of Andrew McDavid" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/lexis.css" type="text/css" />
+    <link rel="stylesheet" href="css/lexis-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: ur-title, center, middle, title-slide
+
+.title[
+# BST430 Lecture 01
+]
+.subtitle[
+## Meet the toolkit
+]
+.author[
+### Seong-Hwan Jun, based on the notes of Andrew McDavid
+]
+.institute[
+### U of Rochester
+]
+.date[
+### 2021-08-17 (updated: 2025-08-26)
+]
+
+---
+
+
+
+
+
+
+## Agenda
+
+- Reproducibility
+- GitHub, github classroom, and git -- make a handle, accept an assignment, make a commit
+- Demo: A reproducible data analysis
+   - R and RStudio
+   - RMarkdown/Quarto
+
+---
+
+
+## Reproducibility checklist
+
+One of recurring themes in this class will be .alert[reproducibility].
+Near-term goals:
+
+- Can you reproduce tables and figures from the code and data?
+- Can someone else reproduce  tables and figures from the code and data?
+- Does the code actually do what you think it does?
+- In addition to what was done, is it clear **why** it was done? 
+(e.g., how were parameter settings chosen?)
+
+Long-term goals:
+
+- Can the code be used for other data?
+- Can you extend the code to do other things?
+
+---
+
+class: center, middle
+
+## Signing at the beginning increases honesty in comparison to signing at the end 
+or the Cambria / Calibri Incident
+
+
+---
+
+&lt;img src = "l01/img/shu-2012.png"&gt;
+
+In 2012, a team of researchers used laboratory and field experiments to conclude that  signing at the beginning rather than at the end of a self-report significantly reduces dishonesty.
+
+???
+
+Lab experiments (undergrads) and a field experiment with a car insurance company.  In the latter, there was a baseline measure of mileage then people were randomized into "before" vs after signing.  Comparing baseline self-report to post-treatment self-report identifies an unbiased treatment effect.
+
+---
+
+&lt;img src = "l01/img/kristal-2020.png"&gt;
+
+--
+In 2020, many of these same researchers published a paper disavowing this finding.  
+
+--
+What happened?
+
+???
+
+Lots of things including a failure of a randomization, but mostly evidence of fraud 
+
+---
+
+## Near duplicated observations
+
+.pull-left[
+-  In the 2020 paper, the data from 2012 was posted (finally) as well, and something curious was noted about the fonts.
+-  In many cases, near duplicate observations were found, with the Cambria observations being `runif(0, 1000)` larger than the Calibri pair.
+-  See this [datacolada](http://datacolada.org/98) post for details.
+]
+.pull-right[&lt;img src = "l01/img/shu-data-colada2.png", width = "100%"&gt;
+]
+
+---
+
+# Lessons learned
+
+-  Avoid doing any serious work in excel, and
+- especially don't use it to fabricate data.
+-  Making it easier to reproduce analyses may reduce the temptation to commit fraud.
+-  But in most cases, programming errors rather than fraud are a greater risk.  .alert[Reproducible analyses help here too!]
+
+---
+
+## Toolkit
+
+![toolkit](l01/img/toolkit.png)
+
+- Scriptability `\(\rightarrow\)` R
+- Literate programming (code, narrative, output in one place) `\(\rightarrow\)` R Markdown / Quarto.
+- Version control `\(\rightarrow\)` Git / GitHub
+---
+
+class: center, middle
+
+# Github and git
+
+- https://github.com/
+
+---
+
+## How do we collaborate?
+
+- The statistical programming language we'll use is R
+- The software we use to interface with R is RStudio
+- But how do I get you the course materials that you can build on for your assignments?
+    + ❌ We're not going to email code back and forth, that would be a mess!
+    + ❌ Blackboard has harsh 2007 vibes.
+---
+
+## GitHub accounts
+
+- If you have a GitHub account, sit back and relax for a minute.
+- If you do not yet have a GitHub account, create one now at https://github.com/. 
+- Tips for selecting a username as per [HGWR](http://happygitwithr.com/github-acct.html#username-advice):
+    - Incorporate your actual name! People like to know who they’re dealing with. Also makes your username easier for people to guess or remember.
+    - Reuse your username from other contexts if you can, e.g., Twitter or Slack.
+    - Pick a username you will be comfortable revealing to your future boss.
+    - Shorter is better than longer.
+    - Be as unique as possible in as few characters as possible.
+    - Make it timeless. Don’t highlight your current university, employer, or place of residence.
+
+
+---
+
+# Join the classroom
+
+- Once you have a github account, click the link to join the github classroom (emailed). 
+
+---
+
+## Version control
+
+- We introduced GitHub as a platform for collaboration
+
+- But it's much more than that...
+
+- It's actually designed for version control
+
+---
+
+## Versioning
+
+![Lego versions](l01/img/lego-steps.png)
+
+---
+
+## Versioning
+
+with human readable messages
+
+![Lego versions with commit messages](l01/img/lego-steps-commit-messages.png)
+
+---
+
+## Why do we need version control?
+
+![PhD Comics](l01/img/phd_comics_vc.gif)
+
+---
+
+# Git and GitHub tips
+
+- Git is a version control system -- like “Track Changes” features from Microsoft Word on steroids. GitHub is the home for your Git-based projects on the internet -- like DropBox but much, much better).
+- There are hundreds of git commands -- it's used for the Linux kernel for chrissakes.  But 95% of the time you will only need three commands: `commit`, `push`, `pull` (maybe also `add`  and adjust the `remote` repositories you sync with).
+- We will be doing Git things and interfacing with GitHub through RStudio but I recommend either installing a GUI-based software client
+  e.g., [GitHub Desktop](https://desktop.github.com/), [Sourcetree](https://www.sourcetreeapp.com/), or [GitKraken](https://www.gitkraken.com/)) or learning the command line interface (CLI) [GitHub CLI](https://cli.github.com/).
+- [happygitwithr.com](http://happygitwithr.com/)  is the recommended resource and reference for working with git and R.
+
+---
+
+class: center, middle
+
+## Read and Analyze some data
+
+DEMO!
+
+---
+
+## Recap: What did we just do?
+
+- Created a repository on **GitHub**
+
+- Clone and open the project in **RStudio**
+
+- Run the analysis using **Quarto**
+
+- Edit the file
+
+- Re-run the analysis using **Quarto**
+
+
+---
+
+class: center, middle
+
+# R and RStudio
+
+---
+
+## What is R/RStudio?
+
+- R is a statistical programming language
+
+- RStudio is a convenient interface for R (an integrated development environment, IDE)
+
+---
+
+class: center, middle
+
+## Let's take a tour - R / RStudio
+
+Demo!
+
+---
+
+Concepts introduced:
+
+- Opening a project
+- Console
+- Using R as a calculator
+- Environment
+- Loading and viewing a data frame
+- Accessing a variable in a data frame
+- R functions
+- Getting help
+
+---
+
+## R essentials
+
+A short list (for now):
+
+- Functions are (most often) verbs, followed by what they will be applied to in parentheses:
+
+
+```r
+do_this(to_this)
+do_that(to_this, to_that, with_those)
+```
+
+--
+
+- Columns (variables) in data frames are accessed with `$`:
+
+
+```r
+dataframe$var_name
+```
+
+--
+
+- Packages are installed with the `install.packages` function and loaded with the `library` function, once per session:
+
+
+```r
+install.packages("package_name")
+library(package_name)
+```
+
+---
+
+## What is the Tidyverse?
+
+.pull-left[
+![](l01/img/tidyverse.png)
+]
+
+.pull-right[
+&lt;center&gt;
+&lt;a href="https://www.tidyverse.org/"&gt;tidyverse.org&lt;/a&gt;
+&lt;/center&gt;
+
+- The tidyverse is an opinionated collection of R packages designed for data science. 
+- All packages share an underlying philosophy and a common syntax. 
+]
+
+---
+
+class: center, middle
+
+# R Markdown
+
+---
+
+
+## R Markdown
+
+- Fully reproducible reports -- each time you knit the analysis is run from the beginning
+
+- Simple markdown syntax for text
+
+- Code goes in chunks, defined by three backticks (`), narrative goes outside of chunks
+
+---
+
+class: center, middle
+
+## Let's take a tour -- R Markdown
+
+Demo!
+
+---
+
+## R Markdown tips
+
+- Keep the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf) and Markdown Quick Reference (Help -&gt; Markdown Quick Reference) handy, you'll refer to it often as the course progresses
+
+- The workspace of your R Markdown document is separate from the Console (so variables can have different values)
+
+---
+
+class: center, middle
+
+# Quarto
+
+---
+
+## What is Quarto?
+
+- Quarto is a new, modern, and powerful tool for creating dynamic documents, presentations, and reports.
+- It is the successor to R Markdown, and is fully compatible with R Markdown documents.
+- Quarto works not only with R, but also with Python, Julia, and other languages.
+
+---
+
+## How will we use Quarto?
+
+- Every assignment / report / project / etc. is a Quarto document
+
+- You'll always have a template Quarto document to start with
+
+
+
+&lt;!-- Accessing the CandyWeight repository from rstudio cloud
+
+1.  From the BST430 workspace select .blue[New Project] -&gt; .blue[New Project from git repository]
+2.  Paste in the github link to your assigned version of the CandyWeight, eg https://github.com/URMC-BST/candyweight-yourgithubID
+3.  Now we need to make it so that rstudio knows about your github account.
+
+1.  https://usethis.r-lib.org/articles/articles/git-credentials.html
+
+--&gt;
+
+---
+
+class: center, middle
+
+# Recap
+
+---
+
+## Recap
+
+Can you answer these questions?
+
+- What is reproducible data analysis, and why do we care?
+- What is version control, and why do we care?
+- What is R vs RStudio?
+- What is git vs GitHub (and do I need to care)?
+--
+
+
+---
+
+## Before next class
+By next Wednesday Sep 4:
+- Install/update RStudio and R or access rstudio cloud
+- Make sure you can access the github classroom
+- Try to commit a change to lab 0 so that we know you can
+- If you can't we'll work it out in class next week
+
+---
+
+# Acknowledgments
+
+These materials are adapted from [Mine Çetinkaya-Rundel and colleagues](https://github.com/Sta199-S18/website/blob/master/static/slides/lec-slides/01-meet-toolkit.Rmd).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "3:2"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
