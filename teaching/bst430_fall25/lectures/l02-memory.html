@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="l02-memory_files/libs/clipboard/clipboard.min.js"></script>
+<script src="l02-memory_files/libs/quarto-html/tabby.min.js"></script>
+<script src="l02-memory_files/libs/quarto-html/popper.min.js"></script>
+<script src="l02-memory_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="l02-memory_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="l02-memory_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="l02-memory_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.40">
+
+  <meta name="author" content="Seong-Hwan Jun">
+  <meta name="dcterms.date" content="2025-08-29">
+  <title>BST430 Lecture 02-C</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="l02-memory_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="l02-memory_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="l02-memory_files/libs/revealjs/dist/theme/quarto-423d414d36ce366a9d05f36d06304417.css">
+  <link href="l02-memory_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="l02-memory_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="l02-memory_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="l02-memory_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">BST430 Lecture 02-C</h1>
+  <p class="subtitle">Memory and Environments in R</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Seong-Hwan Jun 
+</div>
+        <p class="quarto-title-affiliation">
+            U of Rochester
+          </p>
+    </div>
+</div>
+
+  <p class="date">2025-08-29</p>
+</section>
+<section id="namespace" class="slide level2">
+<h2>Namespace</h2>
+<ul>
+<li>Sometimes there are name clashes. For example, <code>filter()</code> exists in both <code>dplyr</code> and <code>stats</code>.</li>
+<li>In such cases, we can specify the package name using <code>::</code> operator.</li>
+</ul>
+</section>
+<section id="namespace-1" class="slide level2">
+<h2>Namespace</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>stats<span class="sc">::</span>filter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>function (x, filter, method = c("convolution", "recursive"), 
+    sides = 2L, circular = FALSE, init = NULL) 
+{
+    method &lt;- match.arg(method)
+    x &lt;- as.ts(x)
+    storage.mode(x) &lt;- "double"
+    xtsp &lt;- tsp(x)
+    n &lt;- as.integer(NROW(x))
+    if (is.na(n)) 
+        stop(gettextf("invalid value of %s", "NROW(x)"), domain = NA)
+    nser &lt;- NCOL(x)
+    filter &lt;- as.double(filter)
+    nfilt &lt;- as.integer(length(filter))
+    if (is.na(nfilt)) 
+        stop(gettextf("invalid value of %s", "length(filter)"), 
+            domain = NA)
+    if (anyNA(filter)) 
+        stop("missing values in 'filter'")
+    if (method == "convolution") {
+        if (nfilt &gt; n) 
+            stop("'filter' is longer than time series")
+        sides &lt;- as.integer(sides)
+        if (is.na(sides) || (sides != 1L &amp;&amp; sides != 2L)) 
+            stop("argument 'sides' must be 1 or 2")
+        circular &lt;- as.logical(circular)
+        if (is.na(circular)) 
+            stop("'circular' must be logical and not NA")
+        if (is.matrix(x)) {
+            y &lt;- matrix(NA, n, nser)
+            for (i in seq_len(nser)) y[, i] &lt;- .Call(C_cfilter, 
+                x[, i], filter, sides, circular)
+        }
+        else y &lt;- .Call(C_cfilter, x, filter, sides, circular)
+    }
+    else {
+        if (missing(init)) {
+            init &lt;- matrix(0, nfilt, nser)
+        }
+        else {
+            ni &lt;- NROW(init)
+            if (ni != nfilt) 
+                stop("length of 'init' must equal length of 'filter'")
+            if (NCOL(init) != 1L &amp;&amp; NCOL(init) != nser) {
+                stop(sprintf(ngettext(nser, "'init' must have %d column", 
+                  "'init' must have 1 or %d columns", domain = "R-stats"), 
+                  nser), domain = NA)
+            }
+            if (!is.matrix(init)) 
+                dim(init) &lt;- c(nfilt, nser)
+        }
+        ind &lt;- seq_len(nfilt)
+        if (is.matrix(x)) {
+            y &lt;- matrix(NA, n, nser)
+            for (i in seq_len(nser)) y[, i] &lt;- .Call(C_rfilter, 
+                x[, i], filter, c(rev(init[, i]), double(n)))[-ind]
+        }
+        else y &lt;- .Call(C_rfilter, x, filter, c(rev(init[, 1L]), 
+            double(n)))[-ind]
+    }
+    tsp(y) &lt;- xtsp
+    class(y) &lt;- if (nser &gt; 1L) 
+        c("mts", "ts")
+    else "ts"
+    y
+}
+&lt;bytecode: 0x7f81037ae2f8&gt;
+&lt;environment: namespace:stats&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="namespace-2" class="slide level2">
+<h2>Namespace</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>dplyr<span class="sc">::</span>filter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>function (.data, ..., .by = NULL, .preserve = FALSE) 
+{
+    check_by_typo(...)
+    by &lt;- enquo(.by)
+    if (!quo_is_null(by) &amp;&amp; !is_false(.preserve)) {
+        abort("Can't supply both `.by` and `.preserve`.")
+    }
+    UseMethod("filter")
+}
+&lt;bytecode: 0x7f81022eb5f0&gt;
+&lt;environment: namespace:dplyr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="global-environment" class="slide level2">
+<h2>Global environment</h2>
+<ul>
+<li>When you start R, the global environment is created automatically.</li>
+<li>You can see the objects in your global environment using <code>ls()</code>.</li>
+<li>You can remove objects from your global environment using <code>rm()</code>.</li>
+<li>The global environment is the top-level environment in R, and it has no parent environment.</li>
+</ul>
+</section>
+<section id="local-environment" class="slide level2">
+<h2>Local environment</h2>
+<ul>
+<li>Most typically created when a function is called.</li>
+<li>Variables declared within a local environment is only accessible within that environment.</li>
+<li>When a function is called, R creates a new local environment for that function call.</li>
+<li>When the function exits, the local environment is destroyed.</li>
+<li>Local environments can access variables in the global environment (parent environment), but not vice versa.</li>
+</ul>
+</section>
+<section id="names-and-values" class="slide level2">
+<h2>Names and values</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This line allocates a space in memory for the vector <code>c(1, 2, 3)</code> and assigns the name <code>x</code> to that space.</p>
+<p><code>x</code> is a reference to an actual object, in this case, vector <code>c(1, 2, 3)</code>.</p>
+</section>
+<section id="names-and-values-1" class="slide level2">
+<h2>Names and values</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>y <span class="ot">&lt;-</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This will create another name, <code>y</code>, that also binds to the existing vector <code>c(1, 2, 3)</code>.</p>
+</section>
+<section id="names-and-values-2" class="slide level2">
+<h2>Names and values</h2>
+<p>Print their memory addresses:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f81065cbb78"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f81065cbb78"</code></pre>
+</div>
+</div>
+<p>They point to the same object.</p>
+</section>
+<section id="names-and-values-3" class="slide level2">
+<h2>Names and values</h2>
+<p>By the way, functions also have names and values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f8101e592f8"</code></pre>
+</div>
+</div>
+<p>Functions are also objects in R.</p>
+<ul>
+<li><code>mean</code> is a name that points to a function object.</li>
+<li>The name <code>mean</code> is just a reference to that object. The actual function object or definition is stored in memory.</li>
+</ul>
+</section>
+<section id="copy-on-modify" class="slide level2">
+<h2>Copy-on-modify</h2>
+<p>R employs a copy-on-modify strategy to manage memory efficiently.</p>
+<p>When you modify an object, R creates a copy of the object only if it is necessary (i.e., if there are multiple references to the same object).</p>
+</section>
+<section id="copy-on-modify-1" class="slide level2">
+<h2>Copy-on-modify</h2>
+<p>We will use <code>tracemem</code> function, which tracks when an object is copied in memory.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>xxx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb13-2"><a href=""></a><span class="fu">tracemem</span>(xxx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "&lt;0x7f810aea27c8&gt;"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>yyy <span class="ot">&lt;-</span> xxx <span class="co"># Copy does not occur here.</span></span>
+<span id="cb15-2"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xxx))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f810aea27c8"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(yyy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f810aea27c8"</code></pre>
+</div>
+</div>
+</section>
+<section id="copy-on-modify-2" class="slide level2">
+<h2>Copy-on-modify</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a>yyy[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="co"># copy occurs here!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tracemem[0x7f810aea27c8 -&gt; 0x7f81043298f8]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="fu">print</span>(xxx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href=""></a><span class="fu">print</span>(yyy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 100   2   3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xxx))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f810aea27c8"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(yyy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f81043298f8"</code></pre>
+</div>
+</div>
+</section>
+<section id="what-happens-if-you-modify-xxx" class="slide level2">
+<h2>What happens if you modify <code>xxx</code>?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href=""></a>xxx[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tracemem[0x7f810aea27c8 -&gt; 0x7f810b009c48]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href=""></a><span class="fu">print</span>(xxx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -100    2    3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xxx))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f810b009c48"</code></pre>
+</div>
+</div>
+<div>
+<ul>
+<li class="fragment"><p>What happened to the original object <code>c(1, 2, 3)</code>?</p></li>
+<li class="fragment"><p>It is still in memory, but now there are no names pointing to it, so it will be garbage collected if you run out of space.</p></li>
+</ul>
+</div>
+</section>
+<section id="copy-on-function-calls" class="slide level2">
+<h2>Copy on function calls?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href=""></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(a) {</span>
+<span id="cb35-2"><a href=""></a>  lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(a)</span>
+<span id="cb35-3"><a href=""></a>  <span class="fu">return</span>(a)</span>
+<span id="cb35-4"><a href=""></a>}</span>
+<span id="cb35-5"><a href=""></a>xyz <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
+<span id="cb35-6"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xyz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f8104322118"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href=""></a>ret_obj <span class="ot">&lt;-</span> <span class="fu">f</span>(xyz)</span>
+<span id="cb37-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(ret_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f8104322118"</code></pre>
+</div>
+</div>
+<p>No copy takes place because <code>xyz</code> is not modified inside function <code>f</code>.</p>
+</section>
+<section id="where-does-copy-take-place" class="slide level2">
+<h2>Where does copy take place?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href=""></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(a) {</span>
+<span id="cb39-2"><a href=""></a>  lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(a)</span>
+<span id="cb39-3"><a href=""></a>  a[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">1</span></span>
+<span id="cb39-4"><a href=""></a>  <span class="fu">return</span>(a)</span>
+<span id="cb39-5"><a href=""></a>}</span>
+<span id="cb39-6"><a href=""></a>xyz <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
+<span id="cb39-7"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xyz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f8104324d48"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href=""></a>ret_obj <span class="ot">&lt;-</span> <span class="fu">f</span>(xyz)</span>
+<span id="cb41-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(ret_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0x7f8104323858"</code></pre>
+</div>
+</div>
+</section>
+<section id="modify-in-place" class="slide level2">
+<h2>Modify-in-place</h2>
+<p>If only a single reference exists for an object, then modifying is to occur in place (no copy is made) – but this is nearly impossible to check.</p>
+<ul>
+<li>When we call <code>tracemem(x)</code>, R seems to create a new reference to the object <code>x</code>, so now there are two references.</li>
+<li>Even when references are removed, the way R keeps track of references is complex, so it is hard to be sure how many references there are.</li>
+</ul>
+<p>An exception: environments. These are a special type of object and always modified in place.</p>
+</section>
+<section id="performance-implications" class="slide level2">
+<h2>Performance implications</h2>
+<p>Why is frequent copying harmful for performance?</p>
+<div>
+<ul>
+<li class="fragment">Copying large objects takes time and memory.</li>
+<li class="fragment">Frequent copying can lead to increased memory usage and slower performance.</li>
+</ul>
+</div>
+</section>
+<section id="shallow-vs-deep-copy" class="slide level2">
+<h2>Shallow vs Deep copy</h2>
+<ul>
+<li>Shallow copy: creates a new object that references the same memory as the original object.</li>
+<li>Deep copy: creates a new object with its own copy of the data in memory.</li>
+</ul>
+</section>
+<section id="lists-list" class="slide level2">
+<h2>Lists: <code>list</code></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href=""></a>l1 <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Each element of the list is a reference to an object.</li>
+<li>e.g., <code>l1[[1]]</code> is a reference to object <code>1</code> stored in memory and <code>l1[[2]]</code> is a reference to object <code>2</code> and so on.</li>
+</ul>
+</section>
+<section id="lists-list-1" class="slide level2">
+<h2>Lists: <code>list</code></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href=""></a>l2 <span class="ot">&lt;-</span> l1 <span class="co"># Shallow copy here.</span></span>
+<span id="cb44-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(l1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>█ [1:0x7f81042f0638] &lt;list&gt; 
+├─[2:0x7f810b729e88] &lt;dbl&gt; 
+├─[3:0x7f810b729da8] &lt;dbl&gt; 
+└─[4:0x7f810b729cc8] &lt;dbl&gt; </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href=""></a>l2[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb46-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(l2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>█ [1:0x7f810a0a38f8] &lt;list&gt; 
+├─[2:0x7f810b729e88] &lt;dbl&gt; 
+├─[3:0x7f810b729da8] &lt;dbl&gt; 
+└─[4:0x7f8108c47128] &lt;dbl&gt; </code></pre>
+</div>
+</div>
+<div>
+<ul>
+<li class="fragment"><code>l2[[1]]</code> and <code>l2[[2]]</code> still point to the same object as <code>l1[[1]]</code> and <code>l1[[2]]</code>.</li>
+<li class="fragment"><code>l2[[3]]</code> now points to a new object <code>4</code> in memory.</li>
+</ul>
+</div>
+</section>
+<section id="data-frames-data.frame" class="slide level2">
+<h2>Data frames: <code>data.frame</code></h2>
+<ul>
+<li>Data frame is a list of vectors – each column points to a vector stored in memory.</li>
+<li>What happens if you modify a column? a row? -&gt; Find out in the lab.</li>
+</ul>
+</section>
+<section id="character-vectors" class="slide level2">
+<h2>Character vectors</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"hi"</span>, <span class="st">"hello"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"hi"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The first and the last element should point to distinct objects both containing the string “hi”… right?</p>
+</section>
+<section id="character-vectors-1" class="slide level2">
+<h2>Character vectors</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"hi"</span>, <span class="st">"hello"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"hi"</span>)</span>
+<span id="cb49-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(x, <span class="at">character =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>█ [1:0x7f810a0fcaa8] &lt;chr&gt; 
+├─[2:0x7f810a0a1160] &lt;string: "hi"&gt; 
+├─[3:0x7f810a0a10b8] &lt;string: "hello"&gt; 
+├─[4:0x7f8101872ce0] &lt;string: "a"&gt; 
+├─[5:0x7f81018d3ba8] &lt;string: "b"&gt; 
+└─[2:0x7f810a0a1160] </code></pre>
+</div>
+</div>
+<p>R uses a global pool of strings to avoid storing multiple copies of the same string in memory.</p>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="l02-memory_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="l02-memory_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="l02-memory_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="l02-memory_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
