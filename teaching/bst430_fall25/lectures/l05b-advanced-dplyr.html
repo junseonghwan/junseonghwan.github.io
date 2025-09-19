@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BST430 Lecture 05-B</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.min.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link rel="stylesheet" href="css/lexis.css" type="text/css" />
+    <link rel="stylesheet" href="css/lexis-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: ur-title, center, middle, title-slide
+
+.title[
+# BST430 Lecture 05-B
+]
+.subtitle[
+## dplyr ii
+]
+.author[
+### Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love
+]
+.institute[
+### U of Rochester
+]
+.date[
+### 2021-09-12 (updated: 2025-09-18)
+]
+
+---
+
+class: middle
+
+
+
+
+
+
+.hand[# A lil' bit more dplyr]
+
+---
+
+## Agenda
+
+* grouping by multiple variables
+* empty groups and summarizing
+* ungrouping
+* grouped mutates and filters
+* special selection operators
+* repeating operations on multiple columns with `across`
+&lt;!-- * row names and row numbers--&gt;
+
+Here's the [R code in this lecture](https://github.com/seonghwanjun/bst430-fall2025-l05/blob/main/advanced-dplyr.R)
+---
+class: code70
+
+## grouping
+
+By adding `group_by()` to a pipeline, we stratify by a categorical variable when we `summarize()`:
+.pull-left[
+**Grand margin**
+
+```r
+library(nycflights13)
+ontime = flights %&gt;% 
+  mutate(ontime = arr_delay &lt;= 0)  
+ontime %&gt;% 
+  summarize(ontime_pct = mean(ontime, na.rm = TRUE)*100)
+```
+
+```
+## # A tibble: 1 × 1
+##   ontime_pct
+##        &lt;dbl&gt;
+## 1       59.4
+```
+]
+
+.pull-right[
+**stratified by carrier**
+
+```r
+ontime %&gt;% group_by(carrier) %&gt;% 
+* summarize(ontime_pct = mean(ontime, na.rm = TRUE)*100)
+```
+
+```
+## # A tibble: 16 × 2
+##   carrier ontime_pct
+##   &lt;chr&gt;        &lt;dbl&gt;
+## 1 9E            61.6
+## 2 AA            66.5
+## 3 AS            73.3
+## 4 B6            56.3
+## # ℹ 12 more rows
+```
+]
+
+---
+
+## `group_by()` multiple variables
+
+It's easy to group by multiple variables:
+
+```r
+flights %&gt;% group_by(&lt;var_1&gt;, &lt;var_2&gt;, ..., &lt;var_n&gt;) %&gt;%
+   summarize()
+```
+
+---
+
+## `group_by()` caveat
+
+Be aware that this only returns the combinations of var_1, var_2, ... that exist in the data. This can lead to erroneous calculations if you are joining tables downstream. To get the Cartesian product:
+
+1.  Convert `var1`, `var2`, ... to factors with `factor`.&lt;sup&gt;1&lt;/sup&gt;
+2.  Set  `group_by(..., .drop = FALSE)`.
+
+.footnote[[1] We'll discuss the pain and pleasure of factors in greater detail.]
+
+&lt;!-- [2] If you are a masochist. --&gt;
+
+---
+
+## Nonsense from dropping
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+departures = flights %&gt;% group_by(carrier, hour) %&gt;% summarize(n_departures = n())
+ggplot(departures, aes(x = hour, y = n_departures)) + 
+  geom_line() + 
+* facet_wrap(~carrier, scales = 'free_y')
+```
+]
+
+.panel[.panel-name[Plot]
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-5-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+## Keep (wacky factors)
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+departures2 = flights %&gt;% 
+* mutate(carrier = factor(carrier), hour = factor(hour)) %&gt;%
+* group_by(carrier, hour, .drop = FALSE) %&gt;%
+  summarize(n_departures = n())
+plt = ggplot(departures2, aes(x = hour, y = n_departures, group = carrier)) + 
+  geom_line() + 
+  facet_wrap(~carrier, scales = 'free_y')
+plt
+```
+]
+
+.panel[.panel-name[Plot]
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-6-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+## Keep (preserve original)
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+departures3 = flights %&gt;% 
+  mutate(carrier = factor(carrier), hourf = factor(hour)) %&gt;%
+  group_by(carrier, hourf, .drop = FALSE) %&gt;%
+  summarize(n_departures = n()) %&gt;%
+* mutate(hour = as.numeric(as.character(hourf)))
+```
+
+```
+## `summarise()` has grouped output by 'carrier'. You can override
+## using the `.groups` argument.
+```
+
+```r
+*(plt %+% departures3) + aes(x = hour)
+```
+]
+
+.panel[.panel-name[Plot]
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-7-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+## grouping is contagious
+
+Note the message:
+
+&gt;  `summarise()` has grouped output by 'carrier'. You can override using the `.groups` argument.
+
+This is telling us that by default, the output will be grouped if we use it in another pipeline.
+
+To save screen real estate, I'm going to turn off this message going forward:
+
+```r
+options(dplyr.summarise.inform = FALSE)
+```
+
+In general you should set `.groups` explicitly.
+
+---
+
+## `ungroup()` to remove grouping variables.
+
+.pull-left[
+Default
+
+```r
+ontime_drop = ontime %&gt;% group_by(carrier, dest) %&gt;% summarize(ontime_pct = mean(ontime, na.rm = TRUE)*100)
+ontime_drop %&gt;% summarize(n_dest = n_distinct(dest))
+```
+
+```
+## # A tibble: 16 × 2
+##   carrier n_dest
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 9E          49
+## 2 AA          19
+## 3 AS           1
+## 4 B6          42
+## # ℹ 12 more rows
+```
+]
+
+.pull-right[
+ungrouped
+
+```r
+*ontime_drop %&gt;% ungroup() %&gt;%
+  summarize(n_dest = n_distinct(dest))
+```
+
+```
+## # A tibble: 1 × 1
+##   n_dest
+##    &lt;int&gt;
+## 1    105
+```
+]
+---
+
+## `group_by() filter()`
+
+We can combine group_by with filter, mutate or arrange to evaluate these verbs on each group.
+
+
+```r
+ontime_1500 = ontime %&gt;% group_by(dest) %&gt;% filter(n() &gt; 1500) %&gt;%
+  mutate(n_flights_dest = n(), .after = 1)
+
+ontime_1500 %&gt;% arrange(n_flights_dest)
+```
+
+```
+## # A tibble: 314,599 × 21
+## # Groups:   dest [53]
+##    year n_flights_dest month   day dep_time sched_dep_time
+##   &lt;int&gt;          &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
+## 1  2013           1525     1     1     1304           1227
+## 2  2013           1525     1     1     1732           1630
+## 3  2013           1525     1     2      834            823
+## 4  2013           1525     1     2     1228           1229
+## # ℹ 314,595 more rows
+## # ℹ 15 more variables: dep_delay &lt;dbl&gt;, arr_time &lt;int&gt;,
+## #   sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, …
+```
+
+---
+
+## Carrier performance by destination
+
+
+```r
+ontime_drop = ontime_1500 %&gt;% group_by(dest, carrier) %&gt;%  
+  summarize(ontime_pct = mean(ontime, na.rm  = TRUE)*100)
+ggplot(ontime_drop, aes(y = ontime_pct, x = dest)) + geom_point() + coord_flip() + theme_minimal(base_size = 8)
+```
+
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-12-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+.question[What's with the carriers with 0% or 100% ontime percentages for a destination?]
+
+---
+
+## The "law" of small numbers
+
+
+```r
+ontime_drop = ontime_1500 %&gt;% group_by(dest, carrier) %&gt;%  
+  summarize(ontime_pct = mean(ontime, na.rm  = TRUE)*100,
+            n_departed = sum(!is.na(ontime)))
+
+ggplot(ontime_drop, aes(y = ontime_pct, x = dest, color = n_departed&lt;10)) + geom_point() + coord_flip() + theme_minimal(base_size = 8)
+```
+
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-13-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+.question[What are some statistical fixes to this issue?]
+---
+
+## Without small numbers
+
+
+```r
+ontime_drop_10 = filter(ontime_drop, n_departed &gt;= 10)
+ggplot(ontime_drop_10, aes(y = ontime_pct, x = dest)) + geom_boxplot() + 
+  coord_flip()  + theme_minimal(base_size = 8)
+```
+
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-14-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+Better...but it's hard to see the rank order of routes.
+
+---
+
+## A sensible plot order
+
+
+```r
+ ontime_drop_10 = ontime_drop_10 %&gt;% ungroup() %&gt;% 
+* mutate(dest = forcats::fct_reorder(dest, ontime_pct))
+ggplot(ontime_drop_10, aes(x = dest, y = ontime_pct)) + geom_boxplot() + 
+  coord_flip()  + theme_minimal(base_size = 8)
+```
+
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-15-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+We'll discuss the `fct_reorder` business in greater detail in the coming weeks.
+
+---
+
+## `select()` 
+&lt;!-- 201 --&gt;
+
+`select()`, `pivot_wider()`, `pivot_longer()`, and friends use [tidy-select](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html), which is a meta-language to select columns from a data frame. There are several helper functions you can use within `select()`:
+
+-   `starts_with("abc")`: matches names that begin with "abc",
+-   `ends_with("xyz")`: matches names that end with "xyz",
+-   `contains("ijk")`: matches names that contain "ijk",
+-   `num_range("x", 1:3)`: matches `x1`, `x2` and `x3`,
+-   `last_col(offset = 0)`: last column, minus offset,
+-   `where(&lt;function&gt;)`: columns where `&lt;function&gt;` returns `TRUE`,
+-   `:` range, `c` concatenate, `!` negate, `&amp;` intersect
+-   ...and a few others.
+---
+
+## select delay columns
+
+
+```r
+flights %&gt;% select(ends_with('delay'))
+```
+
+```
+## # A tibble: 336,776 × 2
+##   dep_delay arr_delay
+##       &lt;dbl&gt;     &lt;dbl&gt;
+## 1         2        11
+## 2         4        20
+## 3         2        33
+## 4        -1       -18
+## # ℹ 336,772 more rows
+```
+---
+
+## everything except columns containing "time"
+
+
+```r
+flights %&gt;% select(!contains('time'))
+```
+
+```
+## # A tibble: 336,776 × 13
+##    year month   day dep_delay arr_delay carrier flight tailnum
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;  
+## 1  2013     1     1         2        11 UA        1545 N14228 
+## 2  2013     1     1         4        20 UA        1714 N24211 
+## 3  2013     1     1         2        33 AA        1141 N619AA 
+## 4  2013     1     1        -1       -18 B6         725 N804JB 
+## # ℹ 336,772 more rows
+## # ℹ 5 more variables: origin &lt;chr&gt;, dest &lt;chr&gt;, distance &lt;dbl&gt;,
+## #   hour &lt;dbl&gt;, minute &lt;dbl&gt;
+```
+---
+
+## character columns
+
+
+```r
+flights %&gt;% select(where(is.character))
+```
+
+```
+## # A tibble: 336,776 × 4
+##   carrier tailnum origin dest 
+##   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
+## 1 UA      N14228  EWR    IAH  
+## 2 UA      N24211  LGA    IAH  
+## 3 AA      N619AA  JFK    MIA  
+## 4 B6      N804JB  JFK    BQN  
+## # ℹ 336,772 more rows
+```
+
+---
+
+## Columns with no missing values
+
+
+```r
+flights %&gt;% select(where(~!any(is.na(.x))))
+```
+
+```
+## # A tibble: 336,776 × 13
+##    year month   day sched_dep_time sched_arr_time carrier flight
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;          &lt;int&gt;          &lt;int&gt; &lt;chr&gt;    &lt;int&gt;
+## 1  2013     1     1            515            819 UA        1545
+## 2  2013     1     1            529            830 UA        1714
+## 3  2013     1     1            540            850 AA        1141
+## 4  2013     1     1            545           1022 B6         725
+## # ℹ 336,772 more rows
+## # ℹ 6 more variables: origin &lt;chr&gt;, dest &lt;chr&gt;, distance &lt;dbl&gt;,
+## #   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;
+```
+The above uses a tidyverse way to define an **anonymous function** and is equivalent to 
+```
+none_na = function(x) !any(is.na(x))
+```
+
+---
+class: middle
+
+.hand[# Repeating an operation with `across`]
+
+---
+
+## `across()`
+
+If you need to repeat the same operation on multiple columns, you can avoid many keystrokes by using across.
+
+The syntax is a bit idiomatic, but in general, it looks something like
+```r
+verb(across(.cols = &lt;tidy selection&gt;, 
+            .funs = list(&lt;fun1&gt;, &lt;fun2&gt;, ...)))
+```
+where `verb` is `summarize`,  `mutate`, and a few others where unquoted columns are provided to a transformation.
+
+---
+
+## NYC AirBNB data
+
+
+
+
+```r
+nycbnb
+```
+
+```
+## # A tibble: 12,773 × 16
+##      id name    host_id price neighborhood accommodates room_type
+##   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt;    
+## 1  2595 Skylit…    2845   150 Midtown                 1 Entire h…
+## 2  3831 Whole …    4869    75 Bedford-Stu…            3 Entire h…
+## 3  5121 BlissA…    7356    60 Bedford-Stu…            2 Private …
+## 4  5136 Spacio…    7378   275 Sunset Park             4 Entire h…
+## # ℹ 12,769 more rows
+## # ℹ 9 more variables: borough &lt;chr&gt;, minimum_nights &lt;dbl&gt;,
+## #   maximum_nights &lt;dbl&gt;, availability_90 &lt;dbl&gt;, beds &lt;dbl&gt;, …
+```
+
+---
+
+## Nights
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+availability = nycbnb %&gt;% group_by(neighborhood) %&gt;% 
+* summarize(across(c(maximum_nights, minimum_nights, availability_90), median))
+ggplot(availability, 
+       aes(x = neighborhood, 
+           ymin = minimum_nights,  
+           y = availability_90, 
+           ymax = maximum_nights)) + 
+  geom_pointrange() + coord_flip() + theme_minimal() +  
+  labs(x = NULL, y = 'Availability (minimum, 90 day, maximum)')
+```
+]
+
+.panel[.panel-name[Plot]
+&lt;img src="l05b-advanced-dplyr_files/figure-html/unnamed-chunk-22-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+---
+
+## Transform by variable type
+
+This can be very powerful:
+
+```r
+median_mad = nycbnb %&gt;% group_by(neighborhood) %&gt;% 
+* summarise(across(where(is.numeric),
+*                  list(median = median, mad = mad)))
+glimpse(median_mad)
+```
+
+```
+## Rows: 41
+## Columns: 23
+## $ neighborhood                 &lt;chr&gt; "Astoria", "Bedford-Stuyve…
+## $ id_median                    &lt;dbl&gt; 26455688, 29970716, 337258…
+## $ id_mad                       &lt;dbl&gt; 22196285, 22187834, 188431…
+## $ host_id_median               &lt;dbl&gt; 48372942, 39365482, 502829…
+## $ host_id_mad                  &lt;dbl&gt; 66969215, 56397777, 705862…
+## $ price_median                 &lt;dbl&gt; 75.0, 100.0, 75.0, 98.0, 2…
+## $ price_mad                    &lt;dbl&gt; 35.5824, 66.7170, 44.4780,…
+## $ accommodates_median          &lt;dbl&gt; 2.0, 2.0, 2.0, 3.0, 2.0, 3…
+## $ accommodates_mad             &lt;dbl&gt; 1.4826, 1.4826, 1.4826, 1.…
+## $ minimum_nights_median        &lt;dbl&gt; 14.0, 5.0, 5.0, 2.0, 5.0, …
+## $ minimum_nights_mad           &lt;dbl&gt; 19.2738, 5.9304, 5.9304, 1…
+## $ maximum_nights_median        &lt;dbl&gt; 1125, 365, 365, 365, 365, …
+## $ maximum_nights_mad           &lt;dbl&gt; 0.0000, 526.3230, 526.3230…
+## $ availability_90_median       &lt;dbl&gt; 50.0, 38.0, 47.0, 70.0, 25…
+## $ availability_90_mad          &lt;dbl&gt; 41.5128, 40.0302, 40.0302,…
+## $ beds_median                  &lt;dbl&gt; NA, NA, NA, NA, NA, 1, NA,…
+## $ beds_mad                     &lt;dbl&gt; NA, NA, NA, NA, NA, 1.4826…
+## $ review_scores_rating_median  &lt;dbl&gt; 4.830, 4.800, 4.800, 4.810…
+## $ review_scores_rating_mad     &lt;dbl&gt; 0.252042, 0.266868, 0.2965…
+## $ number_of_reviews_median     &lt;dbl&gt; 17.0, 20.0, 13.0, 17.0, 13…
+## $ number_of_reviews_mad        &lt;dbl&gt; 22.2390, 26.6868, 17.7912,…
+## $ number_of_reviews_ltm_median &lt;dbl&gt; 2.0, 2.0, 2.0, 4.0, 3.0, 3…
+## $ number_of_reviews_ltm_mad    &lt;dbl&gt; 2.9652, 2.9652, 2.9652, 5.…
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "3:2"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

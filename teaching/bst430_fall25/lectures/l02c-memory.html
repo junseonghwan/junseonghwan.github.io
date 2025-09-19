@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="l02-memory_files/libs/clipboard/clipboard.min.js"></script>
-<script src="l02-memory_files/libs/quarto-html/tabby.min.js"></script>
-<script src="l02-memory_files/libs/quarto-html/popper.min.js"></script>
-<script src="l02-memory_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="l02-memory_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="l02-memory_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="l02-memory_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="l02c-memory_files/libs/clipboard/clipboard.min.js"></script>
+<script src="l02c-memory_files/libs/quarto-html/tabby.min.js"></script>
+<script src="l02c-memory_files/libs/quarto-html/popper.min.js"></script>
+<script src="l02c-memory_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="l02c-memory_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="l02c-memory_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="l02c-memory_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.6.40">
 
   <meta name="author" content="Seong-Hwan Jun">
-  <meta name="dcterms.date" content="2025-08-29">
+  <meta name="dcterms.date" content="2025-09-18">
   <title>BST430 Lecture 02-C</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="l02-memory_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="l02-memory_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="l02c-memory_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="l02c-memory_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -95,11 +95,11 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="l02-memory_files/libs/revealjs/dist/theme/quarto-423d414d36ce366a9d05f36d06304417.css">
-  <link href="l02-memory_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="l02-memory_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="l02-memory_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="l02-memory_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="l02c-memory_files/libs/revealjs/dist/theme/quarto-423d414d36ce366a9d05f36d06304417.css">
+  <link href="l02c-memory_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="l02c-memory_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="l02c-memory_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="l02c-memory_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -207,7 +207,7 @@ Seong-Hwan Jun
     </div>
 </div>
 
-  <p class="date">2025-08-29</p>
+  <p class="date">2025-09-18</p>
 </section>
 <section id="namespace" class="slide level2">
 <h2>Namespace</h2>
@@ -286,7 +286,7 @@ Seong-Hwan Jun
     else "ts"
     y
 }
-&lt;bytecode: 0x7f81037ae2f8&gt;
+&lt;bytecode: 0x7fe849bac6f8&gt;
 &lt;environment: namespace:stats&gt;</code></pre>
 </div>
 </div>
@@ -305,7 +305,7 @@ Seong-Hwan Jun
     }
     UseMethod("filter")
 }
-&lt;bytecode: 0x7f81022eb5f0&gt;
+&lt;bytecode: 0x7fe852dc8df0&gt;
 &lt;environment: namespace:dplyr&gt;</code></pre>
 </div>
 </div>
@@ -350,11 +350,11 @@ Seong-Hwan Jun
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f81065cbb78"</code></pre>
+<pre><code>[1] "0x7fe848757b28"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f81065cbb78"</code></pre>
+<pre><code>[1] "0x7fe848757b28"</code></pre>
 </div>
 </div>
 <p>They point to the same object.</p>
@@ -365,7 +365,7 @@ Seong-Hwan Jun
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(mean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f8101e592f8"</code></pre>
+<pre><code>[1] "0x7fe84c12c2f8"</code></pre>
 </div>
 </div>
 <p>Functions are also objects in R.</p>
@@ -386,16 +386,16 @@ Seong-Hwan Jun
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>xxx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
 <span id="cb13-2"><a href=""></a><span class="fu">tracemem</span>(xxx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "&lt;0x7f810aea27c8&gt;"</code></pre>
+<pre><code>[1] "&lt;0x7fe84b9a9d78&gt;"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>yyy <span class="ot">&lt;-</span> xxx <span class="co"># Copy does not occur here.</span></span>
 <span id="cb15-2"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xxx))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f810aea27c8"</code></pre>
+<pre><code>[1] "0x7fe84b9a9d78"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(yyy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f810aea27c8"</code></pre>
+<pre><code>[1] "0x7fe84b9a9d78"</code></pre>
 </div>
 </div>
 </section>
@@ -404,7 +404,7 @@ Seong-Hwan Jun
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a>yyy[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="co"># copy occurs here!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tracemem[0x7f810aea27c8 -&gt; 0x7f81043298f8]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
+<pre><code>tracemem[0x7fe84b9a9d78 -&gt; 0x7fe84f32bca8]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="fu">print</span>(xxx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -416,11 +416,11 @@ Seong-Hwan Jun
 </div>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xxx))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f810aea27c8"</code></pre>
+<pre><code>[1] "0x7fe84b9a9d78"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(yyy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f81043298f8"</code></pre>
+<pre><code>[1] "0x7fe84f32bca8"</code></pre>
 </div>
 </div>
 </section>
@@ -429,7 +429,7 @@ Seong-Hwan Jun
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href=""></a>xxx[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tracemem[0x7f810aea27c8 -&gt; 0x7f810b009c48]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
+<pre><code>tracemem[0x7fe84b9a9d78 -&gt; 0x7fe84ba99df8]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href=""></a><span class="fu">print</span>(xxx)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -437,7 +437,7 @@ Seong-Hwan Jun
 </div>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href=""></a><span class="fu">print</span>(lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xxx))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f810b009c48"</code></pre>
+<pre><code>[1] "0x7fe84ba99df8"</code></pre>
 </div>
 </div>
 <div>
@@ -457,12 +457,12 @@ Seong-Hwan Jun
 <span id="cb35-5"><a href=""></a>xyz <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
 <span id="cb35-6"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xyz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f8104322118"</code></pre>
+<pre><code>[1] "0x7fe852dd7ec8"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href=""></a>ret_obj <span class="ot">&lt;-</span> <span class="fu">f</span>(xyz)</span>
 <span id="cb37-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(ret_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f8104322118"</code></pre>
+<pre><code>[1] "0x7fe852dd7ec8"</code></pre>
 </div>
 </div>
 <p>No copy takes place because <code>xyz</code> is not modified inside function <code>f</code>.</p>
@@ -478,12 +478,12 @@ Seong-Hwan Jun
 <span id="cb39-6"><a href=""></a>xyz <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>)</span>
 <span id="cb39-7"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(xyz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f8104324d48"</code></pre>
+<pre><code>[1] "0x7fe84f2c7ef8"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href=""></a>ret_obj <span class="ot">&lt;-</span> <span class="fu">f</span>(xyz)</span>
 <span id="cb41-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(ret_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7f8104323858"</code></pre>
+<pre><code>[1] "0x7fe84f2c6a08"</code></pre>
 </div>
 </div>
 </section>
@@ -529,18 +529,18 @@ Seong-Hwan Jun
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href=""></a>l2 <span class="ot">&lt;-</span> l1 <span class="co"># Shallow copy here.</span></span>
 <span id="cb44-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(l1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>█ [1:0x7f81042f0638] &lt;list&gt; 
-├─[2:0x7f810b729e88] &lt;dbl&gt; 
-├─[3:0x7f810b729da8] &lt;dbl&gt; 
-└─[4:0x7f810b729cc8] &lt;dbl&gt; </code></pre>
+<pre><code>█ [1:0x7fe84f2927e8] &lt;list&gt; 
+├─[2:0x7fe853b29c88] &lt;dbl&gt; 
+├─[3:0x7fe853b29ba8] &lt;dbl&gt; 
+└─[4:0x7fe853b29ac8] &lt;dbl&gt; </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href=""></a>l2[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">4</span></span>
 <span id="cb46-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(l2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>█ [1:0x7f810a0a38f8] &lt;list&gt; 
-├─[2:0x7f810b729e88] &lt;dbl&gt; 
-├─[3:0x7f810b729da8] &lt;dbl&gt; 
-└─[4:0x7f8108c47128] &lt;dbl&gt; </code></pre>
+<pre><code>█ [1:0x7fe84b8ed2a8] &lt;list&gt; 
+├─[2:0x7fe853b29c88] &lt;dbl&gt; 
+├─[3:0x7fe853b29ba8] &lt;dbl&gt; 
+└─[4:0x7fe84c567128] &lt;dbl&gt; </code></pre>
 </div>
 </div>
 <div>
@@ -570,12 +570,12 @@ Seong-Hwan Jun
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href=""></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"hi"</span>, <span class="st">"hello"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"hi"</span>)</span>
 <span id="cb49-2"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">ref</span>(x, <span class="at">character =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>█ [1:0x7f810a0fcaa8] &lt;chr&gt; 
-├─[2:0x7f810a0a1160] &lt;string: "hi"&gt; 
-├─[3:0x7f810a0a10b8] &lt;string: "hello"&gt; 
-├─[4:0x7f8101872ce0] &lt;string: "a"&gt; 
-├─[5:0x7f81018d3ba8] &lt;string: "b"&gt; 
-└─[2:0x7f810a0a1160] </code></pre>
+<pre><code>█ [1:0x7fe84f25daa8] &lt;chr&gt; 
+├─[2:0x7fe84b885d60] &lt;string: "hi"&gt; 
+├─[3:0x7fe84b885cb8] &lt;string: "hello"&gt; 
+├─[4:0x7fe8480bd8e0] &lt;string: "a"&gt; 
+├─[5:0x7fe849a87da8] &lt;string: "b"&gt; 
+└─[2:0x7fe84b885d60] </code></pre>
 </div>
 </div>
 <p>R uses a global pool of strings to avoid storing multiple copies of the same string in memory.</p>
@@ -589,19 +589,19 @@ Seong-Hwan Jun
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="l02-memory_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="l02-memory_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="l02-memory_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="l02-memory_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="l02c-memory_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>

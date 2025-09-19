@@ -227,12 +227,12 @@ Seong-Hwan Jun
 </div>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">tracemem</span>(DF) <span class="co"># This will print memory address of DF when it is copied.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "&lt;0x7fa70c8cf408&gt;"</code></pre>
+<pre><code>[1] "&lt;0x7fa1cd0a5a08&gt;"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>DF<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">toupper</span>(DF<span class="sc">$</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tracemem[0x7fa70c8cf408 -&gt; 0x7fa70c98a648]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main 
-tracemem[0x7fa70c98a648 -&gt; 0x7fa70c98a608]: $&lt;-.data.frame $&lt;- eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
+<pre><code>tracemem[0x7fa1cd0a5a08 -&gt; 0x7fa1cd485848]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main 
+tracemem[0x7fa1cd485848 -&gt; 0x7fa1cd485808]: $&lt;-.data.frame $&lt;- eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
 </div>
 </div>
 </section>
@@ -244,7 +244,7 @@ tracemem[0x7fa70c98a648 -&gt; 0x7fa70c98a608]: $&lt;-.data.frame $&lt;- eval eva
 <span id="cb7-2"><a href=""></a>DT <span class="ot">=</span> <span class="fu">data.table</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">y =</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>])</span>
 <span id="cb7-3"><a href=""></a><span class="fu">tracemem</span>(DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "&lt;0x7fa70b536200&gt;"</code></pre>
+<pre><code>[1] "&lt;0x7fa1d6b1c000&gt;"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>DT[,y<span class="sc">:</span><span class="er">=</span> <span class="fu">toupper</span>(y)]</span>
 <span id="cb9-2"><a href=""></a>DT</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -294,7 +294,7 @@ tracemem[0x7fa70c98a648 -&gt; 0x7fa70c98a608]: $&lt;-.data.frame $&lt;- eval eva
 <span id="cb13-3"><a href=""></a>}</span>
 <span id="cb13-4"><a href=""></a><span class="fu">tracemem</span>(DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "&lt;0x7fa70859cc00&gt;"</code></pre>
+<pre><code>[1] "&lt;0x7fa1d799fa00&gt;"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a><span class="fu">modify_DT</span>(DT) <span class="co"># Does not return anything.</span></span>
 <span id="cb15-2"><a href=""></a>DT[x<span class="sc">==</span><span class="st">'i'</span> <span class="sc">&amp;</span> y <span class="sc">==</span> <span class="st">'ij'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -326,7 +326,7 @@ tracemem[0x7fa70c98a648 -&gt; 0x7fa70c98a608]: $&lt;-.data.frame $&lt;- eval eva
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7fa70859cc00"</code></pre>
+<pre><code>[1] "0x7fa1d799fa00"</code></pre>
 </div>
 </div>
 </section>
@@ -336,16 +336,16 @@ tracemem[0x7fa70c98a648 -&gt; 0x7fa70c98a608]: $&lt;-.data.frame $&lt;- eval eva
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a>DF <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">sample</span>(letters, num_elements, <span class="at">replace =</span> <span class="cn">TRUE</span>), <span class="at">y =</span> <span class="fu">sample</span>(letters, num_elements, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
 <span id="cb19-2"><a href=""></a><span class="fu">tracemem</span>(DF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "&lt;0x7fa7085b4408&gt;"</code></pre>
+<pre><code>[1] "&lt;0x7fa1d82ed048&gt;"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a>DF[DF<span class="sc">$</span>x<span class="sc">==</span><span class="st">'i'</span> <span class="sc">&amp;</span> DF<span class="sc">$</span>y <span class="sc">==</span> <span class="st">'i'</span>,<span class="st">'y'</span>] <span class="ot">&lt;-</span> <span class="st">"ij"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tracemem[0x7fa7085b4408 -&gt; 0x7fa7085b5f08]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main 
-tracemem[0x7fa7085b5f08 -&gt; 0x7fa7085b5e48]: [&lt;-.data.frame [&lt;- eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
+<pre><code>tracemem[0x7fa1d82ed048 -&gt; 0x7fa1d82eeb48]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main 
+tracemem[0x7fa1d82eeb48 -&gt; 0x7fa1d82eea88]: [&lt;-.data.frame [&lt;- eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group.block process_group withCallingHandlers withCallingHandlers handle_error process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href=""></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(DF)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x7fa7085b5e48"</code></pre>
+<pre><code>[1] "0x7fa1d82eea88"</code></pre>
 </div>
 </div>
 </section>
