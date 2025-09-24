@@ -1,0 +1,26 @@
+library_id,molecule_h5,rawdata_batch,treatment,sample_ID,tissue_source,sort_group,dataset
+1,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0150_PBL_BT_5/outs/molecule_info.h5,1,300,300_0150,PBL,BT,300_0150_PBL_1
+2,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0150_Syn_BT_5/outs/molecule_info.h5,1,300,300_0150,Syn,BT,300_0150_Syn_2
+3,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0171_PBL_BT_5_2/outs/molecule_info.h5,1,300,300_0171,PBL,BT,300_0171_PBL_3
+4,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0171_PBL_BT_5/outs/molecule_info.h5,1,300,300_0171,PBL,BT,300_0171_PBL_4
+5,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0171_Syn_BT_5/outs/molecule_info.h5,1,300,300_0171,Syn,BT,300_0171_Syn_5
+6,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0173_PBL_BT_5/outs/molecule_info.h5,1,300,300_0173,PBL,BT,300_0173_PBL_6
+7,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0173_Syn_BT_5/outs/molecule_info.h5,1,300,300_0173,Syn,BT,300_0173_Syn_7
+8,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0174_PBL_BT_5/outs/molecule_info.h5,1,300,300_0174,PBL,BT,300_0174_PBL_8
+9,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0174_Syn_BT_5/outs/molecule_info.h5,1,300,300_0174,Syn,BT,300_0174_Syn_9
+10,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0392_PBL_BT_5/outs/molecule_info.h5,1,300,300_0392,PBL,BT,300_0392_PBL_10
+11,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0392_Syn_BT_5/outs/molecule_info.h5,1,300,300_0392,Syn,BT,300_0392_Syn_11
+12,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0410_PBL_BT_5/outs/molecule_info.h5,1,300,300_0410,PBL,BT,300_0410_PBL_12
+13,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0410_Syn_BT_5/outs/molecule_info.h5,1,300,300_0410,Syn,BT,300_0410_Syn_13
+14,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0414_PBL_BT_5/outs/molecule_info.h5,1,300,300_0414,PBL,BT,300_0414_PBL_14
+15,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0414_Syn_BT_5/outs/molecule_info.h5,1,300,300_0414,Syn,BT,300_0414_Syn_15
+16,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0415_Syn_BT_5/outs/molecule_info.h5,1,300,300_0415,Syn,BT,300_0415_Syn_16
+17,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_0416_Syn_BT_5/outs/molecule_info.h5,1,300,300_0416,Syn,BT,300_0416_Syn_17
+18,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_1883_Syn_BT_5/outs/molecule_info.h5,1,300,300_1883,Syn,BT,300_1883_Syn_18
+19,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_1930_PBL_BT_5/outs/molecule_info.h5,1,300,300_1930,PBL,BT,300_1930_PBL_19
+20,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_300_1930_Syn_BT_5/outs/molecule_info.h5,1,300,300_1930,Syn,BT,300_1930_Syn_20
+21,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_301_0174_PBL_BT_5/outs/molecule_info.h5,1,301,301_0174,PBL,BT,301_0174_PBL_21
+22,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_301_0174_Syn_BT_5/outs/molecule_info.h5,1,301,301_0174,Syn,BT,301_0174_Syn_22
+23,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_301_0174_Syn_PC_5/outs/molecule_info.h5,1,301,301_0174,Syn,PC,301_0174_Syn_23
+24,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_301_0270_PBL_BT_5/outs/molecule_info.h5,1,301,301_0270,PBL,BT,301_0270_PBL_24
+25,/scratch/aberry3/Single Cell Pipeline/Anolik/amp_phase2_gex/rawdata/deliv_Anolik_062320_GEX_run2_counts/Sample_301_0270_Syn_BT_5/outs/molecule_info.h5,1,301,301_0270,Syn,BT,301_0270_Syn_25

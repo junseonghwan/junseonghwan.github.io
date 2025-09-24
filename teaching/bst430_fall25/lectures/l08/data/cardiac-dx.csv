@@ -1,0 +1,101 @@
+id,gender,diagnoses
+26108,F,"{a,d,d} | abdominal situs ambiguous (abdominal heterotaxy) | aortic atresia | double outlet right ventricle | heterotaxy syndrome | inferior vena cava, left sided | screener diagnosis: other: cavc, aa, hypoplastic aortic arch, tapvr, heterotaxy syndrome | situs ambiguous of the atria | totally anomalous pulmonary venous return | unbalanced complete atrioventricular canal, right dominant"
+10949,M,"{s,d,l} | aortic stenosis - valvar | atrial septal defect, secundum | atypical coronary arteries in d-loop transposition of the great arteries | double outlet right ventricle | hypoplasia ascending aorta | hypoplastic left ventricle (subnormal cavity volume) | left aortic arch with normal branching pattern | mitral stenosis, valvar | restrictive bulboventricular foramen | right juxtaposition of the atrial appendages | screener diagnosis: other: complex, dilv/tga | single ventricle, right, double inlet right ventricle | tubular hypoplasia of aorta with coarctation"
+8090,F,"{s,l,l} | aortic valve position relative to the pulmonary valve, left and anterior | pulmonary stenosis, subvalvar | pulmonary stenosis, valvar | screener diagnosis: conotruncal abnormality | single ventricle, left; double inlet left ventricle | univentricular, double inlet atrioventricular connection"
+19800,M,"{s,l,l} | crisscross atrioventricular valves | dextrocardia | double outlet right ventricle | hypoplastic left ventricle (subnormal cavity volume) | hypoplastic tricuspid valve | l-loop transposition of the great arteries | pulmonary stenosis, subvalvar | pulmonary stenosis, valvar | screener diagnosis: conotruncal abnormality"
+2708,M,"aberrant left subclavian artery | hypoplastic main pulmonary artery | left sided azygos | left superior vena cava connecting to the coronary sinus | pulmonary stenosis, subvalvar | pulmonary stenosis, valvar | right aortic arch | screener diagnosis: conotruncal abnormality | tetralogy of fallot | ventricular septal defect, malalignment"
+14031,F,"absence of the suprarenal inferior vena cava with azygous continuation | common atrium | double outlet right ventricle with atrioventricular canal defect | heterotaxy syndrome | hypoplastic right ventricle (subnormal cavity volume) | polysplenia syndrome (left isomerism) | screener diagnosis: conotruncal abnormality, heterotaxy syndrome | situs ambiguous of the atria | superior vena caval anomaly | unbalanced complete atrioventricular canal, left dominant"
+4185,M,aortic arch hypoplasia | aortic atresia | coronary-cameral fistulae to left ventricle in hypoplastic left heart syndrome | hypoplasia ascending aorta | hypoplastic left heart syndrome | hypoplastic left ventricle (subnormal cavity volume) | hypoplastic mitral valve | restrictive patent foramen ovale | screener diagnosis: left-sided obstructive lesion
+313,F,aortic arch hypoplasia | aortic atresia | hypoplasia ascending aorta | hypoplastic left heart syndrome | hypoplastic mitral valve | left aortic arch with normal branching pattern | malpositioned atrial septum (with or without papvc) | patent foramen ovale | screener diagnosis: left-sided obstructive lesion
+10792,M,aortic arch hypoplasia | aortic atresia | hypoplasia ascending aorta | hypoplastic left heart syndrome | hypoplastic mitral valve | left aortic arch with unknown branching pattern | screener diagnosis: left-sided obstructive lesion
+766,M,"aortic arch hypoplasia | bicommissural aortic valve, right-left fusion | left aortic arch with normal branching pattern | screener diagnosis: conotruncal abnormality | tricuspid valve abnormality | ventricular septal defect, membranous"
+4168,M,"aortic atresia | atrial septal defect, secundum | hypoplasia ascending aorta | hypoplastic left heart syndrome | hypoplastic left ventricle (subnormal cavity volume) | mitral stenosis | screener diagnosis: left-sided obstructive lesion"
+30159,M,"aortic atresia | atrial septal defect, secundum | hypoplastic left heart syndrome | levoatrialcardinal vein | mitral atresia | screener diagnosis: left-sided obstructive lesion | tricuspid regurgitation"
+19448,F,aortic atresia | hypoplastic left heart syndrome | left superior vena cava connecting to the coronary sinus | pulmonary venous obstruction | restrictive patent foramen ovale | screener diagnosis: left-sided obstructive lesion
+30473,F,aortic atresia | hypoplastic left heart syndrome | mitral atresia | screener diagnosis: left-sided obstructive lesion
+1013,M,aortic atresia | hypoplastic left heart syndrome | mitral atresia | screener diagnosis: left-sided obstructive lesion
+20029,M,aortic stenosis - subvalvar | balanced transitional atrioventricular canal | coarctation off the aorta | hypoplastic aortic annulus | left aortic arch with normal branching pattern | screener diagnosis: other: cavc
+14612,F,"aortic stenosis - subvalvar | coronary fistula (arterio-venous or arterio-cameral) | hypoplastic right pulmonary artery | right aortic arch | screener diagnosis: conotruncal abnormality | tetralogy of fallot with pulmonary atresia and multiple aortopulmonary collaterals | ventricular septal defect, membranous"
+26916,F,"aortic stenosis - valvar | atrial septal defect, secundum | heart disease | ostium primum atrial septal defect | screener diagnosis: other: 1 and 2 asd, bicuspid aortic valve, valvar ps"
+9361,M,aortic stenosis | hypoplastic aortic annulus | hypoplastic left heart syndrome | hypoplastic left ventricle (subnormal cavity volume) | hypoplastic mitral valve | mitral stenosis | patent foramen ovale | screener diagnosis: left-sided obstructive lesion | tubular hypoplasia of aorta with coarctation
+73,M,aortic stenosis | hypoplastic left heart syndrome | mitral stenosis | screener diagnosis: other: hypoplastic left heart
+30036,F,"atrial fibrillation | bicommissural aortic valve | mitral stenosis | partially anomalous pulmonary veins | screener diagnosis: other: bicuspid aortic valve, papvr | tricuspid regurgitation"
+257,F,atrial septal defect | hypoplastic left heart syndrome | screener diagnosis: left-sided obstructive lesion
+15985,M,"atrial septal defect | hypoplastic left heart syndrome | screener diagnosis: left-sided obstructive lesion | ventricular septal defect, muscular"
+1499,M,atrial septal defect | left superior vena cava connecting to the coronary sinus | screener diagnosis: other: hypoplastic right ventricle and asd | tricuspid atresia with no pulmonary stenosis and large vsd (type ic)
+718,F,"atrial septal defect, secundum | bicommissural aortic valve | coarctation off the aorta | screener diagnosis: left-sided obstructive lesion"
+5097,F,"atrial septal defect, secundum | discontinuity of pulmonary arteries | hypoplastic left pulmonary artery | hypoplastic main pulmonary artery | hypoplastic right pulmonary artery | multiple major aortopulmonary collateral arteries (mapcas) | pulmonary atresia congenital | screener diagnosis: conotruncal abnormality | tetralogy of fallot with pulmonary atresia and multiple aortopulmonary collaterals | ventricular septal defect, malalignment | ventricular septal defect, single"
+23361,F,"atrial septal defect, secundum | hypoplastic left heart syndrome | screener diagnosis: conotruncal abnormality"
+24349,M,"atrial septal defect, secundum | hypoplastic left heart syndrome | screener diagnosis: left-sided obstructive lesion"
+1069,M,"atrial septal defect, secundum | hypoplastic left ventricle (subnormal cavity volume) | hypoplastic mitral valve | parachute mitral valve | screener diagnosis: left-sided obstructive lesion | tubular hypoplasia of aorta with coarctation | ventricular septal defect, membranous"
+5496,F,"atrial septal defect, secundum | hypoplastic pulmonary annulus | hypoplastic right ventricle (subnormal cavity volume) | pulmonary stenosis | screener diagnosis: other: tricuspid atresia | tricuspid atresia with pulmonary stenosis or small vsd (type ib) | ventricular septal defect, single"
+29846,F,"atrial septal defect, secundum | hypoplastic right ventricle (subnormal cavity volume) | left superior vena cava connecting to the coronary sinus | noonan syndrome | patent ductus arteriosus | pulmonary atresia, intact ventricular septum | screener diagnosis: other: paivs"
+16143,F,"atrial septal defect, secundum | left aortic arch with normal branching pattern | screener diagnosis: atrial septal defect"
+14541,F,"atrial septal defect, secundum | pulmonary stenosis, supravalvar | screener diagnosis: atrial septal defect"
+20751,M,"atrial septal defect, secundum | screener diagnosis: atrial septal defect"
+15351,M,"atrial septal defect, secundum | screener diagnosis: atrial septal defect"
+16303,F,"atrial septal defect, secundum | screener diagnosis: atrial septal defect"
+1938,M,"atrial septal defect, secundum | screener diagnosis: conotruncal abnormality | ventricular septal defect, membranous | ventricular septal defect, single"
+33484,F,"atrial septal defect, secundum | screener diagnosis: none"
+118,F,"bicommissural aortic valve | bicommissural aortic valve, right-left fusion | coarctation off the aorta | hypoplastic mitral valve | partially anomalous pulmonary veins | patent foramen ovale | screener diagnosis: left-sided obstructive lesion | tubular hypoplasia of aorta with coarctation | ventricular septal defect, muscular"
+11945,F,"bicommissural aortic valve | bicommissural aortic valve, right-non fusion | hypoplastic right ventricle (subnormal cavity volume) | hypoplastic tricuspid valve | pulmonary atresia, intact ventricular septum | right ventricular dependent coronary circulation | screener diagnosis: other: pa/ivs"
+31021,F,cleft mitral valve | ostium primum atrial septal defect | screener diagnosis: atrial septal defect
+2877,M,coarctation off the aorta | hypoplastic aortic isthmus | patent ductus arteriosus | screener diagnosis: left-sided obstructive lesion
+8349,M,"coronary-cameral fistulae to right ventricle in pulmonary atresia with intact ventricular septum | hypoplastic tricuspid valve | pulmonary atresia, intact ventricular septum | right ventricular myocardial sinusoids | screener diagnosis: conotruncal abnormality | single ventricle comprised of mostly left ventricle"
+34673,F,d-loop transposition of the great arteries | screener diagnosis: none
+7,M,"d-loop transposition of the great arteries with intact ventricular septum | restrictive patent foramen ovale | screener diagnosis: conotruncal abnormality | secundum atrial septal defect, restricitve | usual coronary arteries for d-loop transposition of the great arteries"
+16861,F,"dilated aorta | pulmonary stenosis, bilateral branch pulmonary artery | screener diagnosis: conotruncal abnormality | truncus arteriosus type i (main pulmonary artery present) | ventricular septal defect"
+16785,F,dilated aortic root | hypoplastic left pulmonary artery | hypoplastic main pulmonary artery | hypoplastic right pulmonary artery | left aortic arch with normal branching pattern | partially anomalous pulmonary veins | pulmonary atresia congenital | screener diagnosis: conotruncal abnormality | tetralogy of fallot with pulmonary atresia and multiple aortopulmonary collaterals
+9733,F,dilated aortic root | pulmonary artery anomaly | screener diagnosis: conotruncal abnormality | tetralogy of fallot
+3407,F,"discontinuity of pulmonary arteries | hypoplastic right ventricle (subnormal cavity volume) | patent ductus arteriosus | pulmonary atresia congenital | right aortic arch | screener diagnosis: conotruncal abnormality | ventricular septal defect, membranous"
+3625,F,"double aortic arch | screener diagnosis: other: double aortic arch, heterotaxy syndrome"
+4302,F,double outlet right ventricle | hypoplastic left ventricle (subnormal cavity volume) | screener diagnosis: conotruncal abnormality | straddling mitral valve | superior-inferior ventricles (upstairs-downstairs ventricles) | ventricular inversion (l-loop ventricles)
+25604,F,"heart disease | hypoplastic left pulmonary artery | non-cardiac congenital anatomic abnormalities, absent | patent foramen ovale | right aortic arch | screener diagnosis: conotruncal abnormality | tetralogy of fallot | ventricular septal defect, malalignment"
+22080,F,"hypoplastic left heart syndrome | polysplenia syndrome (left isomerism) | screener diagnosis: left-sided obstructive lesion, heterotaxy syndrome"
+1120,F,hypoplastic left heart syndrome | screener diagnosis: left-sided obstructive lesion
+33295,M,hypoplastic left heart syndrome | screener diagnosis: none
+32866,M,hypoplastic left heart syndrome | screener diagnosis: none
+33315,M,hypoplastic left heart syndrome | screener diagnosis: none
+32869,F,hypoplastic left heart syndrome | screener diagnosis: none
+33303,M,hypoplastic left heart syndrome | screener diagnosis: none
+2648,F,"hypoplastic left pulmonary artery | hypoplastic main pulmonary artery | patent foramen ovale | pulmonary stenosis, subvalvar | pulmonary stenosis, valvar | screener diagnosis: conotruncal abnormality | tetralogy of fallot | ventricular septal defect, malalignment"
+12192,M,"hypoplastic left pulmonary artery | hypoplastic right pulmonary artery | pulmonary stenosis, subvalvar | pulmonary stenosis, valvar | right ventricular hypertrophy | screener diagnosis: conotruncal abnormality | tetralogy of fallot | ventricular septal defect, malalignment"
+10921,F,"hypoplastic left pulmonary artery | hypoplastic right pulmonary artery | screener diagnosis: other: pa, vsd | tetralogy of fallot with pulmonary atresia and multiple aortopulmonary collaterals"
+2824,F,"hypoplastic main pulmonary artery | pulmonary stenosis, subvalvar | pulmonary stenosis, supravalvar | pulmonary stenosis, valvar | screener diagnosis: conotruncal abnormality | tetralogy of fallot"
+2021,F,"hypoplastic main pulmonary artery | pulmonary stenosis, subvalvar | right aortic arch with mirror image branching pattern | screener diagnosis: conotruncal abnormality | tetralogy of fallot"
+4346,F,"hypoplastic mitral valve | mitral stenosis | mitral stenosis, parachute mitral valve | screener diagnosis: left-sided obstructive lesion | secundum atrial septal defect, restricitve | ventricular septal defect, subpulmonary or conal"
+22164,M,"hypoplastic right ventricle (subnormal cavity volume) | l-loop corrected tga {s,l,?} with ventricular septal defect and pulmonary stenosis | right aortic arch with mirror image branching pattern | screener diagnosis: other: l-tga"
+1375,F,"hypoplastic right ventricle (subnormal cavity volume) | pulmonary atresia, intact ventricular septum | right ventricular myocardial sinusoids | screener diagnosis: other: pulm. atresia"
+2548,F,"hypoplastic right ventricle (subnormal cavity volume) | pulmonary atresia, intact ventricular septum | screener diagnosis: other: pulmonary atresia | tricuspid valve abnormality"
+14573,M,"left aortic arch with normal branching pattern | patent ductus arteriosus | pulmonary atresia congenital | screener diagnosis: conotruncal abnormality | ventricular septal defect, muscular"
+2272,M,mitral regurgitation | mitral stenosis arcade | screener diagnosis: other: mitral stenosis
+23333,F,"partially anomalous pulmonary veins | screener diagnosis: other: papvr | sinus venosus septal defect, superior type"
+16583,M,screener diagnosis: conotruncal abnormality | tetralogy of fallot
+17596,M,screener diagnosis: none
+6149,F,screener diagnosis: none
+11411,M,screener diagnosis: none
+25971,F,screener diagnosis: none
+12139,F,screener diagnosis: none
+17028,F,screener diagnosis: none
+15153,M,screener diagnosis: none
+23161,M,screener diagnosis: none
+24107,M,screener diagnosis: none
+27493,F,screener diagnosis: none
+32040,F,screener diagnosis: none
+29438,F,screener diagnosis: none
+11617,M,screener diagnosis: none
+7215,F,screener diagnosis: none
+18735,M,screener diagnosis: none
+5492,M,screener diagnosis: none
+11751,M,screener diagnosis: none
+20001,M,screener diagnosis: none
+20640,M,screener diagnosis: none
+8432,F,screener diagnosis: none
+24498,M,screener diagnosis: none
+10881,F,screener diagnosis: none
+23190,F,screener diagnosis: none
+22411,F,screener diagnosis: none
+11347,F,screener diagnosis: none
+8374,F,screener diagnosis: none
+33608,F,screener diagnosis: none | tetralogy of fallot
+33517,F,screener diagnosis: none | tetralogy of fallot
