@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BST430 Lecture 08-A</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.min.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link rel="stylesheet" href="css/lexis.css" type="text/css" />
+    <link rel="stylesheet" href="css/lexis-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: ur-title, center, middle, title-slide
+
+.title[
+# BST430 Lecture 08-A
+]
+.subtitle[
+## Text Processing
+]
+.author[
+### Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love
+]
+.institute[
+### U of Rochester
+]
+.date[
+### 2021-09-26 (updated: 2025-09-23)
+]
+
+---
+
+  
+
+
+
+
+
+
+Here's the [R code and data for this lecture](https://github.com/seonghwanjun/bst430-fall2025/tree/main/l08)
+
+---
+
+## Cardiac diagnoses
+
+
+```r
+diagnoses = read_csv('l08/data/cardiac-dx.csv')
+diagnoses
+```
+
+```
+## # A tibble: 100 × 3
+##      id gender diagnoses                                         
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 26108 F      {a,d,d} | abdominal situs ambiguous (abdominal he…
+## 2 10949 M      {s,d,l} | aortic stenosis - valvar | atrial septa…
+## 3  8090 F      {s,l,l} | aortic valve position relative to the p…
+## 4 19800 M      {s,l,l} | crisscross atrioventricular valves | de…
+## 5  2708 M      aberrant left subclavian artery | hypoplastic mai…
+## 6 14031 F      absence of the suprarenal inferior vena cava with…
+## 7  4185 M      aortic arch hypoplasia | aortic atresia | coronar…
+## 8   313 F      aortic arch hypoplasia | aortic atresia | hypopla…
+## # ℹ 92 more rows
+```
+
+.question[How to get all the diagnoses of hypoplastic left heart?]
+
+---
+
+## Attempt 1
+
+
+```r
+diagnoses %&gt;% count(diagnoses) %&gt;% 
+  arrange(desc(n))
+```
+
+```
+## # A tibble: 67 × 2
+##   diagnoses                                                     n
+##   &lt;chr&gt;                                                     &lt;int&gt;
+## 1 screener diagnosis: none                                     26
+## 2 hypoplastic left heart syndrome | screener diagnosis: no…     5
+## 3 atrial septal defect, secundum | screener diagnosis: atr…     3
+## 4 aortic atresia | hypoplastic left heart syndrome | mitra…     2
+## 5 screener diagnosis: none | tetralogy of fallot                2
+## 6 aberrant left subclavian artery | hypoplastic main pulmo…     1
+## 7 absence of the suprarenal inferior vena cava with azygou…     1
+## 8 aortic arch hypoplasia | aortic atresia | coronary-camer…     1
+## # ℹ 59 more rows
+```
+
+--
+
+Too many unique diagnoses to make headway with this.
+
+---
+
+## Using string matching
+
+
+```r
+filter(diagnoses, str_detect(diagnoses, 'hypoplastic'))
+```
+
+```
+## # A tibble: 50 × 3
+##      id gender diagnoses                                         
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 26108 F      {a,d,d} | abdominal situs ambiguous (abdominal he…
+## 2 10949 M      {s,d,l} | aortic stenosis - valvar | atrial septa…
+## 3 19800 M      {s,l,l} | crisscross atrioventricular valves | de…
+## 4  2708 M      aberrant left subclavian artery | hypoplastic mai…
+## 5 14031 F      absence of the suprarenal inferior vena cava with…
+## 6  4185 M      aortic arch hypoplasia | aortic atresia | coronar…
+## 7   313 F      aortic arch hypoplasia | aortic atresia | hypopla…
+## 8 10792 M      aortic arch hypoplasia | aortic atresia | hypopla…
+## # ℹ 42 more rows
+```
+
+.question[What different sort of hypoplasties are there?]
+
+---
+
+## Split into pieces
+
+
+```r
+diagnoses_row = diagnoses %&gt;% 
+* tidyr::separate_longer_delim(cols = "diagnoses", delim=" | ")
+diagnoses_row
+```
+
+```
+## # A tibble: 412 × 3
+##      id gender diagnoses                                         
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;                                             
+## 1 26108 F      {a,d,d}                                           
+## 2 26108 F      abdominal situs ambiguous (abdominal heterotaxy)  
+## 3 26108 F      aortic atresia                                    
+## 4 26108 F      double outlet right ventricle                     
+## 5 26108 F      heterotaxy syndrome                               
+## 6 26108 F      inferior vena cava, left sided                    
+## 7 26108 F      screener diagnosis: other: cavc, aa, hypoplastic …
+...
+```
+
+---
+
+## Split into pieces
+
+
+```r
+diagnoses_row %&gt;% filter(str_detect(diagnoses, 'hypoplastic')) %&gt;%
+  count(diagnoses) %&gt;% arrange(desc(n))
+```
+
+```
+## # A tibble: 15 × 2
+##   diagnoses                                                 n
+##   &lt;chr&gt;                                                 &lt;int&gt;
+## 1 hypoplastic left heart syndrome                          21
+## 2 hypoplastic right ventricle (subnormal cavity volume)     8
+## 3 hypoplastic left ventricle (subnormal cavity volume)      7
+## 4 hypoplastic mitral valve                                  7
+## 5 hypoplastic left pulmonary artery                         6
+## 6 hypoplastic main pulmonary artery                         6
+## 7 hypoplastic right pulmonary artery                        5
+## 8 hypoplastic tricuspid valve                               3
+## # ℹ 7 more rows
+```
+
+---
+
+## Plot co-occurrence (run this on your laptop)
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+diagnoses_row %&gt;% filter(str_detect(diagnoses, 'hypoplastic')) %&gt;%
+  ggplot(aes(y = diagnoses, x = as.factor(id))) + 
+  geom_tile(color="white") + 
+  scale_x_discrete(breaks = NULL) +
+  labs(y = "Diagnosis", x = 'Patient', 
+       main = 'Co-occurrence of hypoplastic heart disorders')
+```
+].panel[.panel-name[Plot]
+&lt;img src="l08a-text-i_files/figure-html/unnamed-chunk-8-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+### Sensible factor orders
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+diagnoses_row %&gt;% filter(str_detect(diagnoses, 'hypoplastic')) %&gt;%
+* ggplot(aes(y = fct_infreq(diagnoses), x = fct_infreq(as.factor(id)))) +
+  geom_tile(color="white") + 
+  scale_x_discrete(breaks = NULL) +
+  labs(y = "Diagnosis", x = 'Patient', 
+       main = 'Co-occurrence of hypoplastic heart disorders')
+```
+].panel[.panel-name[Plot]
+&lt;img src="l08a-text-i_files/figure-html/unnamed-chunk-9-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+### Wrap text width
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+diagnoses_row %&gt;% filter(str_detect(diagnoses, 'hypoplastic')) %&gt;%
+* mutate(diagnoses = str_wrap(diagnoses, width = 40)) %&gt;%
+  ggplot(aes(y = fct_infreq(diagnoses), x = fct_infreq(as.factor(id)))) + 
+  geom_tile(color="white") + 
+  scale_x_discrete(breaks = NULL) +
+  labs(y = "Diagnosis", x = 'Patient', 
+       main = 'Co-occurrence of hypoplastic heart disorders')
+```
+].panel[.panel-name[Plot]
+&lt;img src="l08a-text-i_files/figure-html/unnamed-chunk-10-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+### Adjust text size and justification
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+diagnoses_row %&gt;% filter(str_detect(diagnoses, 'hypoplastic')) %&gt;%
+  mutate(diagnoses = str_wrap(diagnoses, width = 40)) %&gt;%
+  ggplot(aes(y = fct_infreq(diagnoses), x = fct_infreq(as.factor(id)))) + 
+  geom_tile(color="white") + 
+* theme(axis.text.y = element_text(hjust = 0, vjust = 0, size = 8)) +
+  scale_x_discrete(breaks = NULL) +
+  labs(y = "Diagnosis", x = 'Patient', 
+       main = 'Co-occurrence of hypoplastic heart disorders')
+```
+].panel[.panel-name[Plot]
+&lt;img src="l08a-text-i_files/figure-html/unnamed-chunk-11-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+
+# Topics
+
+*  Why text processing
+*  Low level processing:
+  *  concatenate, count characters, substring, split strings.
+*  Regular expressions (aka regex):
+  *  detect, extract, replace
+*  Text mining
+  *  Tokenizing, filtering, analysis
+
+---
+
+## Low level text processing
+
+*  concatenate with `stringr::str_c()` and `glue::glue()`
+*  count characters with `base::nchar()`
+*  extract and replace substrings with `stringr::str_sub()`
+*  split with `str_split()` or `str_split_fixed()`
+
+---
+
+## Packages
+
+
+.pull-left[
+`stringr` and `glue` rationalize much of text processing, which is otherwise a bit of a thicket in R.
+]
+.pull-right[
+![](https://raw.githubusercontent.com/tidyverse/stringr/master/man/figures/logo.png)
+![](https://raw.githubusercontent.com/tidyverse/glue/master/man/figures/logo.png)
+
+
+]
+
+---
+
+## Concatenate strings
+
+.pull-left[
+
+```r
+names = c("Jeff B.", "Larry E.", "Warren B.")
+favorite_food = c("caviar", "cake", "Pappy Van Winkle")
+str_c(names, 
+      " likes ", #note additional spaces
+      favorite_food, ".")
+```
+
+```
+## [1] "Jeff B. likes caviar."            
+## [2] "Larry E. likes cake."             
+## [3] "Warren B. likes Pappy Van Winkle."
+```
+]
+.pull-right[
+
+```r
+dinner = glue::glue("{names} likes {favorite_food}.")
+dinner
+```
+
+```
+## Jeff B. likes caviar.
+## Larry E. likes cake.
+## Warren B. likes Pappy Van Winkle.
+```
+]
+
+
+---
+
+## Some special characters
+
+*  \n newline
+*  \r carriage return
+*  \t tab
+*  \f form feed
+*  \Unnnnnnnn  Unicode character with given code
+*  \\\ literal backslash (.alert[this one will prove to be especially annoying...])
+*  \" literal quote
+
+Others are listed in `?'"'` (the help on the quote function).
+
+---
+
+## Glue with newlines and unicode
+
+
+```r
+glue::glue("{names} \n {favorite_food} \U1F643.")
+```
+
+```
+## Jeff B. 
+## caviar 🙃.
+## Larry E. 
+## cake 🙃.
+## Warren B. 
+## Pappy Van Winkle 🙃.
+```
+
+
+---
+
+## Count characters
+
+
+```r
+names
+```
+
+```
+## [1] "Jeff B."   "Larry E."  "Warren B."
+```
+
+```r
+nchar(names)
+```
+
+```
+## [1] 7 8 9
+```
+
+---
+
+## Extract substrings
+
+.pull-left[
+Extract
+
+```r
+str_sub(dinner, 1, 11)
+```
+
+```
+## [1] "Jeff B. lik" "Larry E. li" "Warren B. l"
+```
+]
+.pull-right[
+Replace
+
+```r
+str_sub(dinner, 
+        #space + l-
+        nchar(names) + 2, 
+        #space + l-i-k-e
+        nchar(names) + 6 
+) = "demands"
+dinner
+```
+
+```
+## [1] "Jeff B. demands caviar."            
+## [2] "Larry E. demands cake."             
+## [3] "Warren B. demands Pappy Van Winkle."
+```
+]
+
+---
+
+## split strings
+
+Get a character matrix, padding / collapsing excess fields.
+
+```r
+str_split_fixed(dinner, " ",  4)
+```
+
+```
+##      [,1]     [,2] [,3]      [,4]               
+## [1,] "Jeff"   "B." "demands" "caviar."          
+## [2,] "Larry"  "E." "demands" "cake."            
+## [3,] "Warren" "B." "demands" "Pappy Van Winkle."
+```
+
+
+```r
+str_split_fixed(dinner, " ", 6)
+```
+
+```
+##      [,1]     [,2] [,3]      [,4]      [,5]  [,6]     
+## [1,] "Jeff"   "B." "demands" "caviar." ""    ""       
+## [2,] "Larry"  "E." "demands" "cake."   ""    ""       
+## [3,] "Warren" "B." "demands" "Pappy"   "Van" "Winkle."
+```
+
+---
+
+## split strings
+
+Get exactly what you ask for.
+
+```r
+str_split(dinner, " ")
+```
+
+```
+## [[1]]
+## [1] "Jeff"    "B."      "demands" "caviar."
+## 
+## [[2]]
+## [1] "Larry"   "E."      "demands" "cake."  
+## 
+## [[3]]
+## [1] "Warren"  "B."      "demands" "Pappy"   "Van"     "Winkle."
+```
+
+Also recall `tidyr::separate` and `tidyr::separate_rows`.
+
+---
+
+## Other handy low-level string manipulations
+
+*  Change case `str_to_lower()`, `str_to_upper()`, `str_to_title()`
+*  Remove trailing/leading `str_trim()` or repeated `str_squish()` whitespace
+*  Wrap long lines `stringr::str_wrap()`
+*  Truncate `str_trunc()` or abbreviate `base::abbreviate()` long strings.
+
+---
+
+## Application Exercise
+
+.hand[Let's try.] 
+
+Read some data
+
+```r
+data = read_csv("l08/ae/data/sample_sheet2.csv")
+data
+```
+
+```
+## # A tibble: 24 × 6
+##   library_id folder_name        treatment sample_ID tissue_source
+##        &lt;dbl&gt; &lt;chr&gt;                  &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;        
+## 1          1 Sample_300_0150_P…       300 300_0150  PBL          
+## 2          2 Sample_300_0150_S…       300 300_0150  Syn          
+## 3          4 Sample_300_0171_P…       300 300_0171  PBL          
+## 4          5 Sample_300_0171_S…       300 300_0171  Syn          
+## 5          6 Sample_300_0173_P…       300 300_0173  PBL          
+## 6          7 Sample_300_0173_S…       300 300_0173  Syn          
+## 7          8 Sample_300_0174_P…       300 300_0174  PBL          
+## 8          9 Sample_300_0174_S…       300 300_0174  Syn          
+## # ℹ 16 more rows
+## # ℹ 1 more variable: dataset &lt;chr&gt;
+```
+---
+Split the `folder_name` field by the '_' character.  This will give you a character `matrix`.
+
+--
+
+
+```r
+char_matrix = str_split_fixed(data$folder_name, pattern = "_", n = 6)
+char_matrix
+```
+
+```
+##       [,1]     [,2]  [,3]   [,4]  [,5] [,6]
+##  [1,] "Sample" "300" "0150" "PBL" "BT" "5" 
+##  [2,] "Sample" "300" "0150" "Syn" "BT" "5" 
+##  [3,] "Sample" "300" "0171" "PBL" "BT" "5" 
+##  [4,] "Sample" "300" "0171" "Syn" "BT" "5" 
+##  [5,] "Sample" "300" "0173" "PBL" "BT" "5" 
+##  [6,] "Sample" "300" "0173" "Syn" "BT" "5" 
+##  [7,] "Sample" "300" "0174" "PBL" "BT" "5" 
+##  [8,] "Sample" "300" "0174" "Syn" "BT" "5" 
+##  [9,] "Sample" "300" "0392" "PBL" "BT" "5" 
+## [10,] "Sample" "300" "0392" "Syn" "BT" "5" 
+## [11,] "Sample" "300" "0410" "PBL" "BT" "5" 
+## [12,] "Sample" "300" "0410" "Syn" "BT" "5" 
+## [13,] "Sample" "300" "0414" "PBL" "BT" "5" 
+## [14,] "Sample" "300" "0414" "Syn" "BT" "5" 
+## [15,] "Sample" "300" "0415" "Syn" "BT" "5" 
+## [16,] "Sample" "300" "0416" "Syn" "BT" "5" 
+## [17,] "Sample" "300" "1883" "Syn" "BT" "5" 
+## [18,] "Sample" "300" "1930" "PBL" "BT" "5" 
+## [19,] "Sample" "300" "1930" "Syn" "BT" "5" 
+## [20,] "Sample" "301" "0174" "PBL" "BT" "5" 
+## [21,] "Sample" "301" "0174" "Syn" "BT" "5" 
+## [22,] "Sample" "301" "0174" "Syn" "PC" "5" 
+## [23,] "Sample" "301" "0270" "PBL" "BT" "5" 
+## [24,] "Sample" "301" "0270" "Syn" "BT" "5"
+```
+
+---
+Using this and `str_c`, recreate the fields `treatment`, `sample_ID`, `tissue_source`.
+You can extract various columns using `char_matrix[,integer_of_the_column_you_want]`.  
+
+--
+
+
+```r
+data %&gt;% select(folder_name) %&gt;% 
+  mutate(treatment = char_matrix[,2],
+         sample_ID = str_c(char_matrix[,2], "_", char_matrix[,3]),
+         tissue_source = char_matrix[,4])
+```
+
+```
+## # A tibble: 24 × 4
+##   folder_name              treatment sample_ID tissue_source
+##   &lt;chr&gt;                    &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;        
+## 1 Sample_300_0150_PBL_BT_5 300       300_0150  PBL          
+## 2 Sample_300_0150_Syn_BT_5 300       300_0150  Syn          
+## 3 Sample_300_0171_PBL_BT_5 300       300_0171  PBL          
+## 4 Sample_300_0171_Syn_BT_5 300       300_0171  Syn          
+## 5 Sample_300_0173_PBL_BT_5 300       300_0173  PBL          
+## 6 Sample_300_0173_Syn_BT_5 300       300_0173  Syn          
+## 7 Sample_300_0174_PBL_BT_5 300       300_0174  PBL          
+## 8 Sample_300_0174_Syn_BT_5 300       300_0174  Syn          
+## # ℹ 16 more rows
+```
+
+---
+Convert the `dataset` field to be entirely lowercase with `str_to_lower`.
+
+--
+
+
+```r
+data %&gt;% select(dataset) %&gt;% 
+  mutate(new_data = str_to_lower(dataset))
+```
+
+```
+## # A tibble: 24 × 2
+##   dataset        new_data      
+##   &lt;chr&gt;          &lt;chr&gt;         
+## 1 300_0150_PBL_1 300_0150_pbl_1
+## 2 300_0150_Syn_2 300_0150_syn_2
+## 3 300_0171_PBL_4 300_0171_pbl_4
+## 4 300_0171_Syn_5 300_0171_syn_5
+## 5 300_0173_PBL_6 300_0173_pbl_6
+## 6 300_0173_Syn_7 300_0173_syn_7
+## 7 300_0174_PBL_8 300_0174_pbl_8
+## 8 300_0174_Syn_9 300_0174_syn_9
+## # ℹ 16 more rows
+```
+
+---
+Collapse sample_ID field into a single character vector (length 1) separated by semicolons ";" using `str_c(..., collapse = ...)`.
+
+--
+
+
+```r
+str_c(data$sample_ID, collapse=";")
+```
+
+```
+## [1] "300_0150;300_0150;300_0171;300_0171;300_0173;300_0173;300_0174;300_0174;300_0392;300_0392;300_0410;300_0410;300_0414;300_0414;300_0415;300_0416;300_1883;300_1930;300_1930;301_0174;301_0174;301_0174;301_0270;301_0270"
+```
+
+---
+
+class: middle
+
+.hand[Regular Expressions]: 
+
+---
+
+## Regular expressions
+
+&gt; Some people, when confronted with a problem, think "I know, I'll use regular expressions." Now they have two problems.
+-- Jamie Zawinski (creator of Mozilla)
+
+*  Are like *find-replace*, *wildcards* \* 
+*  Are found in nearly every computer language
+*  Can be just the ticket to solving *some* problems
+
+---
+class: bg-green
+
+## Syntax
+
+Write what you want to match (if it's alpha-numeric).
+
+
+```r
+lunch = c("one app", "two appetizers", "three apples")
+str_view(lunch, 'apple')
+```
+
+```
+## [3] │ three &lt;apple&gt;s
+```
+
+---
+class: bg-green
+
+## Match multiple things: wildcard
+
+`.` is a generic wildcard, matches any character.
+
+
+```r
+str_view(lunch, 'app.')
+```
+
+```
+## [2] │ two &lt;appe&gt;tizers
+## [3] │ three &lt;appl&gt;es
+```
+
+---
+class: bg-green
+
+## Match multiple things: character class
+
+`[&lt;set&gt;]` is a character class, matches all characters in `&lt;set&gt;`.  Specify a range of characters with `[&lt;char&gt;-&lt;char&gt;]`.  Invert a class with `[^&lt;set&gt;]`.
+
+
+```r
+str_view(lunch, 'app[le]')
+```
+
+```
+## [2] │ two &lt;appe&gt;tizers
+## [3] │ three &lt;appl&gt;es
+```
+
+---
+class: bg-green
+
+## Match multiple things: disjunction
+
+`(&lt;x&gt;|&lt;y&gt;)` is a disjunction, matches `&lt;x&gt;` or `&lt;y&gt;`.
+
+
+```r
+str_view(lunch, 'app(le|etizer)s')
+```
+
+```
+## [2] │ two &lt;appetizers&gt;
+## [3] │ three &lt;apples&gt;
+```
+
+---
+class: bg-green
+
+## Qualifiers modify matches
+
+1. `*` zero or more matches
+2. `?` zero or one matches
+3. `+` one or more matches
+4. `{min,max}` to match between min-max times.
+
+Compare back to `"app."`, which didn't match the first string.
+
+```r
+str_view(lunch, 'app.*')
+```
+
+```
+## [1] │ one &lt;app&gt;
+## [2] │ two &lt;appetizers&gt;
+## [3] │ three &lt;apples&gt;
+```
+
+---
+
+## Match without consuming with zero-width identifiers
+
+*  `^` matches a zero-width "character" present at the start of all lines.
+*  `$` is the analogous character at the end
+*  `\b` is between "words".  
+
+For example, the string:
+
+`red tired`
+
+can be thought as
+
+.darkgreen[^\b]red.darkgreen[\b] .darkgreen[\b]tired.darkgreen[\b$]
+
+---
+class: bg-green
+
+## Require word boundary
+
+We must double the `\` to keep R from interpreting it as an escape character.
+
+
+```r
+str_view("red tired", "\\bred\\b")
+```
+
+```
+## [1] │ &lt;red&gt; tired
+```
+
+
+---
+class: bg-green
+
+
+## Match unconditionally
+
+
+```r
+str_view("red tired", "red")
+```
+
+```
+## [1] │ &lt;red&gt; ti&lt;red&gt;
+```
+
+---
+
+
+## Using regular expressions
+
+*  Test for an expression `str_detect()`.
+*  Return first `str_extract()` or all `str_extract_all()` matching portions of string.
+*  Return first `str_match()` or all `str_match_all()` matching portions of string **and capture groups**.
+*  Replace first `str_replace()`  or all `str_replace_all()` matching portions of string and capture groups.
+
+---
+
+## `str_detect()`
+
+
+```r
+str_detect(string = c("A", "AA", "AB", "B"), 
+           pattern = "A")
+```
+
+```
+## [1]  TRUE  TRUE  TRUE FALSE
+```
+
+```r
+str_detect(string = lunch, pattern = 'app.')
+```
+
+```
+## [1] FALSE  TRUE  TRUE
+```
+
+---
+
+## `str_extract()`
+
+
+```r
+feline = c("The fur of cats goes by many names.", 
+           "Infimum (the cat) is a cat with a most baleful meow.",
+           "Dog.")
+str_extract(string = feline, pattern = "cat")
+```
+
+```
+## [1] "cat" "cat" NA
+```
+
+```r
+str_extract_all(string = feline, pattern = "cat")
+```
+
+```
+## [[1]]
+## [1] "cat"
+## 
+## [[2]]
+## [1] "cat" "cat"
+## 
+## [[3]]
+## character(0)
+```
+
+---
+
+
+## `str_match()`
+
+For simple queries, behaves like `str_extract()`
+
+```r
+feline = c("The fur of cats goes by many names.", 
+           "Infimum (the cat) is a cat with a most baleful meow.",
+           "Dog.")
+str_match(feline, "cat")
+```
+
+```
+##      [,1] 
+## [1,] "cat"
+## [2,] "cat"
+## [3,] NA
+```
+
+---
+
+## `str_match()`
+
+But returns **capture groups** `(&lt;expression&gt;)` separately.
+
+
+```r
+feline = c("The fur of cats goes by many names.", 
+           "Infimum (the cat) is a cat with a most baleful meow.",
+           "Dog.")
+str_match(feline, "(\\w*) cat.? (\\w*)")
+```
+
+```
+##      [,1]           [,2]  [,3]  
+## [1,] "of cats goes" "of"  "goes"
+## [2,] "the cat) is"  "the" "is"  
+## [3,] NA             NA    NA
+```
+
+`\w = [A-Za-z0-9_]`, we must double the `\` to keep R from interpreting it as an escape character.
+
+---
+
+## `str_match_all()`
+
+```r
+feline = c("The fur of cats goes by many names.", 
+           "Infimum (the cat) is a cat with a most baleful meow.",
+           "Dog.")
+
+str_match_all(feline, "(\\w*) cat.? (\\w*)")
+```
+
+```
+## [[1]]
+##      [,1]           [,2] [,3]  
+## [1,] "of cats goes" "of" "goes"
+## 
+## [[2]]
+##      [,1]          [,2]  [,3]  
+## [1,] "the cat) is" "the" "is"  
+## [2,] "a cat with"  "a"   "with"
+## 
+## [[3]]
+##      [,1] [,2] [,3]
+```
+
+---
+
+## `str_replace()`
+
+
+```r
+feline = c("The fur of cats goes by many names.", 
+           "Infimum (the cat) is a cat with a most baleful meow.",
+           "Dog.")
+
+str_replace(feline, "cat", "murder machine")
+```
+
+```
+## [1] "The fur of murder machines goes by many names."                 
+## [2] "Infimum (the murder machine) is a cat with a most baleful meow."
+## [3] "Dog."
+```
+
+---
+
+## `str_replace_all()`
+
+
+```r
+feline = c("The fur of cats goes by many names.", 
+           "Infimum (the cat) is a cat with a most baleful meow.",
+           "Dog.")
+
+str_replace_all(feline, "cat", "murder machine")
+```
+
+```
+## [1] "The fur of murder machines goes by many names."                            
+## [2] "Infimum (the murder machine) is a murder machine with a most baleful meow."
+## [3] "Dog."
+```
+
+---
+
+## `str_replace()` also can use capture groups
+
+Use `\1` to refer to the first capture group, `\2` for the second, etc.  Note the `\\` because `\` must be escaped in R.
+
+```r
+str_replace_all(feline, "(\\w*)", "\\1\\1")
+```
+
+```
+## [1] "TheThe furfur ofof catscats goesgoes byby manymany namesnames."                             
+## [2] "InfimumInfimum (thethe catcat) isis aa catcat withwith aa mostmost balefulbaleful meowmeow."
+## [3] "DogDog."
+```
+
+Actually, any regular expression can use a capture group, both for matching and replacing!
+---
+
+## Application exercise
+
+.hand[Let's try]. 
+
+If devtools works for you, you might also experiment with installing `devtools::install_github("gadenbuie/regexplain")`.  See https://www.garrickadenbuie.com/project/regexplain/ for example usage.
+
+We'll use the dataset `words`, which is loaded automatically when you load the `stringr` package.  It contains 980 common English words.
+
+
+
+```r
+word_df = tibble(word = words)
+```
+
+---
+
+How many words contain an "x" anywhere in them? List them.
+
+--
+
+
+```r
+filter(word_df, str_detect(word, "x"))
+```
+
+```
+## # A tibble: 17 × 1
+##   word    
+##   &lt;chr&gt;   
+## 1 box     
+## 2 exact   
+## 3 example 
+## 4 except  
+## 5 excuse  
+## 6 exercise
+## 7 exist   
+## 8 expect  
+## # ℹ 9 more rows
+```
+
+---
+
+How many words end in "x"?  List them.  Use `$` to match the end of the string.
+
+--
+
+
+```r
+filter(word_df, str_detect(word, "x$"))
+```
+
+```
+## # A tibble: 4 × 1
+##   word 
+##   &lt;chr&gt;
+## 1 box  
+## 2 sex  
+## 3 six  
+## 4 tax
+```
+
+---
+
+Do any words start with "x"?  Use `^` to match the start of the string.
+
+--
+
+
+```r
+filter(word_df, str_detect(word, "^x"))
+```
+
+```
+## # A tibble: 0 × 1
+## # ℹ 1 variable: word &lt;chr&gt;
+```
+
+---
+
+Using wildcards `.` and quantifiers `+` (rather than the results of the previous exercises), find all the words that contain "x" in the interior (but not at the start or end).  Check that the number of results from 1-4 are coherent.
+
+--
+
+
+```r
+filter(word_df, str_detect(word, '.+x.+'))
+```
+
+```
+## # A tibble: 13 × 1
+##   word    
+##   &lt;chr&gt;   
+## 1 exact   
+## 2 example 
+## 3 except  
+## 4 excuse  
+## 5 exercise
+## 6 exist   
+## 7 expect  
+## 8 expense 
+## # ℹ 5 more rows
+```
+
+---
+
+On average, how many vowels are there per word?  (Hint: use `str_count` and `[]` to define a character class).  What is the average vowel-per-letter (# of vowels normalized per length)
+
+--
+
+
+```r
+word_df %&gt;% 
+  mutate(vowels = str_count(word, "[aeiouAEIOU]"),
+         vowels_per_letter = vowels/nchar(word)) %&gt;% 
+  summarise(mean(vowels), mean(vowels_per_letter))
+```
+
+```
+## # A tibble: 1 × 2
+##   `mean(vowels)` `mean(vowels_per_letter)`
+##            &lt;dbl&gt;                     &lt;dbl&gt;
+## 1           1.99                     0.380
+```
+
+---
+List all the words with three or more vowels in a row.  Use `{min_matches,max_matches}` as a quantifier.
+
+--
+
+
+```r
+filter(word_df, str_detect(word, '[aeiou]{3,10}'))
+```
+
+```
+## # A tibble: 6 × 1
+##   word    
+##   &lt;chr&gt;   
+## 1 beauty  
+## 2 obvious 
+## 3 previous
+## 4 quiet   
+## 5 serious 
+## 6 various
+```
+
+---
+## Sentences
+
+Now, consider the  in the `sentences` data set:
+
+
+```r
+sentence_df = tibble(sentence  = sentences)
+sentence_df
+```
+
+```
+## # A tibble: 720 × 1
+##   sentence                                   
+##   &lt;chr&gt;                                      
+## 1 The birch canoe slid on the smooth planks. 
+## 2 Glue the sheet to the dark blue background.
+## 3 It's easy to tell the depth of a well.     
+## 4 These days a chicken leg is a rare dish.   
+## 5 Rice is often served in round bowls.       
+## 6 The juice of lemons makes fine punch.      
+## 7 The box was thrown beside the parked truck.
+## 8 The hogs were fed chopped corn and garbage.
+## # ℹ 712 more rows
+```
+
+---
+Extract the first word from each sentence.  Hint: negate the space character class "[ ]" to match everything except a space.
+
+--
+
+
+```r
+sentence_df %&gt;% mutate(first_word = str_extract(sentence, '\\w*')) %&gt;% head(3)# doesn't include apostrophes '''
+```
+
+```
+## # A tibble: 3 × 2
+##   sentence                                    first_word
+##   &lt;chr&gt;                                       &lt;chr&gt;     
+## 1 The birch canoe slid on the smooth planks.  The       
+## 2 Glue the sheet to the dark blue background. Glue      
+## 3 It's easy to tell the depth of a well.      It
+```
+
+```r
+sentence_df %&gt;% mutate(first_word = str_extract(sentence, '([^ ])*'))
+```
+
+```
+## # A tibble: 720 × 2
+##   sentence                                    first_word
+##   &lt;chr&gt;                                       &lt;chr&gt;     
+## 1 The birch canoe slid on the smooth planks.  The       
+## 2 Glue the sheet to the dark blue background. Glue      
+## 3 It's easy to tell the depth of a well.      It's      
+## 4 These days a chicken leg is a rare dish.    These     
+## 5 Rice is often served in round bowls.        Rice      
+## 6 The juice of lemons makes fine punch.       The       
+## 7 The box was thrown beside the parked truck. The       
+## 8 The hogs were fed chopped corn and garbage. The       
+## # ℹ 712 more rows
+```
+
+---
+Return all the sentences that contain the colors "red", "blue" or "green".  Use the `|` disjunction.
+
+--
+
+
+```r
+filter(sentence_df, str_detect(sentence, ("red|blue|green")))
+```
+
+```
+## # A tibble: 54 × 1
+##   sentence                                   
+##   &lt;chr&gt;                                      
+## 1 Glue the sheet to the dark blue background.
+## 2 Two blue fish swam in the tank.            
+## 3 The colt reared and threw the tall rider.  
+## 4 The wide road shimmered in the hot sun.    
+## 5 See the cat glaring at the scared mouse.   
+## 6 A wisp of cloud hung in the blue air.      
+## 7 He ordered peach pie with ice cream.       
+## 8 Pure bred poodles have curls.              
+## # ℹ 46 more rows
+```
+
+---
+Extract the first word ending in "s".  Use a capture group `()`, `str_match()` and the everything-but-space `[^ ]` character class.
+
+--
+
+
+```r
+sentence_df = sentence_df %&gt;% 
+  mutate(ends_in_s = str_match(sentence, "([^ ]*s)\\b")[,2])
+sentence_df
+```
+
+```
+## # A tibble: 720 × 2
+##   sentence                                    ends_in_s
+##   &lt;chr&gt;                                       &lt;chr&gt;    
+## 1 The birch canoe slid on the smooth planks.  planks   
+## 2 Glue the sheet to the dark blue background. &lt;NA&gt;     
+## 3 It's easy to tell the depth of a well.      It's     
+## 4 These days a chicken leg is a rare dish.    days     
+## 5 Rice is often served in round bowls.        is       
+## 6 The juice of lemons makes fine punch.       lemons   
+## 7 The box was thrown beside the parked truck. was      
+## 8 The hogs were fed chopped corn and garbage. hogs     
+## # ℹ 712 more rows
+```
+
+
+---
+(Stretch goal) Notice that two questions ago, we also matched the sentence
+
+&gt; The colt reared and threw the tall rider.
+
+because "reared" contains "red". Fix the regular expression so it only matches the complete words, not just a fragment using the "\b" word start marker.  Hint:  use "\\\\b" to keep the backslash from being used as an escape character.
+--
+
+
+```r
+filter(sentence_df, str_detect(sentence, ("\\bred\\b|\\bblue\\b|\\bgreen\\b")))
+```
+
+```
+## # A tibble: 26 × 2
+##   sentence                                        ends_in_s
+##   &lt;chr&gt;                                           &lt;chr&gt;    
+## 1 Glue the sheet to the dark blue background.     &lt;NA&gt;     
+## 2 Two blue fish swam in the tank.                 &lt;NA&gt;     
+## 3 A wisp of cloud hung in the blue air.           &lt;NA&gt;     
+## 4 The spot on the blotter was made by green ink.  was      
+## 5 The sofa cushion is red and of light weight.    is       
+## 6 The sky that morning was clear and bright blue. was      
+## 7 A blue crane is a tall wading bird.             is       
+## 8 It is hard to erase blue or red ink.            is       
+## # ℹ 18 more rows
+```
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- class: middle --&gt;
+
+&lt;!-- ![](https://raw.githubusercontent.com/juliasilge/tidytext/master/man/figures/tidytext.png) --&gt;
+
+&lt;!-- Text mining using `tidytext` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Text mining using `tidytext` --&gt;
+
+&lt;!-- Text is inherently high-dimensional and noisy data.  We could spent weeks on this. Instead, we'll have to be content to know what we don't know: --&gt;
+
+&lt;!-- *  Sampling text data and its potential ascertainment biases --&gt;
+&lt;!-- *  Handling non-Roman (ASCII) characters --&gt;
+&lt;!-- *  Parsing into tokens --&gt;
+&lt;!-- *  Filtering low-content words --&gt;
+&lt;!-- *  Dimension reduction, e.g., latent Dirichlet allocation or non-negative matrix factorization --&gt;
+&lt;!-- *  Embeddings using pre-trained neural networks --&gt;
+
+&lt;!-- Julia Silge has [one book on classical text mining](https://www.tidytextmining.com/) and [another on machine learning on text](https://smltar.com/). --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Most important functionality --&gt;
+
+&lt;!-- *  `unnest_tokens()` split a string into tokens (words, bi-grams, etc) as a data frame --&gt;
+&lt;!-- *  `bind_tf_idf` calculate term and inverse-document frequencies. --&gt;
+&lt;!-- *  `cast_sparse` convert to a (sparse) document-term matrix. --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Austin vs Kafka --&gt;
+&lt;!-- ```{r} --&gt;
+&lt;!-- library(tidytext) --&gt;
+&lt;!-- book_names = tibble(gutenberg_id = c(158, 1342, 5200, 7849), --&gt;
+&lt;!--                     title = c('Emma', 'Pride and prejudice', --&gt;
+&lt;!--                               'Metamorphosis', 'The Trial')) --&gt;
+&lt;!-- books = gutenbergr::gutenberg_download(book_names$gutenberg_id) %&gt;% left_join(book_names) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- .scroll-box-10[ --&gt;
+&lt;!-- ```{r, output.lines = 24} --&gt;
+&lt;!-- books %&gt;% group_by(title) %&gt;% slice_head(n=6) --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ] --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Get words --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- book_words = unnest_tokens(books, text, output = 'word', drop = TRUE) --&gt;
+&lt;!-- book_words --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Count words by book --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- word_counts = book_words %&gt;% --&gt;
+&lt;!--   group_by(title) %&gt;% count(title, word) %&gt;%  --&gt;
+&lt;!--   arrange(desc(n)) --&gt;
+&lt;!-- word_counts %&gt;% slice_head(n = 3) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Remove "stop" words --&gt;
+
+&lt;!-- Stop words are common, low-semantic value words.  Sometimes useful to remove. --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- word_counts %&gt;% anti_join(get_stopwords()) %&gt;% slice_head(n = 3) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Term frequency in Kafka vs Austin --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- total_words = word_counts %&gt;%  --&gt;
+&lt;!--   group_by(title) %&gt;%  --&gt;
+&lt;!--   summarize(total = sum(n)) --&gt;
+&lt;!-- word_counts = left_join(word_counts, total_words) --&gt;
+&lt;!-- word_counts  --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Term frequency in Kafka vs Austin --&gt;
+
+
+&lt;!-- ```{r plottf, warning = FALSE} --&gt;
+&lt;!-- ggplot(word_counts, aes(n/total)) + --&gt;
+&lt;!--   geom_histogram(show.legend = FALSE) + --&gt;
+&lt;!--   xlim(NA, 0.0009) +  --&gt;
+&lt;!--   facet_wrap(~title, ncol = 2, scales = "free_y") + theme_minimal() --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Zipf's law --&gt;
+&lt;!-- Distributions like those on the previous slide are typical in language.  A classic version of this relationship is called Zipf's law.  --&gt;
+
+&lt;!-- &gt; Zipf's law states that the frequency that a word appears is inversely proportional to its rank.  --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Zipf's law --&gt;
+
+&lt;!-- .panelset[ --&gt;
+
+&lt;!-- .panel[.panel-name[Code] --&gt;
+&lt;!-- ```{r freq_by_rank, fig.show='hide'} --&gt;
+&lt;!-- freq_by_rank = word_counts %&gt;%  --&gt;
+&lt;!--   group_by(title) %&gt;%  --&gt;
+&lt;!--   mutate(rank = row_number(),  --&gt;
+&lt;!--          `term frequency` = n/total) %&gt;% --&gt;
+&lt;!--   ungroup()  --&gt;
+
+&lt;!-- freq_by_rank %&gt;%  --&gt;
+&lt;!--   ggplot(aes(x = rank, y = `term frequency`, color = title)) +  --&gt;
+&lt;!--   geom_abline(intercept = -0.62, slope = -1,  --&gt;
+&lt;!--               color = "gray50", linetype = 2) + --&gt;
+&lt;!--   geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) +  --&gt;
+&lt;!--   scale_x_log10() + --&gt;
+&lt;!--   scale_y_log10() +  --&gt;
+&lt;!--   theme_minimal() --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ] --&gt;
+&lt;!-- .panel[.panel-name[Plot] --&gt;
+&lt;!-- ```{r ref.label = 'freq_by_rank', echo = FALSE} --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ] --&gt;
+&lt;!-- ] --&gt;
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Sentiment analysis --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- word_sentiments = word_counts %&gt;%  --&gt;
+&lt;!--   left_join(sentiments) %&gt;% #&lt;&lt; --&gt;
+&lt;!--   filter(!is.na(sentiment)) %&gt;%  --&gt;
+&lt;!--   group_by(title) %&gt;%  --&gt;
+&lt;!--   mutate(word_collapse = fct_lump_n(word, n = 10, w = n), --&gt;
+&lt;!--     word_collapse = fct_reorder(word_collapse, n, sum)) %&gt;%  --&gt;
+&lt;!--     select(title, word_collapse, sentiment, n) --&gt;
+&lt;!-- word_sentiments --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ##  Which is more happy? --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- ggplot(word_sentiments, aes(y = fct_reorder(word_collapse,  n, .fun = sum), x = n, fill = sentiment)) + geom_col() + facet_wrap(~title, scales = 'free_x') + ylab("Word") + xlab("Occurrence") + theme_minimal() --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+
+
+&lt;!-- ## Term frequency and inverse document frequency --&gt;
+
+&lt;!-- The inverse document frequency is --&gt;
+
+&lt;!-- `$$\text{idf}(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}$$` --&gt;
+
+&lt;!-- The IDF thus ranges from 0 for words that appear in every document up to `\(log(n)\)` for a word unique across documents. --&gt;
+
+&lt;!-- The term frequency is just the word counts, normalized to the number of words per text, so the popular TF-IDF&lt;sup&gt;1&lt;/sup&gt; metric is just --&gt;
+
+&lt;!-- `$$\text{tf-idf}(\text{term}) = \text{idf}(\text{term}) \times \text{tf}(\text{term})$$` --&gt;
+&lt;!-- .footnote[[1] Popular, and curiously devoid of an obvious statistical model.  [Some attempts to link to information theory](https://en.wikipedia.org/wiki/Tf%E2%80%93idf#Justification_of_idf) have been made.] --&gt;
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Calculate TF-IDF --&gt;
+
+
+&lt;!-- ```{r calc-tf, output.lines = 12} --&gt;
+&lt;!-- word_counts = word_counts %&gt;% bind_tf_idf(word, title, n) --&gt;
+&lt;!-- word_counts --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## TF-IDF of Kafka and Austen --&gt;
+
+&lt;!-- This words relatively well to identify signature words -- some represent content,  some represent author style (e.g. contractions used by Kafka) --&gt;
+
+&lt;!-- ```{r, echo = FALSE} --&gt;
+&lt;!-- word_counts %&gt;% group_by(title) %&gt;% slice_max(tf_idf, n = 15) %&gt;% ungroup() %&gt;% --&gt;
+&lt;!--   mutate(word = reorder(word, tf_idf)) %&gt;% --&gt;
+&lt;!--   ggplot(aes(tf_idf, word)) + --&gt;
+&lt;!--   geom_col(show.legend = FALSE) + --&gt;
+&lt;!--   labs(x = "tf-idf", y = NULL) + --&gt;
+&lt;!--   facet_wrap(~title, ncol = 2, scales = "free") +  --&gt;
+&lt;!--   theme_minimal() --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Occurrence matrix --&gt;
+
+&lt;!-- Lastly, we might want to convert our counts to an occurrence matrix `\(\mathbf X = [x_{ij}]\)` where `\(x_{ij}\)` is the number of times document `\(i\)` contains term `\(j\)`. --&gt;
+
+&lt;!-- Most `\(x_{ij}\)` will be zero, reflecting Zipf's law.  We will almost always want to store it in a special format called a .alert[sparse matrix], that only stores the non-zero entries and their index in the matrix. --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## `cast_sparse()` --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- X = cast_sparse(word_counts, title, word, n) --&gt;
+&lt;!-- class(X) --&gt;
+&lt;!-- dim(X) --&gt;
+&lt;!-- sum(X&gt;0) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- This is useful for downstream modeling, such as latent Dirichlet allocation. --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- # Resources --&gt;
+
+&lt;!-- Julia Silge has [one book on classical text mining](https://www.tidytextmining.com/) and [another on machine learning on text](https://smltar.com/). --&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "3:2"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
