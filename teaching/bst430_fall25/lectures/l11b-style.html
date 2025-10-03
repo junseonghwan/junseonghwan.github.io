@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BST430 Lecture 11-B</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/lexis.css" type="text/css" />
+    <link rel="stylesheet" href="css/lexis-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: ur-title, center, middle, title-slide
+
+.title[
+# BST430 Lecture 11-B
+]
+.subtitle[
+## Coding Style
+]
+.author[
+### Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love
+]
+.institute[
+### U of Rochester
+]
+.date[
+### 2021-09-10 (updated: 2025-10-03)
+]
+
+---
+
+class: middle
+
+
+
+
+# Coding style
+
+---
+
+## Wise thoughts (i)
+
+&gt;"Good coding style is like correct punctuation: you can manage without it, butitsuremakesthingseasiertoread."
+&gt;
+&gt;--Hadley Wickham
+
+---
+
+## Wise thoughts (ii)
+
+&gt;"As a pedant,  I have chosen the right profession."
+&gt;
+&gt;--Andrew McDavid (and professors everywhere?)
+
+---
+
+## Course style guide
+
+.hand[.light-blue[But seriously...]]
+
+Applying a sensible and consistent style:
+- reduces bugs and increases the maintainability of your code.
+- Allows a temporary illusion of control over an otherwise chaotic and indifferent universe.
+--
+
+- Style guide for this course is a fork of the Tidyverse style guide: https://urmc-bst.github.io/style/
+- There's more to it than what we'll cover now,  we'll do a recap later in the semester
+
+---
+
+## File names and code chunk labels
+
+- Do not use spaces in file names, use `-` or `_` to separate words
+- Use all lowercase letters
+
+
+```r
+# Good
+ucb-admit.csv
+make-georgia-plot
+
+# Bad
+UCB Admit.csv
+make Georgia plot
+```
+
+---
+
+## Object names
+
+- Use `_` to separate words in object names
+- Use informative but short object names
+- Avoid reusing object names within an analysis
+- If you need an uninformative temporary variable, perhaps you should be using a pipeline.
+
+
+```r
+# Good
+acs_employed
+
+# Bad
+acs.employed
+acs2
+acs_subset
+acs_subsetted_for_males
+```
+
+---
+
+## Spacing
+
+-  In general, put a space before and after all infix operators (=, +, -, =, etc.), and when naming arguments in function calls.
+-  Exception: when omitting a space improve clarity about order of operations.
+-  Always put a space after a comma, and never before (just like in regular English).
+
+
+```r
+# Good
+average = mean(feet * 12 + inches, na.rm = TRUE)
+
+# Also OK
+average = mean(feet*12 + inches, na.rm = TRUE)
+
+# Bad
+average=mean(feet*12+inches,na.rm=TRUE)
+```
+
+---
+
+## ggplot
+
+- Always end a line with `+`
+- Always indent the next line
+
+
+```r
+# Good
+ggplot(diamonds, mapping = aes(x = price)) +
+  geom_histogram()
+```
+
+---
+
+## Long lines
+
+- Limit your code to 80 characters per line. This fits comfortably on a printed page with a reasonably sized font.
+
+- Take advantage of RStudio editor's auto formatting for indentation at line breaks.
+
+---
+
+## Assignment
+
+- Use `=` not `&lt;-` (unless you are doing something clever...and generally avoid being clever.)
+
+
+```r
+# Good
+x = 2
+
+# Bad
+x &lt;- 2
+```
+
+* This is a provocative take.
+
+---
+## `&lt;-` Assignment
+
+.pull-left[
+.blue[###Pros]
+
+*  Allows chained and in-place assignment.
+
+```r
+x &lt;- y &lt;- 10
+paste0("x = ", x, " and y = ", y)
+```
+
+```
+## [1] "x = 10 and y = 10"
+```
+*  Could reduce confusion between `==` and 
+`=`?
+*  Looks cooler?
+]
+.pull-right[
+.orange[### Cons]
+
+*  It causes confusion:
+
+```r
+y = 0
+cube_root = function(x) return(x^(1/3))
+*cube_root(y &lt;- 8)
+```
+
+```
+## [1] 2
+```
+
+```r
+y
+```
+
+```
+## [1] 8
+```
+]
+
+---
+
+## More cons
+
+* `&lt;-` is an extra keystroke
+*  If you separate the `&lt;` from the `-` you can get a legal line of code that doesn't do want you expect
+*  Or vice versa!
+
+
+```r
+x = 10
+y = 1
+*if(x&lt;-y){
+  print("x is smaller than -y?")
+}
+```
+
+```
+## [1] "x is smaller than -y?"
+```
+* [This](https://stackoverflow.com/questions/1741820/what-are-the-differences-between-and-assignment-operators-in-r) is a [matter](https://colinfay.me/r-assignment/) [of](https://win-vector.com/2013/04/23/prefer-for-assignment-in-r/) [debate](http://www.separatinghyperplanes.com/2018/02/why-you-should-use-and-never.html).
+
+---
+
+## What does the tidyverse style guide say?
+
+&lt;https://style.tidyverse.org/syntax.html#assignment-1&gt;
+
+---
+
+## Magic `numeric()` or string literals
+
+* Avoid repeated use of literal constants
+
+
+```r
+# bad 
+volume = 3.14159 * r^3
+area = 4/3 * 3.14159 * r^2
+
+# good
+# R knows what pi equals!
+#pi = 3.14159
+volume = pi * r^3
+area = 4/3 * pi * r^2
+```
+
+---
+
+## Convoluted logical expressions
+
+* Logical operators take the `TRUE` path when the condition evaluates to `TRUE`
+
+--
+* Corollary: never need to test `==TRUE` or `!=FALSE`.
+
+
+```r
+# Bad
+ifelse(is.na(x) == TRUE, 0, 1)
+```
+
+```
+## [1] 1
+```
+
+```r
+# Good
+ifelse(is.na(x), 0, 1)
+```
+
+```
+## [1] 1
+```
+
+---
+
+## Naughty shadowing
+
+* Avoid shadowing common R functions: `c`, `t`, `T`, `F`
+
+```r
+c = 'uhoh'
+c("uhoh", c)
+```
+
+```
+## [1] "uhoh" "uhoh"
+```
+
+* Corollary: don't use the sketchy `T` and `F` shortcuts for `TRUE` and `FALSE`:
+
+
+```r
+F = TRUE
+if(F) print("This shouldn't happen. I have broken the universe.")
+```
+
+```
+## [1] "This shouldn't happen. I have broken the universe."
+```
+
+---
+
+### Labeling R code chunks
+
+* I expect you to label your code chunks
+* It helps to tell the story
+* It names the figures that get made so you can find them more easily
+
+```
+``{r load-packages-data, message = FALSE, eval = TRUE}
+library(tidyverse)
+library(lubridate)
+library(vroom)
+``
+```
+
+---
+
+&lt;!-- class: middle --&gt;
+
+&lt;!-- &lt;img src="https://media1.giphy.com/media/3o7abA4a0QCXtSxGN2/giphy.gif?cid=ecf05e47sgk0h030uln8hkxkyg8tsgtmuk0bajy04l5tt7wj&amp;rid=giphy.gif&amp;ct=g" width="480" height="360" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/futurama-professor-farnsworth-good-news-everyone-3o7abA4a0QCXtSxGN2"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt; --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ### Implications for you --&gt;
+
+&lt;!-- *Try to follow these style guides in your code. --&gt;
+&lt;!-- *  Your labs and homeworks will have "lint" (commentary based on the style guide) provided automatically via the (dark) magic of github Actions. --&gt;
+&lt;!-- *  Possibly, in the future, having lint-free (or as close as practical) at the time of final submission will be a part of your grade. --&gt;
+&lt;!-- * This will only happen if I can get it to work and think it's useful. --&gt;
+&lt;!-- * Much of the linting can be handled by Rstudio -&gt; Code -&gt; Reformat code! --&gt;
+
+&lt;!-- --- --&gt;
+
+### Acknowledgments
+
+[Data science in a box](https://www2.stat.duke.edu/courses/Spring18/Sta199/slides/lec-slides/05b-coding-style-data-types.html#1)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "3:2"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
