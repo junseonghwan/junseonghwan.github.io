@@ -28,7 +28,7 @@ class: ur-title, center, middle, title-slide
 ### U of Rochester
 ]
 .date[
-### 2021-09-10 (updated: 2025-10-03)
+### 2021-09-10 (updated: 2025-10-07)
 ]
 
 ---
@@ -67,8 +67,7 @@ Applying a sensible and consistent style:
 - Allows a temporary illusion of control over an otherwise chaotic and indifferent universe.
 --
 
-- Style guide for this course is a fork of the Tidyverse style guide: https://urmc-bst.github.io/style/
-- There's more to it than what we'll cover now,  we'll do a recap later in the semester
+- Style guide for this course is a fork of the Tidyverse style guide: &lt;https://style.tidyverse.org/&gt;
 
 ---
 
@@ -81,11 +80,11 @@ Applying a sensible and consistent style:
 ```r
 # Good
 ucb-admit.csv
-make-georgia-plot
+make_georgia_plot.R
 
 # Bad
 UCB Admit.csv
-make Georgia plot
+make Georgia plot.R
 ```
 
 ---
@@ -95,7 +94,7 @@ make Georgia plot
 - Use `_` to separate words in object names
 - Use informative but short object names
 - Avoid reusing object names within an analysis
-- If you need an uninformative temporary variable, perhaps you should be using a pipeline.
+- If you need an uninformative temporary variable, perhaps you should be using a pipe.
 
 
 ```r
@@ -133,7 +132,7 @@ average=mean(feet*12+inches,na.rm=TRUE)
 
 ## ggplot
 
-- Always end a line with `+`
+- Always end a line with `+` if more plot command follows
 - Always indent the next line
 
 
@@ -153,7 +152,7 @@ ggplot(diamonds, mapping = aes(x = price)) +
 
 ---
 
-## Assignment
+## Assignment (Andrew McDavid's provocative take)
 
 - Use `=` not `&lt;-` (unless you are doing something clever...and generally avoid being clever.)
 
@@ -165,8 +164,6 @@ x = 2
 # Bad
 x &lt;- 2
 ```
-
-* This is a provocative take.
 
 ---
 ## `&lt;-` Assignment
@@ -301,6 +298,22 @@ c("uhoh", c)
 ```
 ## [1] "uhoh" "uhoh"
 ```
+
+But if you do, you can always save yourself:
+
+
+```r
+rm(c)
+c
+```
+
+```
+## function (...)  .Primitive("c")
+```
+
+---
+
+## Naughty shadowing
 
 * Corollary: don't use the sketchy `T` and `F` shortcuts for `TRUE` and `FALSE`:
 
