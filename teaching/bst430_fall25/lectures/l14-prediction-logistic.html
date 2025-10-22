@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BST430 Lecture 14</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.min.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link rel="stylesheet" href="css/lexis.css" type="text/css" />
+    <link rel="stylesheet" href="css/lexis-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: ur-title, center, middle, title-slide
+
+.title[
+# BST430 Lecture 14
+]
+.subtitle[
+## Prediction and Logistic Regression
+]
+.author[
+### Seong-Hwan Jun, based on the course by Andrew McDavid and Tanzy Love
+]
+.institute[
+### U of Rochester
+]
+.date[
+### 2021-11-14 (updated: 2025-10-22)
+]
+
+---
+
+class: middle
+
+
+
+
+
+  
+
+
+
+# Prediction
+
+The dataset is available from the `openintro` package.
+
+
+---
+
+## Goal: Building a spam filter
+
+- Data: Set of emails. Each email is labelled as spam or not. Each email is characterized by features.
+- Use logistic regression to predict the probability that an incoming email is spam
+- Optimize our model by picking the model with the best predictive performance
+
+--
+- Building a model to predict the probability that an email is spam is only half of the battle! We also need a decision rule about which emails get flagged as spam (e.g. what probability should we use as our cutoff?)
+
+--
+- A simple approach: choose a single threshold probability and any email that exceeds that probability is flagged as spam
+
+---
+class: middle
+
+# Logistic regression
+
+---
+
+## Generalized Linear Models (GLMs)
+
+- Logistic regression is a *generalized linear model(GLM)* used to model a binary categorical outcome using numerical and categorical predictors
+
+- A GLM is an extension of the linear model where we model the mean function (expectation). 
+
+- Linear model: `\(Y|\mathbf{x}_i \sim N(\mathbf{x}_i \beta, \sigma^2)\)` and `\(E(Y_i|\mathbf{x}_i) = \mathbf{x}_i \beta\)`.
+
+- GLM generalizes linear model to  `$$g(E(Y_i|x_i)) = \eta_i = \mathbf{x}_i \beta,$$` and `\(Y|X \sim\)` some Exponential-Family distribution. Here, `\(g\)` is referred to as a **link** function.
+
+&lt;!--
+- Whereby the glm allows non-linear effects in `\(\beta\)`, and since the conditional distribution of `\(Y|X\)` can include all sorts of interesting families, it also permits non-constant residual variance.
+--&gt;
+
+---
+
+## The logistic regression model
+
+Given observations `\(y_i \in \{0, 1\}\)`, we model them as Bernoulli trials with probability of success given by `\(p_i\)`.
+
+- `\(y_i|x_i \sim \text{Bernoulli}(p_i)\)`
+
+We want to model `\(p_i\)` as a function of predictors `\(x_i\)`. Under the GLM framework, we link `\(p_i\)` to the predictors `\(x_i\)` via a link function `\(g\)`:
+
+- `\(g(p_i) = \eta_i\)`,
+- `\(\eta_i = \beta_0+\beta_1 x_{1,i} + \cdots + \beta_n x_{n,i}\)` is a linear function of the predictors.
+
+---
+
+## Softmax function
+
+- The softmax (aka expit) function is widely used to model probability distribution over categorical outcomes. 
+- Given an outcome variable `\(Y_i\)` with 2 classes (i.e., 0/1 or spam/not spam), the softmax function is given by,
+
+`\begin{align}
+\mathbb{P}(Y_i = 1) = p_i = \frac{\exp(\eta_i)}{1 + \exp(\eta_i)}.
+\end{align}`
+
+---
+
+### The Bernoulli GLM with logit link
+
+- To specify the Logistic model we just need to define a reasonable link function that connects `\(\eta_i\)` to `\(p_i\)`: take the inverse of the softmax.
+
+--
+- **Logit function:** For `\(0\le p \le 1\)`
+
+`$$g(p) = logit(p) = \log\left(\frac{p}{1-p}\right)$$`
+
+
+---
+
+## Logit function, visualised
+
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-2-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Properties of the logit
+
+- The logit function takes a value between 0 and 1 and maps it to a value between `\(-\infty\)` and `\(\infty\)`
+
+--
+- Inverse of the logit function is the softmax function:
+`$$g^{-1}(x) = \frac{\exp(x)}{1+\exp(x)} = \frac{1}{1+\exp(-x)}$$`
+
+--
+- The expit function takes a value between `\(-\infty\)` and `\(\infty\)` and maps it to a value between 0 and 1
+
+---
+
+
+## Modeling spam
+
+In R we fit a GLM in the same way as a linear model except we
+
+- use `"glm"` instead of `"lm"` as the engine 
+
+- define `family = "binomial"` for the link function to be used in the model
+
+--
+
+- When using `tidymodels`, specify the model with `logistic_reg()`
+
+---
+
+## Prediction
+
+- The mechanics of prediction is **easy**:
+  - Plug in values of predictors to the model equation
+  - Calculate the predicted value of the response variable, `\(\hat{y}\)`
+
+--
+- Getting it right is **hard**!
+  - There is no guarantee the model estimates you have are correct
+  - Or that your model will perform as well with new data as it did with your sample (training) data
+
+---
+
+## Underfitting and overfitting
+
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Spending our data
+
+- Several steps to create a useful model: parameter estimation, model selection, performance assessment, etc.
+
+- Doing all of this on the entire data we have available can lead to **overfitting**
+
+- Allocate specific subsets of data for different tasks, as opposed to allocating the largest possible amount to the model parameter estimation only (which is what we've done so far)
+
+---
+
+class: middle
+
+# Splitting data
+
+---
+
+## Splitting data
+
+- **Training/validation set:**
+  - Sandbox for model building
+  - Spend most of your time using the training set to develop the model
+  - Majority of the data (usually 80%)
+  - Validation set is used for model tuning and selection
+  
+- **Testing set:**
+  - Held in reserve to determine efficacy of one or two chosen models
+  - Critical to look at it only once after training, otherwise it becomes part of the modeling process
+  - Remainder of the data (usually 20%)
+  
+---
+
+## Performing the split
+
+
+```r
+# Fix random numbers by setting the seed 
+# Enables analysis to be reproducible when random numbers are used 
+set.seed(20211115)
+
+# Put 80% of the data into the training set 
+email_split = initial_split(email, prop = 0.80)
+
+# Create data frames for the two sets:
+train_data = training(email_split)
+test_data  = testing(email_split)
+```
+
+.font70[`training` / `testing` aren't doing anything very fancy -- just using `sample_n` and then taking its complement, but this approach generalizes to more complicated ways to split our data.]
+
+---
+class: code70
+
+## Peek at the split
+
+.small[
+.pull-left[
+
+```r
+glimpse(train_data)
+```
+
+```
+## Rows: 3,136
+## Columns: 21
+## $ spam         &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ to_multiple  &lt;fct&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, …
+## $ from         &lt;fct&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ cc           &lt;int&gt; 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 1, 0, 0, 0, …
+## $ sent_email   &lt;fct&gt; 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, …
+## $ time         &lt;dttm&gt; 2012-01-23 19:23:58, 2012-03-28 09:13:47,…
+## $ image        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ attach       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ dollar       &lt;dbl&gt; 0, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 4, 0, …
+## $ winner       &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no…
+## $ inherit      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, …
+## $ viagra       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ password     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ num_char     &lt;dbl&gt; 24.832, 4.998, 3.568, 26.110, 7.870, 5.127…
+## $ line_breaks  &lt;int&gt; 624, 114, 81, 652, 253, 120, 74, 118, 190,…
+## $ format       &lt;fct&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, …
+## $ re_subj      &lt;fct&gt; 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, …
+## $ exclaim_subj &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ urgent_subj  &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ exclaim_mess &lt;dbl&gt; 2, 0, 1, 1, 8, 0, 0, 2, 5, 0, 8, 0, 8, 1, …
+## $ number       &lt;fct&gt; small, small, small, small, big, small, sm…
+```
+]
+.pull-right[
+
+```r
+glimpse(test_data)
+```
+
+```
+## Rows: 785
+## Columns: 21
+## $ spam         &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ to_multiple  &lt;fct&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, …
+## $ from         &lt;fct&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ cc           &lt;int&gt; 1, 2, 1, 7, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, …
+## $ sent_email   &lt;fct&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, …
+## $ time         &lt;dttm&gt; 2012-01-01 14:38:32, 2012-01-01 18:32:53,…
+## $ image        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, …
+## $ attach       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, …
+## $ dollar       &lt;dbl&gt; 0, 2, 0, 0, 0, 2, 0, 9, 0, 0, 0, 0, 0, 0, …
+## $ winner       &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no…
+## $ inherit      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ viagra       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ password     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ num_char     &lt;dbl&gt; 15.075, 19.693, 3.959, 0.334, 1.482, 4.103…
+## $ line_breaks  &lt;int&gt; 354, 330, 81, 9, 24, 173, 107, 151, 76, 41…
+## $ format       &lt;fct&gt; 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ re_subj      &lt;fct&gt; 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, …
+## $ exclaim_subj &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, …
+## $ urgent_subj  &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ exclaim_mess &lt;dbl&gt; 10, 4, 1, 0, 0, 0, 0, 1, 4, 0, 8, 2, 1, 3,…
+## $ number       &lt;fct&gt; small, big, small, small, none, small, sma…
+```
+]
+]
+
+---
+
+class: middle
+
+# Modeling workflow
+
+---
+
+## Fit a model to the training dataset
+
+
+```r
+email_fit = logistic_reg() %&gt;%
+  set_engine("glm") %&gt;%
+  fit(spam ~ ., data = train_data, family = "binomial")
+```
+
+```
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+```
+
+We get a warning: this is due to a technical detail, primarily involving the categorical predictors. Example, no outcomes for one of the levels of a category.
+
+---
+
+# Categorical predictors
+
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-8-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Fit a model to the training dataset
+
+Fit with problematic categorical variables removed:
+
+
+```r
+email_fit = logistic_reg() %&gt;%
+  set_engine("glm") %&gt;%
+* fit(spam ~ . - from - sent_email - viagra - urgent_subj - winner - time, data = train_data, family = "binomial")
+```
+
+.code50[
+
+```r
+email_fit
+```
+
+```
+## parsnip model object
+## 
+## 
+## Call:  stats::glm(formula = spam ~ . - from - sent_email - viagra - 
+##     urgent_subj - winner - time, family = stats::binomial, data = data)
+## 
+## Coefficients:
+##  (Intercept)  to_multiple1            cc         image        attach        dollar       inherit  
+##    -0.400394     -2.794882      0.028191     -3.399864      0.579703     -0.081754      0.437509  
+##     password      num_char   line_breaks       format1      re_subj1  exclaim_subj  exclaim_mess  
+##    -0.682880      0.073648     -0.005390     -0.976311     -3.435578      0.365250      0.007954  
+##  numbersmall     numberbig  
+##    -0.737467      0.067424  
+## 
+## Degrees of Freedom: 3135 Total (i.e. Null);  3120 Residual
+## Null Deviance:	    1933 
+## Residual Deviance: 1447 	AIC: 1479
+```
+]
+
+---
+
+## Predict outcome on the testing dataset
+
+
+```r
+predict(email_fit, test_data)
+```
+
+```
+## # A tibble: 785 × 1
+##   .pred_class
+##   &lt;fct&gt;      
+## 1 0          
+## 2 0          
+## 3 0          
+## 4 0          
+## # ℹ 781 more rows
+```
+
+
+---
+
+## Predict probabilities on the testing dataset
+
+
+```r
+email_pred = predict(email_fit, test_data, type = "prob") %&gt;%
+  bind_cols(test_data %&gt;% select(spam, time))
+
+email_pred
+```
+
+```
+## # A tibble: 785 × 4
+##   .pred_0 .pred_1 spam  time               
+##     &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt; &lt;dttm&gt;             
+## 1   0.998 0.00195 0     2012-01-01 14:38:32
+## 2   0.994 0.00577 0     2012-01-01 18:32:53
+## 3   0.991 0.00917 0     2012-01-01 22:16:39
+## 4   0.988 0.0121  0     2012-01-02 19:07:51
+## # ℹ 781 more rows
+```
+
+---
+
+## A closer look at predictions
+
+
+
+```r
+email_pred %&gt;%
+  arrange(desc(.pred_1)) %&gt;%
+  print(n = 10)
+```
+
+```
+## # A tibble: 785 × 4
+##    .pred_0 .pred_1 spam  time               
+##      &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt; &lt;dttm&gt;             
+##  1   0.262   0.738 0     2012-02-03 08:25:39
+##  2   0.267   0.733 0     2012-01-31 10:07:48
+*##  3   0.311   0.689 1     2012-01-18 20:42:10
+##  4   0.312   0.688 1     2012-02-24 19:43:44
+##  5   0.335   0.665 1     2012-01-25 11:17:54
+##  6   0.335   0.665 0     2012-02-04 05:39:37
+*##  7   0.338   0.662 1     2012-01-05 18:12:55
+##  8   0.430   0.570 0     2012-01-24 07:00:04
+##  9   0.458   0.542 0     2012-01-10 13:53:09
+## 10   0.458   0.542 0     2012-01-11 00:14:57
+## # ℹ 775 more rows
+```
+
+---
+
+## Evaluate the performance
+
+**Receiver operating characteristic (ROC) curve**&lt;sup&gt;+&lt;/sup&gt; which plot true positive rate vs. false positive rate (1 - specificity)
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_curve(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  ) %&gt;%
+  autoplot()
+```
+]
+.pull-right[
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.footnote[
+.small[
+&lt;sup&gt;+&lt;/sup&gt;Originally developed for operators of military radar receivers, hence the name.
+]
+]
+
+---
+
+## Evaluate the performance
+
+Find the area under the curve:
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_auc(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  )
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.824
+```
+]
+.pull-right[
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+
+class: middle
+
+# Feature engineering
+
+---
+
+## Feature engineering
+
+- There are all sorts of ways to build predictive models of binary variables: random forests, support vector machines, neural networks, `\(k\)` nearest neighbors, gradient boosting, ...
+
+- In their own way, each learns the mapping `\(\hat f: \mathbf{x} \mapsto Y\)`
+
+--
+- But the variables `\(\mathbf{x}\)` that go into the model and how they are represented are just as critical to success of the model
+
+--
+- **Feature engineering** allows us to get creative with our predictors in an effort to make them more useful for our model (to increase its predictive performance) 
+
+-  How this engineering is done is part of the learned function `\(\hat f\)`, and needs to be accounted for when we evaluate our models.
+
+---
+
+## Modeling workflow
+
+- Create a **recipe** for feature engineering steps to be applied to the training data
+
+--
+- Fit the model to the training data after these steps have been applied
+
+--
+- Using the model estimates from the training data, predict outcomes for the test data
+
+--
+- Evaluate the performance of the model on the test data
+
+---
+
+class: middle
+
+# Building recipes
+
+
+???
+
+Fancy mutate statements that can be applied easily to both training / test
+Actually, is building up and saving a set of functions (without evaluating them)
+
+---
+
+## Initiate a recipe
+
+
+```r
+email_rec = recipe(
+  spam ~ .,          # formula
+  data = train_data  # data to use for cataloguing names and types of variables
+  )
+
+summary(email_rec)
+```
+
+.code50[
+
+```
+## # A tibble: 21 × 4
+##    variable     type      role      source  
+##    &lt;chr&gt;        &lt;list&gt;    &lt;chr&gt;     &lt;chr&gt;   
+##  1 to_multiple  &lt;chr [3]&gt; predictor original
+##  2 from         &lt;chr [3]&gt; predictor original
+##  3 cc           &lt;chr [2]&gt; predictor original
+##  4 sent_email   &lt;chr [3]&gt; predictor original
+##  5 time         &lt;chr [1]&gt; predictor original
+##  6 image        &lt;chr [2]&gt; predictor original
+##  7 attach       &lt;chr [2]&gt; predictor original
+##  8 dollar       &lt;chr [2]&gt; predictor original
+##  9 winner       &lt;chr [3]&gt; predictor original
+## 10 inherit      &lt;chr [2]&gt; predictor original
+## 11 viagra       &lt;chr [2]&gt; predictor original
+## 12 password     &lt;chr [2]&gt; predictor original
+## 13 num_char     &lt;chr [2]&gt; predictor original
+## 14 line_breaks  &lt;chr [2]&gt; predictor original
+## 15 format       &lt;chr [3]&gt; predictor original
+## 16 re_subj      &lt;chr [3]&gt; predictor original
+## 17 exclaim_subj &lt;chr [2]&gt; predictor original
+## 18 urgent_subj  &lt;chr [3]&gt; predictor original
+## 19 exclaim_mess &lt;chr [2]&gt; predictor original
+## 20 number       &lt;chr [3]&gt; predictor original
+## 21 spam         &lt;chr [3]&gt; outcome   original
+```
+]
+
+---
+
+## Remove certain variables
+
+
+```r
+email_rec = email_rec %&gt;%
+  step_rm(from, sent_email)
+```
+
+---
+
+## Feature engineer date
+
+
+```r
+email_rec = email_rec %&gt;%
+  step_date(time, features = c("dow", "month")) %&gt;%
+  step_rm(time)
+```
+
+`? step_date`
+
+
+---
+
+## Discretize numeric variables
+
+
+```r
+email_rec = email_rec %&gt;%
+  step_cut(cc, attach, dollar, breaks = c(0, 1)) %&gt;%
+  step_cut(inherit, password, breaks = c(0, 1, 5, 10, 20))
+```
+
+.code70[
+
+]
+
+---
+
+## Create dummy variables
+
+
+```r
+email_rec = email_rec %&gt;%
+  step_dummy(all_nominal(), -all_outcomes())
+```
+
+.code70[
+
+]
+
+- `all_nominal()`: apply to all categorical variables.
+- `-all_outcomes()`: except the outcome variable.
+
+---
+
+## Remove zero variance variables
+
+Variables that contain only a single value
+
+
+```r
+email_rec = email_rec %&gt;%
+  step_zv(all_predictors())
+#zv is short for "zero variability"
+```
+
+.code70[
+
+]
+
+---
+
+## All in one place
+
+
+```r
+email_rec = recipe(spam ~ ., data = email) %&gt;%
+  step_rm(from, sent_email) %&gt;%
+  step_date(time, features = c("dow", "month")) %&gt;%               
+  step_rm(time) %&gt;%
+  step_cut(cc, attach, dollar, breaks = c(0, 1)) %&gt;%
+  step_cut(inherit, password, breaks = c(0, 1, 5, 10, 20)) %&gt;%
+  step_dummy(all_nominal(), -all_outcomes()) %&gt;%
+  step_zv(all_predictors())
+```
+
+---
+
+class: middle
+
+# Building workflows
+
+---
+
+## Define model
+
+
+```r
+email_mod = logistic_reg() %&gt;% 
+  set_engine("glm")
+
+email_mod
+```
+
+```
+## Logistic Regression Model Specification (classification)
+## 
+## Computational engine: glm
+```
+
+---
+
+## Define workflow
+
+**Workflows** bring together models and recipes so that they can be easily applied to both the training and test data.
+
+
+```r
+email_wflow = workflow() %&gt;% 
+  add_model(email_mod) %&gt;% 
+  add_recipe(email_rec)
+```
+
+.code60[
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: logistic_reg()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────────────────────────
+## 7 Recipe Steps
+## 
+## • step_rm()
+## • step_date()
+## • step_rm()
+## • step_cut()
+## • step_cut()
+## • step_dummy()
+## • step_zv()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────────────────────────
+## Logistic Regression Model Specification (classification)
+## 
+## Computational engine: glm
+```
+]
+
+---
+
+## Fit model to training data
+
+
+```r
+email_fit = email_wflow %&gt;% 
+  fit(data = train_data)
+```
+
+---
+
+.code50[
+
+```r
+tidy(email_fit)
+```
+
+```
+## # A tibble: 30 × 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept) -1.18      0.273       -4.31 0.0000164
+## 2 image       -2.00      0.976       -2.05 0.0408   
+## 3 num_char     0.0611    0.0240       2.54 0.0111   
+## 4 line_breaks -0.00517   0.00135     -3.82 0.000135 
+## # ℹ 26 more rows
+```
+]
+
+---
+
+## Make predictions for test data
+
+
+```r
+email_pred = predict(email_fit, test_data, type = "prob") %&gt;% 
+  bind_cols(test_data) 
+
+email_pred %&gt;%
+  arrange(desc(.pred_1)) %&gt;%
+  print(n = 10)
+```
+
+```
+## # A tibble: 785 × 23
+##    .pred_0 .pred_1 spam  to_multiple from     cc sent_email
+##      &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;       &lt;fct&gt; &lt;int&gt; &lt;fct&gt;     
+##  1  0.0761   0.924 0     0           1         0 0         
+##  2  0.0970   0.903 0     0           1         0 0         
+##  3  0.136    0.864 1     0           1         4 0         
+##  4  0.166    0.834 1     0           1         0 0         
+##  5  0.172    0.828 1     0           1         0 0         
+##  6  0.201    0.799 1     0           1         0 0         
+##  7  0.205    0.795 1     0           1         0 0         
+...
+```
+
+---
+
+## Evaluate the performance
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_curve(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  ) %&gt;%
+  autoplot()
+```
+]
+.pull-right[
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Evaluate the performance
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_auc(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  )
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.847
+```
+]
+.pull-right[
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: middle
+
+# Making decisions
+
+---
+
+## Cutoff probability: 0.5
+
+.panelset[
+.panel[.panel-name[Output]
+
+Suppose we decide to label an email as spam if the model predicts the probability of spam to be **more than 0.5**.
+
+
+|                        | Email is not spam| Email is spam|
+|:-----------------------|-----------------:|-------------:|
+|Email labelled not spam |               700|            66|
+|Email labelled spam     |                 8|            11|
+]
+.panel[.panel-name[Code]
+
+```r
+cutoff_prob = 0.5
+email_pred %&gt;%
+  mutate(
+    spam      = if_else(spam == 1, "Email is spam", "Email is not spam"),
+    spam_pred = if_else(.pred_1 &gt; cutoff_prob, "Email labelled spam", "Email labelled not spam")
+    ) %&gt;%
+  count(spam_pred, spam) %&gt;%
+  pivot_wider(names_from = spam, values_from = n) %&gt;%
+  knitr::kable(col.names = c("", "Email is not spam", "Email is spam"))
+```
+]
+]
+
+---
+
+## Cutoff probability: 0.25
+
+.panelset[
+.panel[.panel-name[Output]
+
+Suppose we decide to label an email as spam if the model predicts the probability of spam to be **more than 0.25**.
+
+
+|                        | Email is not spam| Email is spam|
+|:-----------------------|-----------------:|-------------:|
+|Email labelled not spam |               644|            38|
+|Email labelled spam     |                64|            39|
+]
+.panel[.panel-name[Code]
+
+```r
+cutoff_prob = 0.25
+email_pred %&gt;%
+  mutate(
+    spam      = if_else(spam == 1, "Email is spam", "Email is not spam"),
+    spam_pred = if_else(.pred_1 &gt; cutoff_prob, "Email labelled spam", "Email labelled not spam")
+    ) %&gt;%
+  count(spam_pred, spam) %&gt;%
+  pivot_wider(names_from = spam, values_from = n) %&gt;%
+  knitr::kable(col.names = c("", "Email is not spam", "Email is spam"))
+```
+]
+]
+
+---
+
+## Cutoff probability: 0.75
+
+.panelset[
+.panel[.panel-name[Output]
+
+Suppose we decide to label an email as spam if the model predicts the probability of spam to be **more than 0.75**.
+
+
+|                        | Email is not spam| Email is spam|
+|:-----------------------|-----------------:|-------------:|
+|Email labelled not spam |               705|            70|
+|Email labelled spam     |                 3|             7|
+]
+.panel[.panel-name[Code]
+
+```r
+cutoff_prob = 0.75
+email_pred %&gt;%
+  mutate(
+    spam      = if_else(spam == 1, "Email is spam", "Email is not spam"),
+    spam_pred = if_else(.pred_1 &gt; cutoff_prob, "Email labelled spam", "Email labelled not spam")
+    ) %&gt;%
+  count(spam_pred, spam) %&gt;%
+  pivot_wider(names_from = spam, values_from = n) %&gt;%
+  knitr::kable(col.names = c("", "Email is not spam", "Email is spam"))
+```
+]
+]
+
+---
+
+## Evaluating performance on training data
+
+-  The training set does not have the capacity to be a good arbiter of performance.
+
+--
+- It is not an independent piece of information; predicting the training set can only reflect what the model already knows.
+
+--
+- Suppose you give a class a test, then give them the answers, then provide the same test. The student scores on the second test do not accurately reflect what they know about the subject; these scores would probably be higher than their results on the first test.
+
+.footnote[
+.small[
+Source: [tidymodels.org](https://www.tidymodels.org/start/resampling/)
+]
+]
+
+---
+
+class: middle
+
+# Cross validation
+
+---
+
+## Cross validation
+
+More specifically, **v-fold cross validation**:
+
+- Shuffle your data v partitions
+- Use 1 partition for validation, and the remaining v-1 partitions for training
+- Repeat v times
+
+.footnote[
+.small[
+You might also heard of this referred to as k-fold cross validation.
+]
+]
+
+---
+
+## Cross validation
+
+&lt;img src="l12/img/cross-validation.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Split data into folds
+
+.pull-left[
+
+```r
+set.seed(345)
+
+folds = vfold_cv(train_data, v = 5)
+folds
+```
+
+```
+## #  5-fold cross-validation 
+## # A tibble: 5 × 2
+##   splits             id   
+##   &lt;list&gt;             &lt;chr&gt;
+## 1 &lt;split [2508/628]&gt; Fold1
+## 2 &lt;split [2509/627]&gt; Fold2
+## 3 &lt;split [2509/627]&gt; Fold3
+## 4 &lt;split [2509/627]&gt; Fold4
+## 5 &lt;split [2509/627]&gt; Fold5
+```
+]
+.pull-right[
+&lt;img src="l12/img/cross-validation.png" width="100%" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
+---
+class: code60
+
+## Fit resamples
+
+.pull-left[
+
+```r
+set.seed(456)
+
+email_fit_rs = email_wflow %&gt;%
+  fit_resamples(folds, metrics = metric_set(accuracy, roc_auc))
+
+email_fit_rs
+```
+
+```
+## # Resampling results
+## # 5-fold cross-validation 
+## # A tibble: 5 × 4
+##   splits             id    .metrics         .notes          
+##   &lt;list&gt;             &lt;chr&gt; &lt;list&gt;           &lt;list&gt;          
+## 1 &lt;split [2508/628]&gt; Fold1 &lt;tibble [2 × 4]&gt; &lt;tibble [2 × 3]&gt;
+## 2 &lt;split [2509/627]&gt; Fold2 &lt;tibble [2 × 4]&gt; &lt;tibble [1 × 3]&gt;
+## 3 &lt;split [2509/627]&gt; Fold3 &lt;tibble [2 × 4]&gt; &lt;tibble [1 × 3]&gt;
+## 4 &lt;split [2509/627]&gt; Fold4 &lt;tibble [2 × 4]&gt; &lt;tibble [2 × 3]&gt;
+## 5 &lt;split [2509/627]&gt; Fold5 &lt;tibble [2 × 4]&gt; &lt;tibble [1 × 3]&gt;
+## 
+## There were issues with some computations:
+## 
+##   - Warning(s) x1: ! There are new levels in `attach`: NA. ℹ Consider using step_unknown() (`?recipes...
+##   - Warning(s) x1: ! There are new levels in `cc`: NA. ℹ Consider using step_unknown() (`?recipes::st...
+##   - Warning(s) x1: ! There are new levels in `password`: NA. ℹ Consider using step_unknown() (`?recip...
+##   - Warning(s) x4: glm.fit: fitted probabilities numerically 0 or 1 occurred
+## 
+## Run `show_notes(.Last.tune.result)` for more information.
+```
+]
+.pull-right[
+&lt;img src="l12/img/cross-validation-animated.gif" width="100%" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
+---
+
+## Collect CV metrics
+
+
+```r
+collect_metrics(email_fit_rs)
+```
+
+```
+## # A tibble: 2 × 6
+##   .metric  .estimator  mean     n std_err .config             
+##   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+## 1 accuracy binary     0.908     5 0.00395 Preprocessor1_Model1
+## 2 roc_auc  binary     0.837     5 0.00384 Preprocessor1_Model1
+```
+
+---
+
+## Deeper look into CV metrics
+
+.panelset[
+.panel[.panel-name[Raw]
+
+```r
+collect_metrics(email_fit_rs, summarize = FALSE) %&gt;%
+  print(n = 10)
+```
+
+```
+## # A tibble: 10 × 5
+##    id    .metric  .estimator .estimate .config             
+##    &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+##  1 Fold1 accuracy binary         0.915 Preprocessor1_Model1
+##  2 Fold1 roc_auc  binary         0.834 Preprocessor1_Model1
+##  3 Fold2 accuracy binary         0.904 Preprocessor1_Model1
+##  4 Fold2 roc_auc  binary         0.847 Preprocessor1_Model1
+##  5 Fold3 accuracy binary         0.915 Preprocessor1_Model1
+##  6 Fold3 roc_auc  binary         0.844 Preprocessor1_Model1
+##  7 Fold4 accuracy binary         0.895 Preprocessor1_Model1
+##  8 Fold4 roc_auc  binary         0.828 Preprocessor1_Model1
+##  9 Fold5 accuracy binary         0.910 Preprocessor1_Model1
+## 10 Fold5 roc_auc  binary         0.831 Preprocessor1_Model1
+```
+]
+.panel[.panel-name[Pretty]
+
+|Fold  | accuracy| roc_auc|
+|:-----|--------:|-------:|
+|Fold1 |    0.915|   0.834|
+|Fold2 |    0.904|   0.847|
+|Fold3 |    0.915|   0.844|
+|Fold4 |    0.895|   0.828|
+|Fold5 |    0.910|   0.831|
+]
+]
+
+
+---
+
+### Training data optimism
+
+In the typical case, we use cross-validation to tune and select between models, then use the train/test split to evaluate the final chosen model
+
+-  In this case, the training data does not severely overestimate the performance in testing or cross-validation.
+-  In general, the gap between training and test is a function of the training *optimism*.
+-  `\(\nearrow\)` model flexibility, `\(\nearrow\)` optimism
+-  `\(\searrow\)` training set size, `\(\nearrow\)` optimism.
+
+---
+
+### Example of training optimism
+
+.pull-left[
+
+```r
+set.seed(123)
+train_data_small = train_data %&gt;% sample_n(size = 100)
+overfit = fit(email_wflow, data = train_data_small)
+overpredict = predict(overfit, train_data_small, type = "prob") %&gt;% 
+  bind_cols(train_data_small)
+```
+]
+
+.pull-right[
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-48-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary             1
+```
+]
+
+---
+
+# Acknowledgments
+
+Data science in a box [U4D7](https://datasciencebox.org/course-materials/_slides/u4-d07-prediction-overfitting/u4-d07-prediction-overfitting#1) [U4D8](https://datasciencebox.org/course-materials/_slides/u4-d08-feature-engineering/u4-d08-feature-engineering#1) [U4D9](https://datasciencebox.org/course-materials/_slides/u4-d09-cross-validation/u4-d09-cross-validation#1)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "3:2"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
