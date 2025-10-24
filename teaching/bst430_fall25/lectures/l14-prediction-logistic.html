@@ -30,7 +30,7 @@ class: ur-title, center, middle, title-slide
 ### U of Rochester
 ]
 .date[
-### 2021-11-14 (updated: 2025-10-22)
+### 2021-11-14 (updated: 2025-10-23)
 ]
 
 ---
@@ -65,6 +65,20 @@ The dataset is available from the `openintro` package.
 - A simple approach: choose a single threshold probability and any email that exceeds that probability is flagged as spam
 
 ---
+
+## Quiz
+
+Load the `openintro` package. This will make the `email` data available.
+
+&gt;How many emails are there in total? How many of them are spam?
+
+&gt;Fit a linear model to this data. Which variable should be used as the outcome (`\(y\)`)? Select 5-10 variables to use as predictors (`\(x\)`). Briefly justify your choices.
+
+&gt;Perform model diagnostics. Plot 1) the fitted values vs the response (outcome) variable, 2) the fitted values vs the residuals, and 3) a histogram of the residuals. 
+
+&gt;Why is fitting a linear model a bad idea?
+
+---
 class: middle
 
 # Logistic regression
@@ -73,13 +87,13 @@ class: middle
 
 ## Generalized Linear Models (GLMs)
 
-- Logistic regression is a *generalized linear model(GLM)* used to model a binary categorical outcome using numerical and categorical predictors
+- A generalized linear model (GLM) is an extension of the linear model where we model the mean of a variable as a function of predictors 
 
-- A GLM is an extension of the linear model where we model the mean function (expectation). 
+- Linear model: `\(Y_i | \mathbf{x}_i \sim N(\mathbf{x}_i \beta, \sigma^2)\)` and `\(E(Y_i|\mathbf{x}_i) = \mathbf{x}_i \beta\)`.
 
-- Linear model: `\(Y|\mathbf{x}_i \sim N(\mathbf{x}_i \beta, \sigma^2)\)` and `\(E(Y_i|\mathbf{x}_i) = \mathbf{x}_i \beta\)`.
-
-- GLM generalizes linear model to  `$$g(E(Y_i|x_i)) = \eta_i = \mathbf{x}_i \beta,$$` and `\(Y|X \sim\)` some Exponential-Family distribution. Here, `\(g\)` is referred to as a **link** function.
+- GLM generalizes the linear model  `$$g(E(Y_i|x_i)) = \eta_i = \mathbf{x}_i \beta,$$` and `\(Y|X \sim\)` some **Exponential-Family** distribution. 
+- Exponential family includes, normal, Bernoulli, bionimal, Poisson, and many of the familiar distributions.
+- `\(g\)` is referred to as a **link** function.
 
 &lt;!--
 - Whereby the glm allows non-linear effects in `\(\beta\)`, and since the conditional distribution of `\(Y|X\)` can include all sorts of interesting families, it also permits non-constant residual variance.
@@ -89,36 +103,41 @@ class: middle
 
 ## The logistic regression model
 
-Given observations `\(y_i \in \{0, 1\}\)`, we model them as Bernoulli trials with probability of success given by `\(p_i\)`.
+Logistic regression is a type of GLM used to model a binary categorical outcomes `\(y_i \in \{0, 1\}\)`. 
+
+We can model them using a **Bernoulli** distribution with probability of success given by `\(p_i\)`:
 
 - `\(y_i|x_i \sim \text{Bernoulli}(p_i)\)`
 
-We want to model `\(p_i\)` as a function of predictors `\(x_i\)`. Under the GLM framework, we link `\(p_i\)` to the predictors `\(x_i\)` via a link function `\(g\)`:
+To model `\(p_i\)` as a function of predictors `\(x_i\)`. Under the GLM framework, we link `\(p_i\)` to the predictors `\(x_i\)` via a link function `\(g\)`:
 
-- `\(g(p_i) = \eta_i\)`,
-- `\(\eta_i = \beta_0+\beta_1 x_{1,i} + \cdots + \beta_n x_{n,i}\)` is a linear function of the predictors.
+- `\(g(p_i) = \eta_i = \beta_0+\beta_1 x_{1,i} + \cdots + \beta_n x_{n,i}\)`,
+
+&gt;What is a reasonable choice of `\(g\)` here?
 
 ---
 
 ## Softmax function
 
 - The softmax (aka expit) function is widely used to model probability distribution over categorical outcomes. 
-- Given an outcome variable `\(Y_i\)` with 2 classes (i.e., 0/1 or spam/not spam), the softmax function is given by,
+- Given an outcome variable `\(Y\)` with 2 classes (i.e., 0/1 or spam/not spam), the softmax function is given by,
 
 `\begin{align}
-\mathbb{P}(Y_i = 1) = p_i = \frac{\exp(\eta_i)}{1 + \exp(\eta_i)}.
+\mathbb{P}(Y = 1) = p(x) = \frac{\exp(\beta^{\top} x)}{1 + \exp(\beta^{\top} x)}.
 \end{align}`
 
 ---
 
 ### The Bernoulli GLM with logit link
 
-- To specify the Logistic model we just need to define a reasonable link function that connects `\(\eta_i\)` to `\(p_i\)`: take the inverse of the softmax.
+- Softmax gives us a way to link `\(p_i\)` to `\(\eta_i\)` but we need: `\(g(p_i) = \eta_i\)`.
+- Taking the log-odds (logit) of both sides of the softmax function gives us the logit function:
 
 --
 - **Logit function:** For `\(0\le p \le 1\)`
 
 `$$g(p) = logit(p) = \log\left(\frac{p}{1-p}\right)$$`
+- The logit function takes a value between 0 and 1 and maps it to a value between `\(-\infty\)` and `\(\infty\)`
 
 
 ---
@@ -129,19 +148,15 @@ We want to model `\(p_i\)` as a function of predictors `\(x_i\)`. Under the GLM 
 
 ---
 
-## Properties of the logit
+## Quiz
 
-- The logit function takes a value between 0 and 1 and maps it to a value between `\(-\infty\)` and `\(\infty\)`
-
---
-- Inverse of the logit function is the softmax function:
-`$$g^{-1}(x) = \frac{\exp(x)}{1+\exp(x)} = \frac{1}{1+\exp(-x)}$$`
-
---
-- The expit function takes a value between `\(-\infty\)` and `\(\infty\)` and maps it to a value between 0 and 1
+- Sample `\(x_i\)` from a standard normal distribution. Set `\(\beta_0 = 0\)` and `\(\beta_1 = 2\)`. Use `\(n=100\)`.
+- Compute `\(p_i\)` and `\(logit(p_i)\)`. Verify: `\(\log(p_i/1-p_i) = \beta_1 x_i\)`.
+- Now, generate `\(y_i\)` from a Bernoulli distribution with probability `\(p_i\)`. 
+- Plot `\(p_i\)` vs `\(x_i\)` and `\(y_i\)` vs `\(x_i\)`.
+- If you are given `\(x^* &gt; 0\)`, what would be your prediction for `\(y^*\)` how about for `\(x^* &lt; 0\)` and `\(x^* = 0\)`?
 
 ---
-
 
 ## Modeling spam
 
@@ -154,6 +169,14 @@ In R we fit a GLM in the same way as a linear model except we
 --
 
 - When using `tidymodels`, specify the model with `logistic_reg()`
+
+---
+
+## Quiz
+
+- Fit `glm` on the generated data `\(x_i, y_i\)`. (Do not include the intercept).
+- Compare the true coefficient `\(\beta\)` to the estimate. 
+- Now, increase the number of data points from `\(n=100\)` to `\(n=200, 400, 800, 1600\)`. Re-fit the model for each values of `\(n\)`. Notice any trend?
 
 ---
 
@@ -201,7 +224,7 @@ class: middle
   - Validation set is used for model tuning and selection
   
 - **Testing set:**
-  - Held in reserve to determine efficacy of one or two chosen models
+  - Held in reserve to evaluate models
   - Critical to look at it only once after training, otherwise it becomes part of the modeling process
   - Remainder of the data (usually 20%)
   
@@ -945,6 +968,12 @@ email_pred %&gt;%
 
 ---
 
+## Quiz
+
+- Which cutoff probability would you choose and why?
+
+---
+
 ## Evaluating performance on training data
 
 -  The training set does not have the capacity to be a good arbiter of performance.
@@ -1154,6 +1183,12 @@ overpredict = predict(overfit, train_data_small, type = "prob") %&gt;%
 ## 1 roc_auc binary             1
 ```
 ]
+
+---
+
+## Model flexibility and training optimism
+
+&lt;img src="l14-prediction-logistic_files/figure-html/unnamed-chunk-49-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
