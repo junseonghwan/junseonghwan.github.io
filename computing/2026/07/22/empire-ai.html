@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Empire AI Setup</title>
+  <meta name="description" content="Empire AI provides CPU nodes called grace, which we will use to run Stan code. The grace nodes use the ARM architecture (aarch64), while the login nodes (alp...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/bootstrap.css">
+  <link rel="canonical" href="junseonghwan.github.io/computing/2026/07/22/empire-ai.html">
+  <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
+
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!--
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>-->
+
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-302YLVPMCX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-302YLVPMCX');
+</script>
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Seong-Hwan Jun</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+        
+          
+            <a class="page-link" href="/code/">Code</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="page-link" href="/research/">Research</a>
+          
+        
+          
+            <a class="page-link" href="/scribbles/">Scribbles</a>
+          
+        
+          
+            <a class="page-link" href="/teaching/">Teaching</a>
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Empire AI Setup</h1>
+    <p class="post-meta">Jul 22, 2026</p>
+  </header>
+
+  <article class="post-content">
+    <p>Empire AI provides CPU nodes called <code class="language-plaintext highlighter-rouge">grace</code>, which we will use to run Stan code. The <code class="language-plaintext highlighter-rouge">grace</code> nodes use the ARM architecture (<code class="language-plaintext highlighter-rouge">aarch64</code>), while the login nodes (<code class="language-plaintext highlighter-rouge">alpha</code>) use the Intel x86 architecture. Because software compiled on one architecture generally cannot be used on the other, all software installation must be performed on a <code class="language-plaintext highlighter-rouge">grace</code> node.</p>
+
+<p>For more details about the Empire AI hardware, see the <a href="https://empireai.freshdesk.com/support/solutions/articles/157000374441-empire-ai-getting-started-alpha-grace-beta-/">Empire AI Getting Started Guide</a>.</p>
+
+<h2 id="miniforge">Miniforge</h2>
+
+<p>Miniforge is a minimal Conda distribution maintained by the conda-forge project. It provides the Conda package manager and installs packages from the <code class="language-plaintext highlighter-rouge">conda-forge</code> channel by default, making it an easy way to install and manage scientific software and its dependencies without requiring administrator privileges.</p>
+
+<p>After logging in to the <code class="language-plaintext highlighter-rouge">alpha</code> login node, download the ARM (<code class="language-plaintext highlighter-rouge">aarch64</code>) version of Miniforge:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-L</span> <span class="nt">-O</span> https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh
+</code></pre></div></div>
+
+<p>Request an interactive <code class="language-plaintext highlighter-rouge">grace</code> node and start a shell:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salloc <span class="nt">--partition</span><span class="o">=</span>grace <span class="nt">--qos</span><span class="o">=</span>interactive <span class="nt">--nodes</span><span class="o">=</span>1 <span class="nt">--ntasks-per-node</span><span class="o">=</span>1 <span class="nt">--cpus-per-task</span><span class="o">=</span>4 <span class="nt">--time</span><span class="o">=</span>01:00:00
+srun <span class="nt">--pty</span> bash
+</code></pre></div></div>
+
+<p>You should now be running on an ARM (<code class="language-plaintext highlighter-rouge">grace</code>) node.</p>
+
+<h2 id="install-miniforge">Install Miniforge</h2>
+
+<p>Run the installer and install it into <code class="language-plaintext highlighter-rouge">~/miniforge3-aarch64</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash Miniforge3-Linux-aarch64.sh <span class="nt">-b</span> <span class="nt">-p</span> ~/miniforge3-aarch64
+</code></pre></div></div>
+
+<p>Important: When prompted to initialize Miniforge by modifying your <code class="language-plaintext highlighter-rouge">~/.bashrc</code> or <code class="language-plaintext highlighter-rouge">~/.bash_profile</code>, select No. We will instead use a custom initialization script so that the ARM (grace) Miniforge installation is used only when needed and does not interfere with software on the alpha login nodes.</p>
+
+<h2 id="configuring-miniforge">Configuring Miniforge</h2>
+
+<p>There is a file called <code class="language-plaintext highlighter-rouge">init-miniforge.sh</code> in our shared scratch storage. Copy it to your home directory:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp /path/to/scratch/init-miniforge.sh ~/
+</code></pre></div></div>
+
+<p>You can initialize conda by running</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> ~/init-miniforge.sh
+</code></pre></div></div>
+
+<p>To test, type</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda <span class="nt">--version</span>
+mamba <span class="nt">--version</span>
+</code></pre></div></div>
+
+<p>Something like conda 26.3.2 and mamba 2.5.0 would do. Don’t log out yet.</p>
+
+<h2 id="setting-up-conda-environment">Setting up conda environment</h2>
+
+<p>Make sure that you are still on the <code class="language-plaintext highlighter-rouge">grace</code> node.</p>
+
+<p>The shared scratch storage contains a Conda environment specification (<code class="language-plaintext highlighter-rouge">r-cmdstan-arm.yml</code>) with R, CmdStan, and the required packages. Create the environment with</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda <span class="nb">env </span>create <span class="nt">-f</span> /path/to/scratch/r-cmdstan-arm.yml
+</code></pre></div></div>
+
+<p>This will take some time. Once it’s done, try to activate the environment,</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda activate r-cmdstan-arm
+</code></pre></div></div>
+
+<p>And check that R is installed:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>R <span class="nt">--version</span>
+</code></pre></div></div>
+
+<p>To check that CmdStan is available,</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>R
+</code></pre></div></div>
+
+<p>then, type</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">cmdstanr</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="installing-additional-r-packages">Installing additional R packages</h2>
+
+<p>Whenever possible, install R packages from the <code class="language-plaintext highlighter-rouge">conda-forge</code> channel rather than from CRAN. This ensures that package dependencies are managed by Conda and that the environment remains reproducible.</p>
+
+<p>To search for a package, use:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mamba search r-&lt;package-name&gt;
+</code></pre></div></div>
+
+<p>For example, to search for the <code class="language-plaintext highlighter-rouge">posterior</code> package:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mamba search r-posterior
+</code></pre></div></div>
+
+<p>If the package is available, install it with:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mamba <span class="nb">install </span>r-&lt;package-name&gt;
+</code></pre></div></div>
+
+<p>For example:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mamba <span class="nb">install </span>r-posterior
+</code></pre></div></div>
+
+<p>If an R package is not available through <code class="language-plaintext highlighter-rouge">conda-forge</code>, it can be installed from within R using:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">install.packages</span><span class="p">(</span><span class="s2">"&lt;package-name&gt;"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>However, prefer the <code class="language-plaintext highlighter-rouge">conda-forge</code> version whenever one is available.</p>
+
+<h2 id="next-steps">Next steps</h2>
+
+<p>In the future, you can try interactive sessions for development/debugging:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salloc <span class="nt">--partition</span><span class="o">=</span>grace <span class="nt">--qos</span><span class="o">=</span>interactive <span class="nt">--nodes</span><span class="o">=</span>1 <span class="nt">--ntasks-per-node</span><span class="o">=</span>1 <span class="nt">--cpus-per-task</span><span class="o">=</span>4 <span class="nt">--time</span><span class="o">=</span>04:00:00
+srun <span class="nt">--pty</span> bash
+</code></pre></div></div>
+
+<p>Then,</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> ~/init-miniforge.sh
+conda activate r-cmdstan-arm
+</code></pre></div></div>
+
+<p>We will also go over how to submit a batch job using <code class="language-plaintext highlighter-rouge">sbatch</code>. For a preview, the scripts are already in the scratch space under <code class="language-plaintext highlighter-rouge">/path/to/scratch/NBSR/</code>.</p>
+
+<p>Finally, to upload/download files to and from Empire AI, we can use Globus: https://app.globus.org/file-manager/collections. Search for EmpireAI and follow through the instructions.</p>
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+<!--    <h2 class="footer-heading">Seong-Hwan Jun</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-3">
+        <ul class="contact-list">
+          <li>Address:</li>
+          <li>265 Crittenden Blvd</li> 
+          <li>Box 630</li>
+          <li>Rochester, NY 14642</li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <ul class="social-media-list">
+          <!--<li>Email: seonghwan_jun AT urmc DOT rochester DOT edu</li>-->
+
+          
+          <li>
+            <a href="https://github.com/junseonghwan">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">junseonghwan</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+<!--
+      <div class="footer-col  footer-col-3">
+        <p class="text"></p>
+      </div>
+    </div>
+-->
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
