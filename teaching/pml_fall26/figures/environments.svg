@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" font-family="Aptos, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#12355b"/>
+    </marker>
+  </defs>
+
+  <!-- Your computer -->
+  <rect x="10" y="10" width="740" height="500" rx="14" fill="none" stroke="#252422" stroke-width="2.5"/>
+  <text x="30" y="46" font-size="24" font-weight="700" fill="#252422">Your computer</text>
+
+  <!-- System python -->
+  <rect x="30" y="70" width="300" height="88" rx="10" fill="#e9e6df" stroke="#8a867c" stroke-width="2"/>
+  <text x="46" y="100" font-size="20" font-weight="700" fill="#252422">System Python</text>
+  <text x="46" y="128" font-size="17" fill="#252422">ships with the OS; leave it alone</text>
+  <text x="46" y="148" font-size="15" fill="#6b675e" font-family="Menlo, monospace">/usr/bin/python3</text>
+
+  <!-- miniforge base -->
+  <rect x="30" y="180" width="700" height="310" rx="12" fill="#f1efe9" stroke="#12355b" stroke-width="2.5"/>
+  <text x="46" y="210" font-size="22" font-weight="700" fill="#12355b">miniforge</text>
+  <text x="714" y="210" font-size="17" fill="#252422" text-anchor="end">installs one Python plus the tools</text>
+  <text x="46" y="236" font-size="16" fill="#252422">
+    <tspan font-family="Menlo, monospace" fill="#12355b">base</tspan>: python 3.12, conda, mamba
+  </text>
+
+  <!-- env: pml -->
+  <rect x="46" y="262" width="320" height="210" rx="10" fill="#dcebf3" stroke="#2a6f97" stroke-width="3"/>
+  <text x="62" y="292" font-size="21" font-weight="700" fill="#2a6f97" font-family="Menlo, monospace">pml</text>
+  <text x="120" y="292" font-size="16" fill="#252422">(this course)</text>
+  <text x="62" y="322" font-size="17" fill="#252422" font-family="Menlo, monospace">python 3.11</text>
+  <text x="62" y="348" font-size="17" fill="#252422" font-family="Menlo, monospace">numpy  2.x</text>
+  <text x="62" y="374" font-size="17" fill="#252422" font-family="Menlo, monospace">scipy, pandas, seaborn</text>
+  <text x="62" y="400" font-size="17" fill="#252422" font-family="Menlo, monospace">jupyterlab, gh</text>
+  <text x="62" y="450" font-size="15" fill="#6b675e" font-family="Menlo, monospace">envs/pml/bin/python</text>
+
+  <!-- env: other project -->
+  <rect x="394" y="262" width="320" height="210" rx="10" fill="#ffffff" stroke="#8a867c" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="410" y="292" font-size="21" font-weight="700" fill="#6b675e" font-family="Menlo, monospace">thesis</text>
+  <text x="490" y="292" font-size="16" fill="#6b675e">(another project)</text>
+  <text x="410" y="322" font-size="17" fill="#6b675e" font-family="Menlo, monospace">python 3.9</text>
+  <text x="410" y="348" font-size="17" fill="#6b675e" font-family="Menlo, monospace">numpy  1.24</text>
+  <text x="410" y="374" font-size="17" fill="#6b675e" font-family="Menlo, monospace">old-package 0.3</text>
+  <text x="410" y="450" font-size="15" fill="#6b675e" font-family="Menlo, monospace">envs/thesis/bin/python</text>
+
+  <!-- activation arrow -->
+  <path d="M 400 124 L 400 172 L 320 172 L 320 258" fill="none" stroke="#12355b" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="380" y="84" width="330" height="40" rx="8" fill="#12355b"/>
+  <text x="545" y="111" font-size="18" fill="#fbfaf7" text-anchor="middle" font-family="Menlo, monospace">conda activate pml</text>
+  <text x="418" y="150" font-size="14" fill="#12355b">points the terminal and VS Code at this one</text>
+</svg>
