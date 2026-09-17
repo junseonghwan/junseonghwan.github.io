@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="2_lab_files/libs/clipboard/clipboard.min.js"></script>
+<script src="2_lab_files/libs/quarto-html/tabby.min.js"></script>
+<script src="2_lab_files/libs/quarto-html/popper.min.js"></script>
+<script src="2_lab_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="2_lab_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="2_lab_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="2_lab_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.40">
+
+  <meta name="author" content="Seong-Hwan Jun">
+  <title>Probabilistic Machine Learning</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="2_lab_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="2_lab_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="2_lab_files/libs/revealjs/dist/theme/quarto-8651012f02df9268b4f164d78f1a96f0.css">
+  <link href="2_lab_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="2_lab_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="2_lab_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="2_lab_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="2_lab_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="2_lab_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Probabilistic Machine Learning</h1>
+  <p class="subtitle">Lab 2: numpy, scipy, and Monte Carlo integration</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Seong-Hwan Jun 
+</div>
+        <p class="quarto-title-affiliation">
+            Department of Biostatistics and Computational Biology, University of Rochester Medical Center
+          </p>
+    </div>
+</div>
+
+</section>
+<section id="where-this-fits" class="slide level2">
+<h2>Where this fits</h2>
+<p>In lecture you computed the marginal likelihood of the coin flip <strong>in closed form</strong>:</p>
+<p><span class="math display">\[
+p(y_{1:N}) = \int_0^1 \theta^{s} (1-\theta)^{N-s} \, p(\theta) \, d\theta = \frac{B(s + a,\; N - s + b)}{B(a, b)}.
+\]</span></p>
+<ul>
+<li>That worked because Beta and Bernoulli are conjugate. Almost nothing else in this course will be so obliging.</li>
+<li>Today: compute the same integral <strong>by sampling</strong>, check it against the closed form, and then find out where the naive approach falls apart.</li>
+</ul>
+</section>
+<section id="goals" class="slide level2">
+<h2>Goals</h2>
+<ul>
+<li><code>numpy</code> to <strong>generate</strong> random samples, <code>scipy.stats</code> to <strong>evaluate</strong> densities.</li>
+<li>Monte Carlo integration: turning an integral into an average.</li>
+<li>Why you must work on the log scale, demonstrated rather than asserted.</li>
+<li>Importance sampling: what to do when the thing you care about almost never happens.</li>
+</ul>
+</section>
+<section>
+<section id="sampling-and-densities" class="title-slide slide level1 center">
+<h1>Sampling and densities</h1>
+
+</section>
+<section id="two-libraries-two-jobs" class="slide level2">
+<h2>Two libraries, two jobs</h2>
+<div id="81815eac" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href=""></a><span class="im">import</span> scipy.stats <span class="im">as</span> ss</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>)</span>
+<span id="cb1-5"><a href=""></a></span>
+<span id="cb1-6"><a href=""></a>x <span class="op">=</span> rng.normal(loc<span class="op">=</span><span class="fl">1.0</span>, scale<span class="op">=</span><span class="fl">2.0</span>, size<span class="op">=</span><span class="dv">5</span>)      <span class="co"># numpy generates</span></span>
+<span id="cb1-7"><a href=""></a><span class="bu">print</span>(<span class="st">"samples:"</span>, np.<span class="bu">round</span>(x, <span class="dv">3</span>))</span>
+<span id="cb1-8"><a href=""></a></span>
+<span id="cb1-9"><a href=""></a><span class="bu">print</span>(<span class="st">"pdf :"</span>, np.<span class="bu">round</span>(ss.norm.pdf(x, loc<span class="op">=</span><span class="fl">1.0</span>, scale<span class="op">=</span><span class="fl">2.0</span>), <span class="dv">4</span>))   <span class="co"># scipy evaluates</span></span>
+<span id="cb1-10"><a href=""></a><span class="bu">print</span>(<span class="st">"cdf :"</span>, np.<span class="bu">round</span>(ss.norm.cdf(x, loc<span class="op">=</span><span class="fl">1.0</span>, scale<span class="op">=</span><span class="fl">2.0</span>), <span class="dv">4</span>))</span>
+<span id="cb1-11"><a href=""></a><span class="bu">print</span>(<span class="st">"logpdf:"</span>, np.<span class="bu">round</span>(ss.norm.logpdf(x, loc<span class="op">=</span><span class="fl">1.0</span>, scale<span class="op">=</span><span class="fl">2.0</span>), <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>samples: [ 1.378 -0.045  0.174 -3.883  4.599]
+pdf : [0.1959 0.174  0.1832 0.0101 0.0395]
+cdf : [0.575  0.3006 0.3398 0.0073 0.964 ]
+logpdf: [-1.63   -1.7487 -1.6974 -4.5925 -3.2316]</code></pre>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p><code>scipy.stats</code> can sample too (<code>ss.norm.rvs</code>), and numpy can do most standard distributions. Use <code>rng</code> for sampling so your seed controls everything, and <code>scipy</code> for densities – especially <code>logpdf</code>, which you will need constantly.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="three-idioms-you-will-use-today" class="slide level2">
+<h2>Three idioms you will use today</h2>
+<div id="9fabbbbb" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>x <span class="op">=</span> rng.normal(size<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb3-2"><a href=""></a><span class="bu">print</span>(<span class="st">"x        :"</span>, np.<span class="bu">round</span>(x, <span class="dv">2</span>))</span>
+<span id="cb3-3"><a href=""></a></span>
+<span id="cb3-4"><a href=""></a><span class="co"># 1. arithmetic with a scalar applies to every entry</span></span>
+<span id="cb3-5"><a href=""></a><span class="bu">print</span>(<span class="st">"x**2 * 3 :"</span>, np.<span class="bu">round</span>(x<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> <span class="dv">3</span>, <span class="dv">2</span>))</span>
+<span id="cb3-6"><a href=""></a></span>
+<span id="cb3-7"><a href=""></a><span class="co"># 2. a comparison gives a boolean array; True counts as 1, so .mean() is a fraction</span></span>
+<span id="cb3-8"><a href=""></a><span class="bu">print</span>(<span class="st">"x &gt; 0    :"</span>, x <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb3-9"><a href=""></a><span class="bu">print</span>(<span class="st">"fraction :"</span>, (x <span class="op">&gt;</span> <span class="dv">0</span>).mean())</span>
+<span id="cb3-10"><a href=""></a></span>
+<span id="cb3-11"><a href=""></a><span class="co"># 3. build up results in a list, then hand it to numpy</span></span>
+<span id="cb3-12"><a href=""></a>results <span class="op">=</span> []</span>
+<span id="cb3-13"><a href=""></a><span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb3-14"><a href=""></a>    r <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb3-15"><a href=""></a>    results.append(r.normal(size<span class="op">=</span><span class="dv">1000</span>).mean())</span>
+<span id="cb3-16"><a href=""></a><span class="bu">print</span>(<span class="st">"results  :"</span>, np.<span class="bu">round</span>(np.array(results), <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x        : [ 1.14 -0.33  0.77  0.28 -0.55  0.98]
+x**2 * 3 : [3.93 0.32 1.8  0.24 0.92 2.87]
+x &gt; 0    : [ True False  True  True False  True]
+fraction : 0.6666666666666666
+results  : [-0.048  -0.0543 -0.0224]</code></pre>
+</div>
+</div>
+</section>
+<section id="task-1-get-comfortable" class="slide level2">
+<h2>Task 1: get comfortable</h2>
+<div id="32683695" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb5-2"><a href=""></a></span>
+<span id="cb5-3"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: draw 10,000 samples from Beta(2, 5)</span></span>
+<span id="cb5-4"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: check the sample mean against the theoretical mean a/(a+b)</span></span>
+<span id="cb5-5"><a href=""></a><span class="cf">assert</span> <span class="bu">abs</span>(samples.mean() <span class="op">-</span> <span class="dv">2</span><span class="op">/</span><span class="dv">7</span>) <span class="op">&lt;</span> <span class="fl">0.01</span></span>
+<span id="cb5-6"><a href=""></a></span>
+<span id="cb5-7"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: evaluate the Beta(2,5) density on a grid over [0,1] and plot it,</span></span>
+<span id="cb5-8"><a href=""></a><span class="co">#       with a histogram of your samples (use density=True) behind it</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section>
+<section>
+<section id="monte-carlo-integration" class="title-slide slide level1 center">
+<h1>Monte Carlo integration</h1>
+
+</section>
+<section id="integrals-are-expectations" class="slide level2">
+<h2>Integrals are expectations</h2>
+<p>If <span class="math inline">\(p\)</span> is a <strong>probability density</strong> that you can <strong>sample from</strong>, then</p>
+<p><span class="math display">\[
+I = \int f(\theta) \, p(\theta) \, d\theta = \mathbb{E}_{p}[f(\theta)]
+\]</span></p>
+<p>can be estimated by drawing <span class="math inline">\(\theta_1, \ldots, \theta_K \sim p\)</span> and averaging:</p>
+<p><span class="math display">\[
+\hat{I}_K = \frac{1}{K}\sum_{k=1}^{K} f(\theta_k).
+\]</span></p>
+<ul>
+<li><strong>Law of large numbers:</strong> <span class="math inline">\(\hat I_K \to I\)</span> as <span class="math inline">\(K \to \infty\)</span> whenever <span class="math inline">\(\mathbb{E}_p|f(\theta)| &lt; \infty\)</span>. That is why Monte Carlo works at all. It is also unbiased for every <span class="math inline">\(K\)</span>.</li>
+<li><strong>Central limit theorem:</strong> if <span class="math inline">\(\operatorname{Var}_p(f) &lt; \infty\)</span>, then <span class="math inline">\(\operatorname{sd}(\hat I_K) = \operatorname{sd}_p(f)/\sqrt{K}\)</span> and the error is approximately normal. The rate is <span class="math inline">\(1/\sqrt{K}\)</span> <strong>regardless of dimension</strong>, and that is why we do this at all.</li>
+<li>The catch is the constant. <span class="math inline">\(\operatorname{sd}_p(f)\)</span> can be enormous, or infinite, in which case the rate claim is simply false.</li>
+</ul>
+</section>
+<section id="the-coin-flip-again" class="slide level2">
+<h2>The coin flip, again</h2>
+<p><span class="math display">\[
+p(y_{1:N}) = \int_0^1 \underbrace{\theta^{s}(1-\theta)^{N-s}}_{f(\theta)} \; \underbrace{p(\theta)}_{\text{Beta}(1,1)} \, d\theta
+\]</span></p>
+<p>So: sample <span class="math inline">\(\theta_k \sim \text{Beta}(1,1)\)</span>, evaluate the likelihood at each, average.</p>
+<div id="69507b60" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>)</span>
+<span id="cb6-2"><a href=""></a>N, theta_true <span class="op">=</span> <span class="dv">100</span>, <span class="fl">0.7</span></span>
+<span id="cb6-3"><a href=""></a>y <span class="op">=</span> rng.binomial(<span class="dv">1</span>, theta_true, size<span class="op">=</span>N)</span>
+<span id="cb6-4"><a href=""></a>s <span class="op">=</span> y.<span class="bu">sum</span>()</span>
+<span id="cb6-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"N = </span><span class="sc">{</span>N<span class="sc">}</span><span class="ss">,  s = </span><span class="sc">{</span>s<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>N = 100,  s = 76</code></pre>
+</div>
+</div>
+<p>Use exactly this data for the rest of the lab, so your numbers match mine.</p>
+</section>
+<section id="task-2-the-estimator" class="slide level2">
+<h2>Task 2: the estimator</h2>
+<div id="5f2dbbc0" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>num_samples <span class="op">=</span> <span class="dv">100_000</span></span>
+<span id="cb8-2"><a href=""></a>theta_samples <span class="op">=</span> rng.beta(<span class="dv">1</span>, <span class="dv">1</span>, size<span class="op">=</span>num_samples)</span>
+<span id="cb8-3"><a href=""></a></span>
+<span id="cb8-4"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: evaluate theta^s (1-theta)^(N-s) at every sample, and average</span></span>
+<span id="cb8-5"><a href=""></a>estimate <span class="op">=</span> ...</span>
+<span id="cb8-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>estimate<span class="sc">:.6e}</span><span class="ss">"</span>)     <span class="co"># expect about 1.24e-25</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="task-3-is-it-right" class="slide level2">
+<h2>Task 3: is it right?</h2>
+<p>We know the answer in closed form, but there is a slicker check. Bayes’ theorem rearranges to</p>
+<p><span class="math display">\[
+p(y) = \frac{p(y \mid \theta) \, p(\theta)}{p(\theta \mid y)},
+\]</span></p>
+<p>and this holds for <strong>every</strong> <span class="math inline">\(\theta\)</span>. With conjugacy the posterior is <span class="math inline">\(\text{Beta}(s+1, N-s+1)\)</span>, so we can just evaluate the right hand side.</p>
+<div id="87ff39f1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="kw">def</span> exact_marginal(theta):</span>
+<span id="cb9-2"><a href=""></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: likelihood * prior / posterior, all evaluated at theta</span></span>
+<span id="cb9-3"><a href=""></a>    ...</span>
+<span id="cb9-4"><a href=""></a></span>
+<span id="cb9-5"><a href=""></a><span class="bu">print</span>(exact_marginal(<span class="fl">0.5</span>))</span>
+<span id="cb9-6"><a href=""></a><span class="bu">print</span>(exact_marginal(<span class="fl">0.31</span>))    <span class="co"># should be identical -- it holds for any theta</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Both give <span class="math inline">\(1.241098 \times 10^{-25}\)</span>. If your two numbers differ, one of the three densities is wrong.</p>
+</section>
+<section id="task-4-how-accurate" class="slide level2">
+<h2>Task 4: how accurate?</h2>
+<div id="9ed70c80" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb10-2"><a href=""></a></span>
+<span id="cb10-3"><a href=""></a>sample_sizes <span class="op">=</span> [<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1_000</span>, <span class="dv">10_000</span>, <span class="dv">100_000</span>, <span class="dv">1_000_000</span>]</span>
+<span id="cb10-4"><a href=""></a>sds <span class="op">=</span> []</span>
+<span id="cb10-5"><a href=""></a><span class="cf">for</span> num_samples <span class="kw">in</span> sample_sizes:</span>
+<span id="cb10-6"><a href=""></a>    estimates <span class="op">=</span> []</span>
+<span id="cb10-7"><a href=""></a>    <span class="cf">for</span> seed <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
+<span id="cb10-8"><a href=""></a>        rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb10-9"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: draw num_samples from Beta(1, 1) and compute the MC estimate</span></span>
+<span id="cb10-10"><a href=""></a>        estimate <span class="op">=</span> ...</span>
+<span id="cb10-11"><a href=""></a>        estimates.append(estimate)</span>
+<span id="cb10-12"><a href=""></a>    sds.append(np.std(estimates))</span>
+<span id="cb10-13"><a href=""></a></span>
+<span id="cb10-14"><a href=""></a>plt.loglog(sample_sizes, sds, <span class="st">"o-"</span>)</span>
+<span id="cb10-15"><a href=""></a>plt.xlabel(<span class="st">"number of samples"</span>)<span class="op">;</span> plt.ylabel(<span class="st">"sd of the estimate"</span>)</span>
+<span id="cb10-16"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>What slope do you see? Compare it with the <span class="math inline">\(1/\sqrt{K}\)</span> the central limit theorem promised.</p>
+</section></section>
+<section>
+<section id="work-in-log-space" class="title-slide slide level1 center">
+<h1>Work in log space</h1>
+
+</section>
+<section id="why-the-direct-version-is-doomed" class="slide level2">
+<h2>Why the direct version is doomed</h2>
+<div id="27e4d732" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a><span class="im">from</span> scipy.special <span class="im">import</span> logsumexp, betaln</span>
+<span id="cb11-2"><a href=""></a></span>
+<span id="cb11-3"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
+<span id="cb11-4"><a href=""></a>num_samples <span class="op">=</span> <span class="dv">20_000</span></span>
+<span id="cb11-5"><a href=""></a><span class="cf">for</span> N_big <span class="kw">in</span> (<span class="dv">100</span>, <span class="dv">400</span>, <span class="dv">800</span>, <span class="dv">1500</span>, <span class="dv">3000</span>):</span>
+<span id="cb11-6"><a href=""></a>    y_big <span class="op">=</span> rng.binomial(<span class="dv">1</span>, theta_true, size<span class="op">=</span>N_big)      <span class="co"># the same coin as before, more flips</span></span>
+<span id="cb11-7"><a href=""></a>    s_big <span class="op">=</span> y_big.<span class="bu">sum</span>()</span>
+<span id="cb11-8"><a href=""></a>    theta_k <span class="op">=</span> rng.beta(<span class="dv">1</span>, <span class="dv">1</span>, size<span class="op">=</span>num_samples)            <span class="co"># draws from the Beta(1, 1) prior</span></span>
+<span id="cb11-9"><a href=""></a>    lik <span class="op">=</span> theta_k<span class="op">**</span>s_big <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> theta_k)<span class="op">**</span>(N_big <span class="op">-</span> s_big)</span>
+<span id="cb11-10"><a href=""></a>    direct <span class="op">=</span> lik.mean()</span>
+<span id="cb11-11"><a href=""></a>    log_lik <span class="op">=</span> s_big <span class="op">*</span> np.log(theta_k) <span class="op">+</span> (N_big <span class="op">-</span> s_big) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> theta_k)</span>
+<span id="cb11-12"><a href=""></a>    log_est <span class="op">=</span> logsumexp(log_lik) <span class="op">-</span> np.log(num_samples)</span>
+<span id="cb11-13"><a href=""></a>    log_true <span class="op">=</span> betaln(s_big <span class="op">+</span> <span class="dv">1</span>, N_big <span class="op">-</span> s_big <span class="op">+</span> <span class="dv">1</span>)       <span class="co"># exact: B(s + 1, N - s + 1)</span></span>
+<span id="cb11-14"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"N = </span><span class="sc">{</span>N_big<span class="sc">:5d}</span><span class="ss">  heads = </span><span class="sc">{</span>s_big<span class="sc">:5d}</span><span class="ss">   direct = </span><span class="sc">{</span>direct<span class="sc">:.3e}</span><span class="ss">   "</span></span>
+<span id="cb11-15"><a href=""></a>          <span class="ss">f"log space = </span><span class="sc">{</span>log_est<span class="sc">:9.2f}</span><span class="ss">   exact = </span><span class="sc">{</span>log_true<span class="sc">:9.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>N =   100  heads =    75   direct = 4.118e-26   log space =    -58.45   exact =    -58.46
+N =   400  heads =   285   direct = 3.426e-106   log space =   -242.84   exact =   -242.83
+N =   800  heads =   569   direct = 5.990e-211   log space =   -484.06   exact =   -484.04
+N =  1500  heads =  1031   direct = 0.000e+00   log space =   -935.32   exact =   -935.33
+N =  3000  heads =  2107   direct = 0.000e+00   log space =  -1830.50   exact =  -1830.49</code></pre>
+</div>
+</div>
+<p>At <span class="math inline">\(N = 1500\)</span> the direct computation returns <strong>exactly zero</strong>. Not a small number – zero. Every subsequent calculation is then meaningless, and nothing raises an error.</p>
+</section>
+<section id="task-5-the-log-space-estimator-on-our-data" class="slide level2">
+<h2>Task 5: the log space estimator, on our data</h2>
+<p><span class="math display">\[
+\log \hat{p}(y) = \log \left( \frac{1}{K} \sum_k e^{\ell_k} \right) = \operatorname{logsumexp}(\ell_{1:K}) - \log K,
+\qquad \ell_k = s \log \theta_k + (N-s)\log(1-\theta_k)
+\]</span></p>
+<div id="409b832f" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a><span class="co"># Use the seeded data from before: y, s, N, and the theta_samples from Task 2.</span></span>
+<span id="cb13-2"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: log-likelihood at every sample, then logsumexp minus log(num_samples)</span></span>
+<span id="cb13-3"><a href=""></a>log_estimate <span class="op">=</span> ...</span>
+<span id="cb13-4"><a href=""></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>log_estimate<span class="sc">:.6f}</span><span class="ss">"</span>)                 <span class="co"># expect about -57.34</span></span>
+<span id="cb13-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>betaln(s <span class="op">+</span> <span class="dv">1</span>, N <span class="op">-</span> s <span class="op">+</span> <span class="dv">1</span>)<span class="sc">:.6f}</span><span class="ss">"</span>)     <span class="co"># the truth</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p><code>float64</code> holds numbers down to about <span class="math inline">\(10^{-308}\)</span>. Anything smaller becomes zero silently. Every likelihood in this course is a product over observations, so this is not an edge case – it is the normal situation.</p>
+</div>
+</div>
+</div>
+</section></section>
+<section>
+<section id="when-monte-carlo-fails" class="title-slide slide level1 center">
+<h1>When Monte Carlo fails</h1>
+
+</section>
+<section id="a-rare-event" class="slide level2">
+<h2>A rare event</h2>
+<p>Let <span class="math inline">\(X \sim \mathcal{N}(0,1)\)</span>, with density <span class="math inline">\(p(x) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}\)</span>. Estimate <span class="math inline">\(P(X &gt; 10)\)</span>.</p>
+<p><span class="math display">\[
+P(X &gt; 10) = \int \mathbb{1}[x &gt; 10] \, p(x) \, dx = \mathbb{E}_p\big[\mathbb{1}[X &gt; 10]\big]
+\]</span></p>
+<p>That is an expectation of the indicator <span class="math inline">\(h(x) = \mathbb{1}[x &gt; 10]\)</span> under <span class="math inline">\(p\)</span>, so Monte Carlo applies.</p>
+<div id="e5ef6b96" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="2_lab_files/figure-revealjs/cell-11-output-1.png" class="quarto-figure quarto-figure-center" width="1046" height="353"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="task-6-try-the-obvious-thing" class="slide level2">
+<h2>Task 6: try the obvious thing</h2>
+<div id="dfb42a7b" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: draw 10 million standard normals and compute the fraction above 10</span></span>
+<span id="cb14-2"><a href=""></a>naive <span class="op">=</span> ...</span>
+<span id="cb14-3"><a href=""></a><span class="bu">print</span>(naive)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="question">
+<p>Why is it zero?</p>
+</div>
+<ul>
+<li>How many of your ten million samples are greater than <span class="math inline">\(10\)</span>?</li>
+<li>How many samples would you need to draw to get <strong>one</strong> sample greater than <span class="math inline">\(10\)</span>, in expectation?</li>
+<li>Is the estimator biased?</li>
+</ul>
+</section>
+<section id="importance-sampling" class="slide level2">
+<h2>Importance sampling</h2>
+<p>Sample from somewhere useful instead, and correct for it. For a target density <span class="math inline">\(p\)</span> and any density <span class="math inline">\(q\)</span> with <span class="math inline">\(q(x) &gt; 0\)</span> wherever <span class="math inline">\(h(x)\,p(x) \neq 0\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbb{E}_p[h(X)]
+&amp;= \int h(x)\, p(x)\, dx \\
+&amp;= \int h(x)\, p(x)\, \frac{q(x)}{q(x)}\, dx \\
+&amp;= \int h(x)\, \frac{p(x)}{q(x)}\, q(x)\, dx \\
+&amp;= \mathbb{E}_q\!\left[ h(X)\, w(X) \right], \qquad w(x) = \frac{p(x)}{q(x)}.
+\end{aligned}
+\]</span></p>
+<ul>
+<li>Draw <span class="math inline">\(x_k \sim q\)</span>, the <strong>proposal</strong>, chosen to put mass where <span class="math inline">\(h\,p\)</span> is nonzero.</li>
+<li>Weight each draw by <span class="math inline">\(w(x_k)\)</span> to undo the change of distribution.</li>
+<li>The estimator <span class="math inline">\(\frac{1}{K}\sum_k h(x_k)\, w(x_k)\)</span> is unbiased for <strong>any</strong> <span class="math inline">\(q\)</span> satisfying the support condition above. Only the variance changes.</li>
+</ul>
+</section>
+<section id="task-7-the-estimator" class="slide level2">
+<h2>Task 7: the estimator</h2>
+<div id="678f82c6" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>x0 <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb15-2"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: sample 100,000 draws from N(x0, 1)</span></span>
+<span id="cb15-3"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: compute weights = p(x)/q(x) using ss.norm.pdf twice (target, then proposal)</span></span>
+<span id="cb15-4"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: estimate as the mean of weights * (x &gt; x0)</span></span>
+<span id="cb15-5"><a href=""></a><span class="cf">assert</span> <span class="bu">abs</span>(estimate <span class="op">-</span> ss.norm.sf(x0)) <span class="op">/</span> ss.norm.sf(x0) <span class="op">&lt;</span> <span class="fl">0.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A hundred thousand samples from the right place beat ten million from the wrong one.</p>
+</section>
+<section id="task-8-does-the-proposal-matter" class="slide level2">
+<h2>Task 8: does the proposal matter?</h2>
+<div id="edac6695" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a><span class="co"># Compare three proposals, all with num_samples = 10,000:</span></span>
+<span id="cb16-2"><a href=""></a><span class="co">#   (a) N(10, 1)</span></span>
+<span id="cb16-3"><a href=""></a><span class="co">#   (b) N(10, 2)</span></span>
+<span id="cb16-4"><a href=""></a><span class="co">#   (c) 10 + Exponential(1)      &lt;- check how scipy.stats parameterizes the exponential</span></span>
+<span id="cb16-5"><a href=""></a><span class="co"># For each, report the estimate and the relative standard error</span></span>
+<span id="cb16-6"><a href=""></a><span class="co">#       v = weights * (x &gt; x0);   v.std() / v.mean() / sqrt(num_samples)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>All three are unbiased. They are not equally good, and the ranking may surprise you – think about which proposal has tails shaped most like the integrand.</p>
+</section>
+<section id="what-makes-a-proposal-good" class="slide level2">
+<h2>What makes a proposal good</h2>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>The variance of the weights is everything. If <span class="math inline">\(q\)</span> has <strong>lighter tails</strong> than <span class="math inline">\(p\)</span>, some <span class="math inline">\(w(x) = p/q\)</span> become enormous, a handful of samples dominate the average, and the estimator is unusable while still looking fine.</p>
+</div>
+</div>
+</div>
+<ul>
+<li>Rule of thumb: the proposal should be at least as heavy tailed as the target.</li>
+<li>Diagnostic: look at the largest few weights. If one sample carries most of the total weight, you are in trouble.</li>
+<li>This is the central difficulty of sequential Monte Carlo later in the course, where the weights degenerate over time.</li>
+</ul>
+</section></section>
+<section>
+<section id="wrapping-up" class="title-slide slide level1 center">
+<h1>Wrapping up</h1>
+
+</section>
+<section id="what-to-submit" class="slide level2 scrollable">
+<h2>What to submit</h2>
+<p>A rendered <code>lab2.qmd</code> (<code>.qmd</code> and <code>.html</code>) containing:</p>
+<ol type="1">
+<li>Task 1 with its plot.</li>
+<li>Tasks 2 and 3: the Monte Carlo estimate and the conjugacy check agreeing.</li>
+<li>Task 4’s log-log plot, with a sentence on the slope.</li>
+<li>Task 5: the log space estimator, matching the closed form.</li>
+<li>Tasks 6-8: the naive attempt, the importance sampling estimator, and your comparison of the three proposals.</li>
+</ol>
+<p>Due at the start of next week’s lab.</p>
+</section>
+<section id="checklist" class="slide level2">
+<h2>Checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Task 2 gives about <span class="math inline">\(1.24 \times 10^{-25}\)</span></label></li>
+<li><label><input type="checkbox"><code>exact_marginal(0.5)</code> and <code>exact_marginal(0.31)</code> return the same number</label></li>
+<li><label><input type="checkbox">Task 5 gives about <span class="math inline">\(-57.34\)</span>, matching <code>betaln(s+1, N-s+1)</code></label></li>
+<li><label><input type="checkbox">Task 7 is within 5% of <code>ss.norm.sf(10)</code></label></li>
+<li><label><input type="checkbox">every random draw comes from a seeded <code>default_rng</code></label></li>
+</ul>
+<div class="question">
+<p>Task 3 evaluated <span class="math inline">\(p(y) = p(y \mid \theta)p(\theta) / p(\theta \mid y)\)</span> at an arbitrary <span class="math inline">\(\theta\)</span> and got the exact answer with no integration at all. Why can we not always do this, and what did conjugacy actually buy us?</p>
+</div>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="2_lab_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="2_lab_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="2_lab_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="2_lab_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 8.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
