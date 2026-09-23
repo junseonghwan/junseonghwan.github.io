@@ -245,7 +245,7 @@ Seong-Hwan Jun
 </section>
 <section id="toy-example-heights" class="slide level2">
 <h2>Toy example: heights</h2>
-<div id="372f2ca6" class="cell" data-execution_count="1">
+<div id="28822094" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -285,7 +285,7 @@ Seong-Hwan Jun
 </section>
 <section id="heights-the-labels-we-do-not-see" class="slide level2">
 <h2>Heights: the labels we do not see</h2>
-<div id="7dd1f7e1" class="cell" data-execution_count="2">
+<div id="bdfe0e5a" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>dat <span class="op">=</span> pd.DataFrame({<span class="st">"y"</span>: y_obs, <span class="st">"label"</span>: labels})</span>
@@ -305,7 +305,7 @@ Seong-Hwan Jun
 </section>
 <section id="toy-example-old-faithful-geyser" class="slide level2">
 <h2>Toy example: Old Faithful geyser</h2>
-<div id="e4bac1c5" class="cell" data-execution_count="3">
+<div id="26bf0a01" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>faithful <span class="op">=</span> sns.load_dataset(<span class="st">"geyser"</span>)</span>
@@ -324,7 +324,7 @@ Seong-Hwan Jun
 </section>
 <section id="toy-example-palmer-penguins" class="slide level2">
 <h2>Toy example: Palmer penguins</h2>
-<div id="cfb59a8a" class="cell" data-execution_count="4">
+<div id="678a4ffb" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>penguins <span class="op">=</span> sns.load_dataset(<span class="st">"penguins"</span>).dropna()</span>
@@ -365,7 +365,7 @@ y_i \mid z_i &amp;\sim \text{Normal}(\mu_{z_i}, \sigma_{z_i}^2), \qquad i = 1, \
 </section>
 <section id="as-a-graphical-model" class="slide level2">
 <h2>As a graphical model</h2>
-<div id="9dd7a795" class="cell" data-execution_count="5">
+<div id="e2556d61" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -422,7 +422,7 @@ p(y_i \mid \theta)
 </section>
 <section id="the-mixture-density" class="slide level2">
 <h2>The mixture density</h2>
-<div id="a6eb8db5" class="cell" data-execution_count="6">
+<div id="26563ed4" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -524,7 +524,7 @@ N_0 &amp;= \sum_{i=1}^{N} 1[z_i = 0], \\
 </section>
 <section id="overlap-creates-uncertain-cases" class="slide level2">
 <h2>Overlap creates uncertain cases</h2>
-<div id="09c97091" class="cell" data-execution_count="7">
+<div id="2a11c42a" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>sns.histplot(data<span class="op">=</span>dat, x<span class="op">=</span><span class="st">"y"</span>, hue<span class="op">=</span><span class="st">"label"</span>, binwidth<span class="op">=</span><span class="dv">2</span>, multiple<span class="op">=</span><span class="st">"layer"</span>)</span>
@@ -559,7 +559,7 @@ N_0 &amp;= \sum_{i=1}^{N} 1[z_i = 0], \\
 </section>
 <section id="initializing-theta-code" class="slide level2">
 <h2>Initializing <span class="math inline">\(\theta\)</span>: code</h2>
-<div id="c89f0843" class="cell" data-execution_count="8">
+<div id="5413ffb7" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a><span class="kw">def</span> initialize(y, seed):</span>
 <span id="cb6-2"><a href=""></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
 <span id="cb6-3"><a href=""></a>    mu <span class="op">=</span> rng.choice(y, size<span class="op">=</span><span class="dv">2</span>, replace<span class="op">=</span><span class="va">False</span>)   <span class="co"># two random data points</span></span>
@@ -577,7 +577,7 @@ N_0 &amp;= \sum_{i=1}^{N} 1[z_i = 0], \\
 <section id="the-starting-components" class="slide level2">
 <h2>The starting components</h2>
 <p>The two components we start with are usually a poor description of the data.</p>
-<div id="77c337a1" class="cell" data-execution_count="9">
+<div id="50d4fc8b" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>grid <span class="op">=</span> np.linspace(y_obs.<span class="bu">min</span>() <span class="op">-</span> <span class="dv">5</span>, y_obs.<span class="bu">max</span>() <span class="op">+</span> <span class="dv">5</span>, <span class="dv">200</span>)</span>
@@ -636,7 +636,7 @@ p(z_{1:N} \mid y_{1:N}, \theta)
 </section>
 <section id="soft-assignments-after-initialization" class="slide level2">
 <h2>Soft assignments after initialization</h2>
-<div id="8d04d6ae" class="cell" data-execution_count="10">
+<div id="280851ad" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="kw">def</span> responsibility(y, mu, sd, pi):</span>
@@ -669,7 +669,7 @@ p_i \sim \text{Uniform}(0, 1), \quad i = 1, ..., N,
 \]</span></p>
 <p>and begin with the parameter update instead of the responsibility update.</p>
 <div class="all-at-once">
-<div id="2111346c" class="cell" data-execution_count="11">
+<div id="a48c65c3" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>rng_p <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
@@ -722,7 +722,7 @@ p_i^{(t+1)} = \frac{\pi^{(t)} \, \mathcal{N}(y_i; \mu_1^{(t)}, \sigma_1^{2(t)})}
 <li>This is exactly the responsibility we computed to get started. Nothing new.</li>
 <li>Each <span class="math inline">\(p_i\)</span> depends only on its own <span class="math inline">\(y_i\)</span>, so the <span class="math inline">\(N\)</span> updates are independent and vectorize.</li>
 </ul>
-<div id="f50ed227" class="cell" data-execution_count="12">
+<div id="2c63b278" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="kw">def</span> e_step(y, mu, sd, pi):</span>
 <span id="cb12-2"><a href=""></a>    lik1 <span class="op">=</span> pi <span class="op">*</span> norm.pdf(y, mu[<span class="dv">1</span>], sd[<span class="dv">1</span>])          <span class="co"># numerator</span></span>
 <span id="cb12-3"><a href=""></a>    lik0 <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> pi) <span class="op">*</span> norm.pdf(y, mu[<span class="dv">0</span>], sd[<span class="dv">0</span>])</span>
@@ -790,7 +790,7 @@ Q(\theta \mid \theta^{(t)}) = \sum_{i=1}^{N} \Big\{ (1 - p_i) \log \big[ (1 - \p
 </section>
 <section id="m-step-code" class="slide level2">
 <h2>M-step: code</h2>
-<div id="dd385d3a" class="cell" data-execution_count="13">
+<div id="7b3226ad" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a><span class="kw">def</span> m_step(y, p):</span>
 <span id="cb13-2"><a href=""></a>    N1 <span class="op">=</span> p.<span class="bu">sum</span>()</span>
 <span id="cb13-3"><a href=""></a>    N0 <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> p).<span class="bu">sum</span>()</span>
@@ -809,7 +809,7 @@ Q(\theta \mid \theta^{(t)}) = \sum_{i=1}^{N} \Big\{ (1 - p_i) \log \big[ (1 - \p
 <p><span class="math display">\[
 \ell(\theta) = \sum_{i=1}^{N} \log \Big[ (1 - \pi) \mathcal{N}(y_i; \mu_0, \sigma_0^2) + \pi \, \mathcal{N}(y_i; \mu_1, \sigma_1^2) \Big].
 \]</span></p>
-<div id="097612f2" class="cell" data-execution_count="14">
+<div id="1d95807b" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a><span class="kw">def</span> loglik(y, mu, sd, pi):</span>
@@ -821,7 +821,7 @@ Q(\theta \mid \theta^{(t)}) = \sum_{i=1}^{N} \Big\{ (1 - p_i) \log \big[ (1 - \p
 </section>
 <section id="putting-it-together" class="slide level2">
 <h2>Putting it together</h2>
-<div id="699d14a1" class="cell" data-execution_count="15">
+<div id="fa0ef739" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a><span class="kw">def</span> run_em(y, seed, max_iter<span class="op">=</span><span class="dv">5000</span>, tol<span class="op">=</span><span class="fl">1e-6</span>):</span>
 <span id="cb15-2"><a href=""></a>    mu, sd, pi <span class="op">=</span> initialize(y, seed)</span>
 <span id="cb15-3"><a href=""></a>    trace <span class="op">=</span> [loglik(y, mu, sd, pi)]</span>
@@ -860,7 +860,7 @@ truth: P(z = 1) = 0.6, mu = [161. 176.], sd = [7.  7.6]</code></pre>
 </section>
 <section id="watching-it-converge" class="slide level2">
 <h2>Watching it converge</h2>
-<div id="16149810" class="cell" data-execution_count="16">
+<div id="64340a9b" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a>plt.plot(trace, marker<span class="op">=</span><span class="st">"o"</span>, markersize<span class="op">=</span><span class="dv">3</span>)</span>
@@ -897,7 +897,7 @@ truth: P(z = 1) = 0.6, mu = [161. 176.], sd = [7.  7.6]</code></pre>
 <section id="separation-is-what-makes-it-easy" class="slide level2">
 <h2>Separation is what makes it easy</h2>
 <p>The heights are a <em>hard</em> instance: the two means are barely two standard deviations apart. Compare with two groups whose means are ten standard deviations apart:</p>
-<div id="e12d1484" class="cell" data-execution_count="17">
+<div id="5463f857" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>rng_sep <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
@@ -925,7 +925,7 @@ truth: P(z = 1) = 0.6, mu = [161. 176.], sd = [7.  7.6]</code></pre>
 </section>
 <section id="separation-the-same-code-a-different-problem" class="slide level2">
 <h2>Separation: the same code, a different problem</h2>
-<div id="92b318d9" class="cell" data-execution_count="18">
+<div id="0d6753e9" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>mu_s, sd_s, pi_s, p_s, trace_sep, iters_sep <span class="op">=</span> run_em(y_sep, seed<span class="op">=</span><span class="dv">1</span>)</span>
@@ -959,7 +959,7 @@ truth: P(z = 1) = 0.7, mu = [0, 10], sd = [1, 1]</code></pre>
 </section>
 <section id="the-fitted-mixture" class="slide level2">
 <h2>The fitted mixture</h2>
-<div id="c674b3da" class="cell" data-execution_count="19">
+<div id="d07ba512" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a>sns.histplot(x<span class="op">=</span>y_obs, binwidth<span class="op">=</span><span class="dv">1</span>, stat<span class="op">=</span><span class="st">"density"</span>, color<span class="op">=</span><span class="st">"lightgray"</span>)</span>
@@ -983,7 +983,7 @@ truth: P(z = 1) = 0.7, mu = [0, 10], sd = [1, 1]</code></pre>
 </section>
 <section id="soft-assignments-before-and-after" class="slide level2">
 <h2>Soft assignments, before and after</h2>
-<div id="318f3cce" class="cell" data-execution_count="20">
+<div id="6d85ec0a" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="fl">4.5</span>), sharey<span class="op">=</span><span class="va">True</span>)</span>
@@ -1120,7 +1120,7 @@ N_k &amp;= \sum_{i=1}^{N} r_{ik}, \qquad \pi_k = \frac{N_k}{N}, \\
 </section>
 <section id="old-faithful" class="slide level2">
 <h2>Old Faithful</h2>
-<div id="7dc0f4b8" class="cell" data-execution_count="22">
+<div id="6a77870f" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href=""></a>X_geyser <span class="op">=</span> faithful[[<span class="st">"duration"</span>, <span class="st">"waiting"</span>]].to_numpy()</span>
@@ -1148,7 +1148,7 @@ Sigma[1] =
 </section>
 <section id="old-faithful-how-well-did-it-do" class="slide level2">
 <h2>Old Faithful: how well did it do?</h2>
-<div id="92001064" class="cell" data-execution_count="23">
+<div id="56920e30" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href=""></a>acc <span class="op">=</span> compare(X_geyser, fit_geyser, faithful[<span class="st">"kind"</span>].to_numpy(),</span>
@@ -1169,7 +1169,7 @@ Sigma[1] =
 </section>
 <section id="penguins" class="slide level2">
 <h2>Penguins</h2>
-<div id="fa0381ae" class="cell" data-execution_count="24">
+<div id="d7fb128d" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a>X_peng <span class="op">=</span> penguins[[<span class="st">"bill_length_mm"</span>, <span class="st">"flipper_length_mm"</span>]].to_numpy()</span>
@@ -1200,7 +1200,7 @@ Sigma[2] =
 </section>
 <section id="penguins-how-well-did-it-do" class="slide level2">
 <h2>Penguins: how well did it do?</h2>
-<div id="9e90c99d" class="cell" data-execution_count="25">
+<div id="304b6a9f" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a>acc <span class="op">=</span> compare(X_peng, fit_peng, penguins[<span class="st">"species"</span>].to_numpy(),</span>
@@ -1221,7 +1221,7 @@ Sigma[2] =
 </section>
 <section id="penguins-where-the-mistakes-are" class="slide level2">
 <h2>Penguins: where the mistakes are</h2>
-<div id="8866c9d8" class="cell" data-execution_count="26">
+<div id="fd57cde3" class="cell" data-execution_count="26">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>codes_peng <span class="op">=</span> pd.Categorical(penguins[<span class="st">"species"</span>]).codes</span>
@@ -1279,7 +1279,7 @@ Sigma[2] =
 </section>
 <section id="restarts-are-not-optional" class="slide level2">
 <h2>Restarts are not optional</h2>
-<div id="a134e527" class="cell" data-execution_count="27">
+<div id="3f6eac59" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href=""></a>restarts <span class="op">=</span> pd.DataFrame([</span>
@@ -1373,7 +1373,7 @@ Sigma[2] =
 <section id="generating-from-the-fitted-mixture" class="slide level2">
 <h2>Generating from the fitted mixture</h2>
 <p>Week 1 listed three things a model can do: inference, prediction, generation. A fitted mixture is a generative model. Run it forwards: draw a label, then draw a point from that component.</p>
-<div id="13cae47b" class="cell" data-execution_count="28">
+<div id="bc9a906b" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>rng_gen <span class="op">=</span> np.random.default_rng(<span class="dv">1</span>)</span>
@@ -1407,7 +1407,7 @@ Sigma[2] =
 <li><strong>Choosing <span class="math inline">\(K\)</span>.</strong> We were told <span class="math inline">\(2\)</span> and <span class="math inline">\(3\)</span>. In general, use BIC, cross validation, or a nonparametric prior over the number of components (we will discuss this in week 9 or 10).</li>
 <li><strong>Regularizing <span class="math inline">\(\Sigma_k\)</span>.</strong> The small multiple of the identity added to each <span class="math inline">\(\Sigma_k\)</span> is not cosmetic: without it a component can collapse onto a few points, <span class="math inline">\(\Sigma_k\)</span> becomes singular, and the likelihood diverges. We take this up in Thursday’s lab.</li>
 <li><strong>Priors on <span class="math inline">\(\theta\)</span>.</strong> Put a prior on <span class="math inline">\(\theta\)</span> and replace the maximum in the M-step by the posterior mode. With a conjugate prior on <span class="math inline">\(\Sigma_k\)</span> the update adds a fixed matrix to the weighted scatter, which is exactly what the regularizer does. Week 2’s conjugacy and this week’s EM combine in one line.</li>
-<li><strong>Constrained covariances.</strong> Fix <span class="math inline">\(\Sigma_k = \sigma^2 I\)</span> with the same <span class="math inline">\(\sigma^2\)</span> for every <span class="math inline">\(k\)</span>, and let <span class="math inline">\(\sigma^2 \to 0\)</span> instead of estimating it. The responsibilities become a softmax over squared distances with <span class="math inline">\(\sigma^2\)</span> as the temperature, so at zero temperature they are hard assignments to the nearest mean, and EM becomes <span class="math inline">\(k\)</span>-means.</li>
+<li><strong><span class="math inline">\(k\)</span>-means is a special case.</strong> Fix every covariance to the same <span class="math inline">\(\sigma^2 I\)</span> and do not update it. For a small enough <span class="math inline">\(\sigma^2\)</span>, the E-step gives each observation to its nearest mean with responsibility essentially <span class="math inline">\(1\)</span>, and the M-step averages the points assigned to each mean. That is <span class="math inline">\(k\)</span>-means.</li>
 </ul>
 </div>
 </section></section>
@@ -1441,6 +1441,9 @@ Sigma[2] =
 \sum_{i=1}^{N} \log p(y_i, z_i \mid \theta).
 \]</span></p>
 <p>The difference is a <span class="math inline">\(\log\)</span> of a <em>sum</em>. It does not split into a term for <span class="math inline">\(\theta_0\)</span> and a term for <span class="math inline">\(\theta_1\)</span>, there is no closed form, and the parameters stay coupled.</p>
+</div>
+<div class="question">
+<p>Exercise: find the maximum of <span class="math inline">\(\ell(\theta)\)</span> directly for the Gaussian mixture model. Take the derivative with respect to <span class="math inline">\(\mu_1\)</span> and set to 0. Try to see if you can find <span class="math inline">\(\hat{\mu}_1\)</span> in closed form.</p>
 </div>
 </section>
 <section id="introduce-a-distribution-over-the-latent-variables" class="slide level2">
@@ -1502,7 +1505,7 @@ Sigma[2] =
 q^{(t+1)} = \operatorname{argmax}_{q} \, \mathcal{L}(q, \theta^{(t)}).
 \]</span></p>
 <div class="all-at-once">
-<p>The left side of the identity, <span class="math inline">\(\ell(\theta^{(t)})\)</span>, does not depend on <span class="math inline">\(q\)</span> at all. So</p>
+<p>Since <span class="math inline">\(\ell(\theta^{(t)})\)</span> does not depend on <span class="math inline">\(q\)</span> at all (last line of slide 67),</p>
 <p><span class="math display">\[
 \max_{q} \mathcal{L}(q, \theta^{(t)}) \iff \min_{q} \sum_i \text{KL}\!\left( q_i \, \| \, p(z_i \mid y_i, \theta^{(t)}) \right),
 \]</span></p>
@@ -1554,13 +1557,26 @@ p_i := q_i^{(t+1)}(z_i = 1) = P(z_i = 1 \mid y_i, \theta^{(t)}) = \frac{\pi \, \
 \]</span></p>
 <div class="all-at-once">
 <ul>
-<li>Averaging <em>inside</em> the log is what makes <span class="math inline">\(\ell\)</span> hard: a log of a sum, which does not separate. That is what marginalizing <span class="math inline">\(z\)</span> does, and it is not what the E-step does.</li>
+<li>Averaging <em>inside</em> the log is what makes <span class="math inline">\(\ell\)</span> hard: a log of a sum, which does not separate.</li>
 <li>Averaging the log is easy: the log hits a single joint density, which factorizes into one term per parameter.</li>
 <li>Jensen says <span class="math inline">\(\mathbb{E}[\log X] \leq \log \mathbb{E}[X]\)</span>: swapping the two costs us something, and the KL is exactly what it costs.</li>
 </ul>
 </div>
 <div class="all-at-once">
 <p>The right hand side is also where the name comes from. The <strong>E</strong>xpectation step averages the complete data log likelihood over every value <span class="math inline">\(z\)</span> could take, weighted by the posterior. The bound view explains <em>why</em> the posterior is the right weight, and hands us monotonicity for free.</p>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Nowhere in EM is <span class="math inline">\(z\)</span> marginalized out. EM computes a posterior over <span class="math inline">\(z\)</span> and averages the <strong>log</strong> joint under it.</p>
+</div>
+</div>
 </div>
 </section>
 <section id="deriving-the-updates" class="slide level2">
@@ -1605,7 +1621,7 @@ Q = \sum_i \Big\{ (1 - p_i)\big[\log(1-\pi) + \log \mathcal{N}(y_i; \mu_0, \sigm
 </section>
 <section id="the-picture" class="slide level2">
 <h2>The picture</h2>
-<div id="d531f669" class="cell" data-execution_count="29">
+<div id="88a721a8" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a><span class="kw">def</span> elbo_mu1(y, p, mu0, mu1, sd, pi):</span>
@@ -1690,7 +1706,7 @@ Q = \sum_i \Big\{ (1 - p_i)\big[\log(1-\pi) + \log \mathcal{N}(y_i; \mu_0, \sigm
 <p><span class="math display">\[
 \theta^{(t+1)} - \theta^\star \approx J \, (\theta^{(t)} - \theta^\star), \qquad J = \frac{\partial M}{\partial \theta}\bigg|_{\theta^\star},
 \]</span></p>
-<p>so convergence is <strong>linear</strong>, at a rate set by the largest eigenvalue of <span class="math inline">\(J\)</span>, the <strong>fraction of missing information</strong>:</p>
+<p>so convergence is <strong>linear</strong>, at a rate set by the largest eigenvalue of <span class="math inline">\(J\)</span>, the <strong>fraction of missing information</strong> (Dempster, Laird and Rubin, 1977, Theorem 4):</p>
 <p><span class="math display">\[
 J = I_{\text{missing}} \, I_{\text{complete}}^{-1}.
 \]</span></p>
@@ -1810,8 +1826,7 @@ J = I_{\text{missing}} \, I_{\text{complete}}^{-1}.
 <div class="all-at-once">
 <ul>
 <li><strong>Gentler and more thorough.</strong> Bishop, <em>Pattern Recognition and Machine Learning</em> (2006), §13.1 Markov models and §13.2 Hidden Markov models, including the forward-backward algorithm (§13.2.2) and Viterbi (§13.2.5).</li>
-<li><strong>One volume.</strong> MLaPP Ch. 17, <em>Markov and hidden Markov models</em>.</li>
-<li><strong>The classic tutorial.</strong> Rabiner, L. R. (1989). <em>A tutorial on hidden Markov models and selected applications in speech recognition.</em> Proceedings of the IEEE, 77(2), 257–286.</li>
+<li><strong>One volume.</strong> MLaPP Ch. 17, <em>Markov and hidden Markov models</em>. <!-- - **The classic tutorial.** Rabiner, L. R. (1989). *A tutorial on hidden Markov models and selected applications in speech recognition.* Proceedings of the IEEE, 77(2), 257--286. --></li>
 </ul>
 </div>
 <div class="all-at-once">
@@ -1850,6 +1865,23 @@ J = I_{\text{missing}} \, I_{\text{complete}}^{-1}.
 \]</span></p>
 <div class="all-at-once">
 <p>The middle step is <span class="math inline">\(\nabla p = p \, \nabla \log p\)</span>, and the ratio that appears is the posterior. Evaluating at <span class="math inline">\(\theta = \theta^{(t)}\)</span>, the right hand side is the gradient of <span class="math inline">\(Q(\theta \mid \theta^{(t)})\)</span> at <span class="math inline">\(\theta^{(t)}\)</span>, because <span class="math inline">\(Q\)</span> averages <span class="math inline">\(\log p(y, z \mid \theta)\)</span> under that same posterior and the averaging weights do not depend on <span class="math inline">\(\theta\)</span>.</p>
+</div>
+</section>
+<section id="linear-convergence-the-taylor-expansion" class="slide level2">
+<h2>Linear convergence: the Taylor expansion</h2>
+<p>EM is a map <span class="math inline">\(\theta^{(t+1)} = M(\theta^{(t)})\)</span>, and a limit point <span class="math inline">\(\theta^\star\)</span> is a fixed point, <span class="math inline">\(\theta^\star = M(\theta^\star)\)</span>. Expand <span class="math inline">\(M\)</span> to first order around <span class="math inline">\(\theta^\star\)</span>:</p>
+<p><span class="math display">\[
+\theta^{(t+1)} = M(\theta^{(t)}) = M(\theta^\star) + J \, (\theta^{(t)} - \theta^\star) + O\big(\|\theta^{(t)} - \theta^\star\|^2\big),
+\qquad J = \frac{\partial M}{\partial \theta}\bigg|_{\theta^\star}.
+\]</span></p>
+<div class="all-at-once">
+<p>Subtract <span class="math inline">\(\theta^\star = M(\theta^\star)\)</span> from both sides and drop the second order term:</p>
+<p><span class="math display">\[
+\theta^{(t+1)} - \theta^\star \approx J \, (\theta^{(t)} - \theta^\star)
+\qquad \Longrightarrow \qquad
+\theta^{(t)} - \theta^\star \approx J^{\,t} \, (\theta^{(0)} - \theta^\star).
+\]</span></p>
+<p>The error is multiplied by <span class="math inline">\(J\)</span> at every iteration, so it shrinks geometrically at the rate of the largest eigenvalue of <span class="math inline">\(J\)</span>. That is what <strong>linear convergence</strong> means: a fixed number of extra iterations buys a fixed number of extra digits.</p>
 </div>
 
 </section></section>
