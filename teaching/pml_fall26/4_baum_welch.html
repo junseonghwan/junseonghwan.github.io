@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="4_baum_welch_files/libs/clipboard/clipboard.min.js"></script>
+<script src="4_baum_welch_files/libs/quarto-html/tabby.min.js"></script>
+<script src="4_baum_welch_files/libs/quarto-html/popper.min.js"></script>
+<script src="4_baum_welch_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="4_baum_welch_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="4_baum_welch_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="4_baum_welch_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.40">
+
+  <meta name="author" content="Seong-Hwan Jun">
+  <title>Probabilistic Machine Learning</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="4_baum_welch_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="4_baum_welch_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="4_baum_welch_files/libs/revealjs/dist/theme/quarto-8651012f02df9268b4f164d78f1a96f0.css">
+  <link href="4_baum_welch_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="4_baum_welch_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="4_baum_welch_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="4_baum_welch_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="4_baum_welch_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="4_baum_welch_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Probabilistic Machine Learning</h1>
+  <p class="subtitle">Learning hidden Markov models: the Baum-Welch algorithm</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Seong-Hwan Jun 
+</div>
+        <p class="quarto-title-affiliation">
+            Department of Biostatistics and Computational Biology, University of Rochester Medical Center
+          </p>
+    </div>
+</div>
+
+</section>
+<section>
+<section id="monday-again" class="title-slide slide level1 center">
+<h1>Monday, again</h1>
+<p>The computations Wednesday builds on, copied from Monday.</p>
+</section>
+<section id="the-joint-distribution" class="slide level2">
+<h2>The joint distribution</h2>
+<p>Chain rule along the arrows:</p>
+<p><span class="math display">\[
+p(z_{1:T}, y_{1:T} \mid \theta) = \underbrace{p(z_1)}_{\pi} \; \prod_{t=2}^{T} \underbrace{p(z_t \mid z_{t-1})}_{A} \; \prod_{t=1}^{T} \underbrace{p(y_t \mid z_t)}_{\phi}.
+\]</span></p>
+<div class="all-at-once">
+<p>Set beside the mixture model,</p>
+<p><span class="math display">\[
+p(z_{1:N}, y_{1:N} \mid \theta) = \prod_{i=1}^{N} p(z_i) \, p(y_i \mid z_i),
+\]</span></p>
+<p>the only new object is the middle product. Everything we know about emissions carries over untouched.</p>
+</div>
+</section>
+<section id="the-forward-variable" class="slide level2">
+<h2>The forward variable</h2>
+<p><span class="math display">\[
+\alpha_t(k) \;:=\; p(y_{1:t}, \, z_t = k).
+\]</span></p>
+<p>The joint probability of everything seen <strong>up to</strong> time <span class="math inline">\(t\)</span>, together with being in state <span class="math inline">\(k\)</span> at time <span class="math inline">\(t\)</span>.</p>
+<div class="all-at-once">
+<p>Write <span class="math inline">\(B_t(k) := p(y_t \mid z_t = k)\)</span> for the emission probability of what was seen at <span class="math inline">\(t\)</span>. Then</p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_t(k) &amp;= \sum_{j} p(y_{1:t}, z_{t-1}=j, z_t=k) \\
+&amp;= \sum_j \underbrace{p(y_{1:t-1}, z_{t-1}=j)}_{\alpha_{t-1}(j)} \; \underbrace{p(z_t=k \mid z_{t-1}=j)}_{A_{jk}} \; \underbrace{p(y_t \mid z_t=k)}_{B_t(k)}
+\end{aligned}
+\]</span></p>
+<p>using the Markov property and the locality of emissions. So</p>
+<p><span class="math display">\[
+\boxed{\;\alpha_t(k) = B_t(k) \sum_{j=1}^{K} \alpha_{t-1}(j) \, A_{jk}\;}
+\]</span></p>
+</div>
+</section>
+<section id="the-forward-recursion-end-to-end" class="slide level2">
+<h2>The forward recursion, end to end</h2>
+<p><span class="math display">\[
+\begin{aligned}
+\textbf{initialize:} \quad &amp; \alpha_1(k) = \pi_k \, B_1(k) \\
+\textbf{recurse:} \quad &amp; \alpha_t(k) = B_t(k) \sum_{j} \alpha_{t-1}(j) A_{jk}, \qquad t = 2, \ldots, T \\
+\textbf{terminate:} \quad &amp; p(y_{1:T}) = \sum_{k} \alpha_T(k).
+\end{aligned}
+\]</span></p>
+<div class="all-at-once">
+<ul>
+<li><span class="math inline">\(T\)</span> steps, each a <span class="math inline">\(K \times K\)</span> matrix-vector product: <span class="math inline">\(O(TK^2)\)</span>.</li>
+<li>Question 1, the likelihood, is already answered, and we have not touched a single path.</li>
+<li>In matrix form, with <span class="math inline">\(\alpha_t\)</span> and <span class="math inline">\(B_t\)</span> as row vectors of length <span class="math inline">\(K\)</span>: <span class="math inline">\(\alpha_t = (\alpha_{t-1} A) \odot B_t\)</span>, where <span class="math inline">\(\odot\)</span> is the elementwise product, <span class="math inline">\((u \odot v)_k = u_k v_k\)</span>.</li>
+</ul>
+</div>
+</section>
+<section id="numerical-stability" class="slide level2">
+<h2>Numerical stability</h2>
+<p><span class="math inline">\(\alpha_t(k)\)</span> is a joint probability of <span class="math inline">\(t\)</span> observations. It decays geometrically and underflows within a few hundred steps.</p>
+<p>The standard fix is to normalize as we go. Define <span class="math inline">\(c_t := p(y_t \mid y_{1:t-1})\)</span> and</p>
+<p><span class="math display">\[
+\hat{\alpha}_t(k) := \frac{\alpha_t(k)}{p(y_{1:t})} = p(z_t = k \mid y_{1:t}).
+\]</span></p>
+<div class="all-at-once">
+<ul>
+<li><span class="math inline">\(\hat{\alpha}_t\)</span> is the <strong>filtering distribution</strong>: an interpretable quantity that sums to one, rather than a vanishing number.</li>
+<li>The recursion becomes <strong>predict, then update</strong>: <span class="math inline">\(\hat{\alpha}_t \propto (\hat{\alpha}_{t-1} A) \odot B_t\)</span>, and the normalizer at step <span class="math inline">\(t\)</span> is exactly <span class="math inline">\(c_t\)</span>.</li>
+<li>The normalizers give the likelihood for free: <span class="math inline">\(\;\log p(y_{1:T}) = \sum_{t=1}^{T} \log c_t\)</span>.</li>
+<li>The alternative is to run everything in log space with <code>logsumexp</code>, as we did for the mixture model.</li>
+</ul>
+</div>
+</section>
+<section id="the-backward-variable" class="slide level2">
+<h2>The backward variable</h2>
+<p><span class="math display">\[
+\beta_t(k) \;:=\; p(y_{t+1:T} \mid z_t = k).
+\]</span></p>
+<p>The probability of everything <strong>after</strong> <span class="math inline">\(t\)</span>, given the state at <span class="math inline">\(t\)</span>. Condition on <span class="math inline">\(z_{t+1}\)</span> and use the same two independences:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\beta_t(k) &amp;= \sum_{j} p(z_{t+1} = j \mid z_t = k) \; p(y_{t+1} \mid z_{t+1} = j) \; p(y_{t+2:T} \mid z_{t+1} = j) \\
+&amp;= \sum_{j} A_{kj} \, B_{t+1}(j) \, \beta_{t+1}(j).
+\end{aligned}
+\]</span></p>
+<div class="all-at-once">
+<p><span class="math display">\[
+\begin{aligned}
+\textbf{initialize:} \quad &amp; \beta_T(k) = 1 \qquad \text{(nothing comes after } T\text{)} \\
+\textbf{recurse:} \quad &amp; \beta_t(k) = \sum_{j} A_{kj} \, B_{t+1}(j) \, \beta_{t+1}(j), \qquad t = T-1, \ldots, 1.
+\end{aligned}
+\]</span></p>
+<p>Same cost, run right to left. Note <span class="math inline">\(\beta\)</span> is a <em>conditional likelihood</em>, not a distribution over states: it need not sum to one, and it needs the same rescaling as <span class="math inline">\(\alpha\)</span>.</p>
+</div>
+</section>
+<section id="putting-the-two-passes-together" class="slide level2">
+<h2>Putting the two passes together</h2>
+<p>Because <span class="math inline">\(y_{1:t}\)</span> and <span class="math inline">\(y_{t+1:T}\)</span> are conditionally independent given <span class="math inline">\(z_t\)</span>:</p>
+<p><span class="math display">\[
+p(y_{1:T}, z_t = k) = \underbrace{p(y_{1:t}, z_t=k)}_{\alpha_t(k)} \cdot \underbrace{p(y_{t+1:T} \mid z_t = k)}_{\beta_t(k)}
+\]</span></p>
+<div class="all-at-once">
+<p><strong>Smoothed marginals</strong>, the posterior over each state:</p>
+<p><span class="math display">\[
+\gamma_t(k) := p(z_t = k \mid y_{1:T}) = \frac{\alpha_t(k)\,\beta_t(k)}{p(y_{1:T})}.
+\]</span></p>
+<p><strong>Pairwise marginals</strong>, the posterior over each transition:</p>
+<p><span class="math display">\[
+\xi_t(j,k) := p(z_{t-1}=j, z_t=k \mid y_{1:T}) = \frac{\alpha_{t-1}(j) \, A_{jk} \, B_t(k) \, \beta_t(k)}{p(y_{1:T})}.
+\]</span></p>
+</div>
+</section>
+<section id="exercise-derive-xi-and-write-it-up" class="slide level2 scrollable">
+<h2>Exercise: derive <span class="math inline">\(\xi\)</span>, and write it up</h2>
+<p>On paper first, then typed up in a Quarto document. This is the week’s lab exercise.</p>
+<div class="all-at-once">
+<ol type="1">
+<li>Starting from the definition <span class="math inline">\(\xi_t(j,k) = p(z_{t-1}=j, z_t=k \mid y_{1:T})\)</span>, show that <span class="math display">\[
+\xi_t(j,k) = \frac{\alpha_{t-1}(j) \, A_{jk} \, B_t(k) \, \beta_t(k)}{p(y_{1:T})}.
+\]</span></li>
+<li>Sum <span class="math inline">\(\xi_t(j,k)\)</span> over <span class="math inline">\(j\)</span> and show that you recover <span class="math inline">\(\gamma_t(k)\)</span>.</li>
+<li>Repeat part 1 with the rescaled quantities <span class="math inline">\(\hat\alpha_{t-1}(j) = p(z_{t-1}=j \mid y_{1:t-1})\)</span> and <span class="math inline">\(\hat\beta_t(k) = \beta_t(k) / p(y_{t+1:T} \mid y_{1:t})\)</span>, and show that <span class="math display">\[
+\xi_t(j,k) = \frac{\hat\alpha_{t-1}(j) \, A_{jk} \, B_t(k) \, \hat\beta_t(k)}{c_t}, \qquad c_t = p(y_t \mid y_{1:t-1}).
+\]</span></li>
+</ol>
+</div>
+</section>
+<section id="goals" class="slide level2">
+<h2>Goals</h2>
+<ul>
+<li>Generate rolls from a casino you designed, and compare their likelihood under two models with the forward algorithm.</li>
+<li>Write down the complete data log likelihood of an HMM and its maximizer when the states are known.</li>
+<li>Show that the expected complete data log likelihood depends on the posterior only through <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(\xi\)</span>, and hence that forward-backward is the whole E-step.</li>
+<li>Derive the M-step for <span class="math inline">\(\pi\)</span>, <span class="math inline">\(A\)</span> and two emission families, and recognize them in the code.</li>
+<li>Run Baum-Welch on your rolls and judge whether it recovered your choices.</li>
+<li>Read the results critically: restarts, local optima, sample size, and priors.</li>
+</ul>
+</section></section>
+<section>
+<section id="your-own-casino" class="title-slide slide level1 center">
+<h1>Your own casino</h1>
+
+</section>
+<section id="mondays-code-which-you-will-need" class="slide level2">
+<h2>Monday’s code, which you will need</h2>
+<div id="f6dab100" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="kw">def</span> forward(logB, pi, A):</span>
+<span id="cb1-2"><a href=""></a>    T, K <span class="op">=</span> logB.shape</span>
+<span id="cb1-3"><a href=""></a>    B <span class="op">=</span> np.exp(logB)</span>
+<span id="cb1-4"><a href=""></a>    alpha, c <span class="op">=</span> np.zeros((T, K)), np.zeros(T)</span>
+<span id="cb1-5"><a href=""></a>    a <span class="op">=</span> pi <span class="op">*</span> B[<span class="dv">0</span>]</span>
+<span id="cb1-6"><a href=""></a>    c[<span class="dv">0</span>] <span class="op">=</span> a.<span class="bu">sum</span>()<span class="op">;</span> alpha[<span class="dv">0</span>] <span class="op">=</span> a <span class="op">/</span> c[<span class="dv">0</span>]</span>
+<span id="cb1-7"><a href=""></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, T):</span>
+<span id="cb1-8"><a href=""></a>        a <span class="op">=</span> (alpha[t<span class="op">-</span><span class="dv">1</span>] <span class="op">@</span> A) <span class="op">*</span> B[t]</span>
+<span id="cb1-9"><a href=""></a>        c[t] <span class="op">=</span> a.<span class="bu">sum</span>()<span class="op">;</span> alpha[t] <span class="op">=</span> a <span class="op">/</span> c[t]</span>
+<span id="cb1-10"><a href=""></a>    <span class="cf">return</span> alpha, c</span>
+<span id="cb1-11"><a href=""></a></span>
+<span id="cb1-12"><a href=""></a><span class="kw">def</span> backward(logB, A, c):</span>
+<span id="cb1-13"><a href=""></a>    T, K <span class="op">=</span> logB.shape</span>
+<span id="cb1-14"><a href=""></a>    B <span class="op">=</span> np.exp(logB)</span>
+<span id="cb1-15"><a href=""></a>    beta <span class="op">=</span> np.zeros((T, K))<span class="op">;</span> beta[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-16"><a href=""></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(T<span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb1-17"><a href=""></a>        beta[t] <span class="op">=</span> (A <span class="op">@</span> (B[t<span class="op">+</span><span class="dv">1</span>] <span class="op">*</span> beta[t<span class="op">+</span><span class="dv">1</span>])) <span class="op">/</span> c[t<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb1-18"><a href=""></a>    <span class="cf">return</span> beta</span>
+<span id="cb1-19"><a href=""></a></span>
+<span id="cb1-20"><a href=""></a><span class="kw">def</span> forward_backward(logB, pi, A):</span>
+<span id="cb1-21"><a href=""></a>    alpha, c <span class="op">=</span> forward(logB, pi, A)</span>
+<span id="cb1-22"><a href=""></a>    beta <span class="op">=</span> backward(logB, A, c)</span>
+<span id="cb1-23"><a href=""></a>    B <span class="op">=</span> np.exp(logB)</span>
+<span id="cb1-24"><a href=""></a>    gamma <span class="op">=</span> alpha <span class="op">*</span> beta</span>
+<span id="cb1-25"><a href=""></a>    xi <span class="op">=</span> alpha[:<span class="op">-</span><span class="dv">1</span>, :, <span class="va">None</span>] <span class="op">*</span> A[<span class="va">None</span>] <span class="op">*</span> (B[<span class="dv">1</span>:] <span class="op">*</span> beta[<span class="dv">1</span>:])[:, <span class="va">None</span>, :] <span class="op">/</span> c[<span class="dv">1</span>:, <span class="va">None</span>, <span class="va">None</span>]</span>
+<span id="cb1-26"><a href=""></a>    <span class="cf">return</span> gamma, xi, np.log(c).<span class="bu">sum</span>(), alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="design-your-casino" class="slide level2">
+<h2>Design your casino</h2>
+<p>Three numbers are yours to choose. Everything in this lecture runs on them.</p>
+<div class="all-at-once">
+<ul>
+<li><span class="math inline">\(p_6\)</span>: the probability that the loaded die shows a six. The other five faces share the rest equally.</li>
+<li><span class="math inline">\(a_{FF}\)</span>: the probability that the dealer keeps the fair die from one roll to the next.</li>
+<li><span class="math inline">\(a_{LL}\)</span>: the probability that the dealer keeps the loaded die.</li>
+</ul>
+</div>
+<div id="f400be67" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="kw">def</span> make_casino(p_six, stay_fair, stay_loaded):</span>
+<span id="cb2-2"><a href=""></a>    pi <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>])</span>
+<span id="cb2-3"><a href=""></a>    A <span class="op">=</span> np.array([[stay_fair, <span class="dv">1</span> <span class="op">-</span> stay_fair],</span>
+<span id="cb2-4"><a href=""></a>                  [<span class="dv">1</span> <span class="op">-</span> stay_loaded, stay_loaded]])</span>
+<span id="cb2-5"><a href=""></a>    B <span class="op">=</span> np.vstack([np.ones(<span class="dv">6</span>) <span class="op">/</span> <span class="dv">6</span>,</span>
+<span id="cb2-6"><a href=""></a>                   np.r_[np.repeat((<span class="dv">1</span> <span class="op">-</span> p_six) <span class="op">/</span> <span class="dv">5</span>, <span class="dv">5</span>), p_six]])</span>
+<span id="cb2-7"><a href=""></a>    <span class="cf">return</span> pi, A, B</span>
+<span id="cb2-8"><a href=""></a></span>
+<span id="cb2-9"><a href=""></a>pi_cas, A_cas, B_cas <span class="op">=</span> make_casino(p_six<span class="op">=</span><span class="fl">0.5</span>, stay_fair<span class="op">=</span><span class="fl">0.9</span>, stay_loaded<span class="op">=</span><span class="fl">0.8</span>)   <span class="co"># my choices</span></span>
+<span id="cb2-10"><a href=""></a><span class="bu">print</span>(<span class="st">"A =</span><span class="ch">\n</span><span class="st">"</span>, A_cas, <span class="st">"</span><span class="ch">\n</span><span class="st">B =</span><span class="ch">\n</span><span class="st">"</span>, np.<span class="bu">round</span>(B_cas, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A =
+ [[0.9 0.1]
+ [0.2 0.8]] 
+B =
+ [[0.167 0.167 0.167 0.167 0.167 0.167]
+ [0.1   0.1   0.1   0.1   0.1   0.5  ]]</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>Mine are the numbers behind Monday’s rolls. Pick something different: a barely loaded die, a dealer who almost never switches, a dealer who switches every roll. Each teaches something different, and we compare notes at the end.</p>
+</div>
+</section>
+<section id="simulate-it" class="slide level2">
+<h2>Simulate it</h2>
+<div id="cb63facd" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a><span class="kw">def</span> simulate_casino(T, pi, A, B, seed):</span>
+<span id="cb4-2"><a href=""></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb4-3"><a href=""></a>    z, y <span class="op">=</span> np.zeros(T, dtype<span class="op">=</span><span class="bu">int</span>), np.zeros(T, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb4-4"><a href=""></a>    z[<span class="dv">0</span>] <span class="op">=</span> rng.choice(<span class="dv">2</span>, p<span class="op">=</span>pi)<span class="op">;</span> y[<span class="dv">0</span>] <span class="op">=</span> rng.choice(<span class="dv">6</span>, p<span class="op">=</span>B[z[<span class="dv">0</span>]]) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb4-5"><a href=""></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, T):</span>
+<span id="cb4-6"><a href=""></a>        z[t] <span class="op">=</span> rng.choice(<span class="dv">2</span>, p<span class="op">=</span>A[z[t<span class="op">-</span><span class="dv">1</span>]])<span class="op">;</span> y[t] <span class="op">=</span> rng.choice(<span class="dv">6</span>, p<span class="op">=</span>B[z[t]]) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb4-7"><a href=""></a>    <span class="cf">return</span> z, y</span>
+<span id="cb4-8"><a href=""></a></span>
+<span id="cb4-9"><a href=""></a>z_sim, y_sim <span class="op">=</span> simulate_casino(<span class="dv">300</span>, pi_cas, A_cas, B_cas, seed<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-10"><a href=""></a><span class="bu">print</span>(<span class="st">"rolls :"</span>, <span class="st">""</span>.join(<span class="bu">str</span>(r) <span class="cf">for</span> r <span class="kw">in</span> y_sim[:<span class="dv">70</span>]))</span>
+<span id="cb4-11"><a href=""></a><span class="bu">print</span>(<span class="st">"die   :"</span>, <span class="st">""</span>.join(<span class="st">"L"</span> <span class="cf">if</span> s <span class="cf">else</span> <span class="st">"."</span> <span class="cf">for</span> s <span class="kw">in</span> z_sim[:<span class="dv">70</span>]))</span>
+<span id="cb4-12"><a href=""></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>(y_sim <span class="op">==</span> <span class="dv">6</span>)<span class="sc">.</span>mean()<span class="sc">:.0%}</span><span class="ss"> sixes overall, </span><span class="sc">{</span>(y_sim[z_sim <span class="op">==</span> <span class="dv">1</span>] <span class="op">==</span> <span class="dv">6</span>)<span class="sc">.</span>mean()<span class="sc">:.0%}</span><span class="ss"> while the loaded die was in use"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>rolls : 6633145332266361564162455551631524633166221122134534323162556442246666
+die   : L...........LL........................................LLLLLLLLL...LLLL
+26% sixes overall, 47% while the loaded die was in use</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>Keep <code>z</code>. You will not show it to the algorithm, but you will need it to grade the algorithm’s answers.</p>
+</div>
+</section>
+<section id="the-likelihood-of-your-rolls" class="slide level2">
+<h2>The likelihood of your rolls</h2>
+<p>You have the rolls, and you have the <span class="math inline">\(\theta\)</span> that produced them. Compute <span class="math inline">\(\log p(y_{1:T} \mid \theta)\)</span>.</p>
+<div class="all-at-once">
+<ul>
+<li>No code on this slide. You have <code>forward</code> from Monday and the slide <em>Numerical stability</em>; work out what to call and what to do with what comes back.</li>
+<li>Wrap it in a function of <code>(y, pi, A, B)</code>. You will call it many times today.</li>
+</ul>
+</div>
+<div id="11b2c054" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-stdout">
+<pre><code>my casino, my rolls :  -530.56</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>Mine, for reference. Yours will differ, and it should be negative and of a similar size, a few hundred nats for 300 rolls.</p>
+</div>
+</section>
+<section id="now-under-one-fair-die" class="slide level2">
+<h2>Now under one fair die</h2>
+<p>Same rolls, a different story: every roll is an independent draw from six equally likely faces. No dealer, no hidden state. Compute <span class="math inline">\(\log p(y_{1:T})\)</span> under this model.</p>
+<div class="all-at-once">
+<ul>
+<li>Two routes. Write down the closed form, or notice that this is a one-state HMM and feed <code>forward</code> a <span class="math inline">\(1 \times 1\)</span> transition matrix. They must agree.</li>
+</ul>
+</div>
+<div id="5b593a49" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-stdout">
+<pre><code>one fair die :  -537.53
+my casino    :  -530.56
+difference   :     6.96 nats, or 0.023 per roll</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>Seven nats: my rolls are about <span class="math inline">\(e^7 \approx 1000\)</span> times more probable under the two-dice story than under one fair die. That is 0.023 nats per roll: on average a roll is only about 2% more probable under the two-dice story than under a fair die. No single roll gives the casino away; three hundred of them together do.</p>
+</div>
+</section>
+<section id="how-well-did-yours-hide" class="slide level2">
+<h2>How well did yours hide?</h2>
+<div id="5c4282a7" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>rows <span class="op">=</span> []</span>
+<span id="cb8-2"><a href=""></a><span class="cf">for</span> p6 <span class="kw">in</span> (<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>):</span>
+<span id="cb8-3"><a href=""></a>    pi_, A_, B_ <span class="op">=</span> make_casino(p6, <span class="fl">0.9</span>, <span class="fl">0.8</span>)</span>
+<span id="cb8-4"><a href=""></a>    _, y_ <span class="op">=</span> simulate_casino(<span class="dv">300</span>, pi_, A_, B_, seed<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb8-5"><a href=""></a>    rows.append({<span class="st">"p_6"</span>: p6, <span class="st">"one fair die"</span>: <span class="bu">round</span>(<span class="dv">300</span> <span class="op">*</span> np.log(<span class="dv">1</span><span class="op">/</span><span class="dv">6</span>), <span class="dv">1</span>),</span>
+<span id="cb8-6"><a href=""></a>                 <span class="st">"the casino"</span>: <span class="bu">round</span>(loglik_hmm(y_, pi_, A_, B_), <span class="dv">1</span>),</span>
+<span id="cb8-7"><a href=""></a>                 <span class="st">"difference (nats)"</span>: <span class="bu">round</span>(loglik_hmm(y_, pi_, A_, B_) <span class="op">-</span> <span class="dv">300</span> <span class="op">*</span> np.log(<span class="dv">1</span><span class="op">/</span><span class="dv">6</span>), <span class="dv">1</span>)})</span>
+<span id="cb8-8"><a href=""></a>md_table(pd.DataFrame(rows))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="7">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>p_6</th>
+<th>one fair die</th>
+<th>the casino</th>
+<th>difference (nats)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.25</td>
+<td>-537.5</td>
+<td>-537.8</td>
+<td>-0.2</td>
+</tr>
+<tr class="even">
+<td>0.5</td>
+<td>-537.5</td>
+<td>-528.2</td>
+<td>9.3</td>
+</tr>
+<tr class="odd">
+<td>0.9</td>
+<td>-537.5</td>
+<td>-475.9</td>
+<td>61.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="all-at-once">
+<ul>
+<li>A die that shows a six a quarter of the time is invisible in 300 rolls: the one-die model fits the rolls just as well. A die that shows a six nine times in ten is unmissable.</li>
+<li>Compare with your neighbour. Whoever chose the smaller <span class="math inline">\(p_6\)</span> has the harder problem, and everything that follows, learning included, will be harder for them.</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="em-algorithm-baum-welch" class="title-slide slide level1 center">
+<h1>EM algorithm (Baum-Welch)</h1>
+
+</section>
+<section id="review-of-em" class="slide level2">
+<h2>Review of EM</h2>
+<p>For any distribution <span class="math inline">\(q\)</span> over the hidden variables, Week 3 gave us</p>
+<p><span class="math display">\[
+\ell(\theta) = \mathcal{L}(q, \theta) + \text{KL}\big( q \,\|\, p(z_{1:T} \mid y_{1:T}, \theta) \big),
+\qquad
+\mathcal{L}(q, \theta) = \mathbb{E}_q\big[\log p(z_{1:T}, y_{1:T} \mid \theta)\big] + H(q).
+\]</span></p>
+<div class="all-at-once">
+<p>Nothing in the derivation used the mixture structure, so the recipe is unchanged:</p>
+<ul>
+<li><strong>E-step</strong>: maximize <span class="math inline">\(\mathcal{L}\)</span> over <span class="math inline">\(q\)</span>. The maximizer is the posterior, <span class="math inline">\(q = p(z_{1:T} \mid y_{1:T}, \theta^{(s)})\)</span>, and the bound becomes tight.</li>
+<li><strong>M-step</strong>: maximize <span class="math inline">\(\mathcal{L}\)</span> over <span class="math inline">\(\theta\)</span>. The entropy drops out, leaving <span class="math inline">\(Q(\theta \mid \theta^{(s)}) = \mathbb{E}_q[\log p(z_{1:T}, y_{1:T} \mid \theta)]\)</span>.</li>
+</ul>
+</div>
+<div class="all-at-once">
+<p>The difference is what <span class="math inline">\(q\)</span> <em>is</em>. In Week 3 it was <span class="math inline">\(N\)</span> independent distributions over <span class="math inline">\(K\)</span> labels, <span class="math inline">\(N(K-1)\)</span> numbers. Now it is a single distribution over <span class="math inline">\(K^T\)</span> paths. We cannot write it down as a table, and we should not try.</p>
+</div>
+<div class="all-at-once">
+<div class="question">
+<p>Derive the <span class="math inline">\(Q\)</span> function for the HMM by writing out the expectation. Start from Monday’s joint, <span class="math inline">\(p(z_{1:T}, y_{1:T} \mid \theta) = \pi_{z_1} \prod_{t=2}^{T} A_{z_{t-1} z_t} \prod_{t=1}^{T} p(y_t \mid \phi_{z_t})\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="the-complete-data-log-likelihood" class="slide level2">
+<h2>The complete data log likelihood</h2>
+<p>Take the log of Monday’s joint and write each factor with indicators:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\log p(z_{1:T}, y_{1:T} \mid \theta)
+&amp;= \sum_{k} 1[z_1 = k] \log \pi_k \\
+&amp;\quad + \sum_{t=2}^{T} \sum_{j, k} 1[z_{t-1} = j, z_t = k] \log A_{jk} \\
+&amp;\quad + \sum_{t=1}^{T} \sum_{k} 1[z_t = k] \log p(y_t \mid \phi_k).
+\end{aligned}
+\]</span></p>
+<div class="all-at-once">
+<ul>
+<li>Three separate pieces: one for <span class="math inline">\(\pi\)</span>, one for <span class="math inline">\(A\)</span>, one for <span class="math inline">\(\phi\)</span>. They share no parameters.</li>
+<li>Each piece is <strong>linear in the indicators</strong>. That is the property that made EM work for the mixture, and it survives the chain.</li>
+</ul>
+</div>
+</section>
+<section id="now-take-the-expectation" class="slide level2">
+<h2>Now take the expectation</h2>
+<p>The E-step needs <span class="math inline">\(Q(\theta \mid \theta^{(s)}) = \mathbb{E}_q[\log p(z_{1:T}, y_{1:T} \mid \theta)]\)</span> with <span class="math inline">\(q = p(z_{1:T} \mid y_{1:T}, \theta^{(s)})\)</span>.</p>
+<div class="question">
+<p>Take the expectation of each line on the previous slide. What is <span class="math inline">\(\mathbb{E}_q\, 1[z_t = k]\)</span>? What is <span class="math inline">\(\mathbb{E}_q\, 1[z_{t-1} = j, z_t = k]\)</span>?</p>
+</div>
+</section>
+<section id="q-only-needs-marginals" class="slide level2">
+<h2><span class="math inline">\(Q\)</span> only needs marginals</h2>
+<p>Each line of the complete data log likelihood is linear in the indicators, so the expectation passes straight through to them:</p>
+<div class="all-at-once">
+<p><span class="math display">\[
+\begin{aligned}
+Q(\theta \mid \theta^{(s)})
+&amp;= \sum_{k} \underbrace{\mathbb{E}_q\, 1[z_1 = k]}_{\gamma_1(k)} \log \pi_k \\
+&amp;\quad + \sum_{t=2}^{T} \sum_{j, k} \underbrace{\mathbb{E}_q\, 1[z_{t-1} = j, z_t = k]}_{\xi_t(j, k)} \log A_{jk} \\
+&amp;\quad + \sum_{t=1}^{T} \sum_{k} \underbrace{\mathbb{E}_q\, 1[z_t = k]}_{\gamma_t(k)} \log p(y_t \mid \phi_k).
+\end{aligned}
+\]</span></p>
+</div>
+<div class="all-at-once">
+<p>The expectation of an indicator is a probability, so the posterior over <span class="math inline">\(K^T\)</span> paths enters only through <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(\xi\)</span>: <span class="math inline">\(T\)</span> vectors and <span class="math inline">\(T-1\)</span> matrices, which forward-backward computes. That is why Monday’s algorithm returned those two objects and nothing else.</p>
+</div>
+</section>
+<section id="the-complete-data-estimators" class="slide level2">
+<h2>The complete data estimators</h2>
+<p>Suppose for a moment that the states were known. Collect the indicators into counts, <span class="math inline">\(n_{jk} = \sum_{t \geq 2} 1[z_{t-1} = j, z_t = k]\)</span> transitions from <span class="math inline">\(j\)</span> to <span class="math inline">\(k\)</span> and <span class="math inline">\(n_k = \sum_t 1[z_t = k]\)</span> visits to <span class="math inline">\(k\)</span>, and maximize each piece on its own:</p>
+<p><span class="math display">\[
+\hat{\pi}_k = 1[z_1 = k], \qquad
+\hat{A}_{jk} = \frac{n_{jk}}{\sum_{k'} n_{jk'}}, \qquad
+\hat{\phi}_k = \operatorname{argmax}_{\phi} \sum_{t \,:\, z_t = k} \log p(y_t \mid \phi).
+\]</span></p>
+<div class="all-at-once">
+<ul>
+<li><span class="math inline">\(A\)</span>: divide the transition counts by the row totals. The constraint <span class="math inline">\(\sum_k A_{jk} = 1\)</span> is what makes it a proportion rather than a raw count; we derive it properly in a moment.</li>
+<li><span class="math inline">\(\phi_k\)</span>: the ordinary MLE for the emission family, applied to the observations in state <span class="math inline">\(k\)</span>. For a categorical emission, symbol frequencies; for a Gaussian, the mean and variance.</li>
+<li><span class="math inline">\(\pi\)</span>: with one sequence there is exactly one draw from <span class="math inline">\(\pi\)</span>, so the estimate is a point mass on <span class="math inline">\(z_1\)</span>. Nothing more can be learned about <span class="math inline">\(\pi\)</span> from a single sequence. With several sequences, it is the fraction that start in each state.</li>
+</ul>
+</div>
+</section>
+<section id="expected-counts" class="slide level2">
+<h2>Expected counts</h2>
+<p>Compare <span class="math inline">\(Q\)</span> with the complete data log likelihood term by term. Every count has become an <strong>expected count</strong>:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>known states</th>
+<th>unknown states</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(1[z_1 = k]\)</span></td>
+<td><span class="math inline">\(\gamma_1(k)\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(n_{jk} = \sum_{t \geq 2} 1[z_{t-1} = j, z_t = k]\)</span></td>
+<td><span class="math inline">\(\bar{n}_{jk} = \sum_{t \geq 2} \xi_t(j, k)\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(n_k = \sum_t 1[z_t = k]\)</span></td>
+<td><span class="math inline">\(\bar{n}_k = \sum_t \gamma_t(k)\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="all-at-once">
+<p>These are the soft counts of Week 3, now including a soft count for every transition. <span class="math inline">\(\bar{n}_{jk} = 17.3\)</span> means the data supply the equivalent of <span class="math inline">\(17.3\)</span> observed <span class="math inline">\(j \to k\)</span> transitions.</p>
+</div>
+</section>
+<section id="the-m-step-for-a" class="slide level2">
+<h2>The M-step for <span class="math inline">\(A\)</span></h2>
+<p>Maximize <span class="math inline">\(\sum_{j,k} \bar{n}_{jk} \log A_{jk}\)</span> subject to <span class="math inline">\(\sum_k A_{jk} = 1\)</span> for every <span class="math inline">\(j\)</span>. The rows separate, so fix <span class="math inline">\(j\)</span> and add a Lagrange multiplier:</p>
+<p><span class="math display">\[
+\frac{\partial}{\partial A_{jk}} \Big[ \sum_{k'} \bar{n}_{jk'} \log A_{jk'} - \lambda_j \Big( \sum_{k'} A_{jk'} - 1 \Big) \Big]
+= \frac{\bar{n}_{jk}}{A_{jk}} - \lambda_j = 0
+\;\;\Longrightarrow\;\; A_{jk} = \frac{\bar{n}_{jk}}{\lambda_j}.
+\]</span></p>
+<div class="all-at-once">
+<p>Summing over <span class="math inline">\(k\)</span> and using the constraint gives <span class="math inline">\(\lambda_j = \sum_k \bar{n}_{jk}\)</span>, so</p>
+<p><span class="math display">\[
+\boxed{\; A_{jk}^{(s+1)} = \frac{\sum_{t=2}^{T} \xi_t(j, k)}{\sum_{t=2}^{T} \sum_{k'} \xi_t(j, k')} \;}
+\]</span></p>
+<p>Expected <span class="math inline">\(j \to k\)</span> transitions, divided by expected departures from <span class="math inline">\(j\)</span>.</p>
+<p>The same calculation with <span class="math inline">\(\gamma_1\)</span> gives <span class="math inline">\(\pi_k^{(s+1)} = \gamma_1(k)\)</span>, and with the symbol counts gives the categorical emission update.</p>
+</div>
+</section>
+<section id="the-m-step-for-the-emissions" class="slide level2">
+<h2>The M-step for the emissions</h2>
+<p>The emission piece of <span class="math inline">\(Q\)</span> is <span class="math inline">\(\sum_k \sum_t \gamma_t(k) \log p(y_t \mid \phi_k)\)</span>: a <strong>weighted</strong> log likelihood for each state, with <span class="math inline">\(\gamma_t(k)\)</span> as the weight on <span class="math inline">\(y_t\)</span>. Whatever the family, it is Week 3’s M-step with <span class="math inline">\(\gamma\)</span> in place of <span class="math inline">\(r\)</span>.</p>
+<div class="all-at-once">
+<p><strong>Categorical</strong> on symbols <span class="math inline">\(1, \ldots, M\)</span>, <span class="math inline">\(p(y_t = m \mid z_t = k) = B_{km}\)</span>:</p>
+<p><span class="math display">\[
+B_{km} = \frac{\sum_t \gamma_t(k) \, 1[y_t = m]}{\bar{n}_k}
+\qquad \text{expected number of } m\text{'s emitted in state } k, \text{ divided by expected visits to } k.
+\]</span></p>
+</div>
+<div class="all-at-once">
+<div class="question">
+<p>Derive the categorical update from <span class="math inline">\(Q\)</span> with a Lagrange multiplier, exactly as for <span class="math inline">\(A\)</span>. Where does the row constraint <span class="math inline">\(\sum_m B_{km} = 1\)</span> enter?</p>
+</div>
+</div>
+</section>
+<section id="mixture-and-hmm-side-by-side" class="slide level2">
+<h2>Mixture and HMM, side by side</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>mixture (Week 3)</th>
+<th>HMM (today)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>hidden variables</td>
+<td><span class="math inline">\(z_i\)</span>, independent</td>
+<td><span class="math inline">\(z_t\)</span>, a Markov chain</td>
+</tr>
+<tr class="even">
+<td>posterior</td>
+<td><span class="math inline">\(\prod_i p(z_i \mid y_i)\)</span></td>
+<td><span class="math inline">\(p(z_{1:T} \mid y_{1:T})\)</span>, no factorization</td>
+</tr>
+<tr class="odd">
+<td>E-step computes</td>
+<td><span class="math inline">\(r_{ik}\)</span>, by Bayes’ theorem</td>
+<td><span class="math inline">\(\gamma_t(k)\)</span> and <span class="math inline">\(\xi_t(j,k)\)</span>, by forward-backward</td>
+</tr>
+<tr class="even">
+<td>E-step cost</td>
+<td><span class="math inline">\(O(NK)\)</span></td>
+<td><span class="math inline">\(O(TK^2)\)</span></td>
+</tr>
+<tr class="odd">
+<td>M-step for weights</td>
+<td><span class="math inline">\(\pi_k = \bar{n}_k / N\)</span></td>
+<td><span class="math inline">\(A_{jk} = \bar{n}_{jk} / \sum_{k'} \bar{n}_{jk'}\)</span></td>
+</tr>
+<tr class="even">
+<td>M-step for emissions</td>
+<td>weighted MLE with <span class="math inline">\(r\)</span></td>
+<td>weighted MLE with <span class="math inline">\(\gamma\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="all-at-once">
+<p>One row is new: the transition update, which needs the pairwise marginals. Everything else is the algorithm you implemented in Lab 3 with a different E-step plugged in.</p>
+</div>
+</section>
+<section id="the-algorithm" class="slide level2 scrollable">
+<h2>The algorithm</h2>
+<p><strong>Baum-Welch</strong> (Baum, Petrie, Soules and Weiss, 1970; seven years before Dempster, Laird and Rubin named the general recipe).</p>
+<div class="all-at-once">
+<p>Initialize <span class="math inline">\(\theta^{(0)}\)</span>. Repeat until <span class="math inline">\(\ell\)</span> stops increasing:</p>
+<ol type="1">
+<li><strong>E-step.</strong> Run forward-backward at <span class="math inline">\(\theta^{(s)}\)</span>. Record <span class="math inline">\(\ell(\theta^{(s)})\)</span>, <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(\xi\)</span>.</li>
+<li><strong>M-step.</strong> <span class="math inline">\(\pi \leftarrow \gamma_1\)</span>; <span class="math inline">\(A_{jk} \leftarrow \sum_t \xi_t(j,k) \big/ \sum_{t,k'} \xi_t(j,k')\)</span>; <span class="math inline">\(\phi_k \leftarrow\)</span> weighted MLE of the emission family with weights <span class="math inline">\(\gamma_t(k)\)</span>.</li>
+</ol>
+</div>
+<div class="all-at-once">
+<p>Cost per iteration: one forward-backward pass, <span class="math inline">\(O(TK^2)\)</span>, plus an M-step that is linear in <span class="math inline">\(T\)</span>. The guarantees are EM’s: <span class="math inline">\(\ell\)</span> never decreases, and the iterates converge to a stationary point.</p>
+<p>In the code on the next slides, the E-step is one call to <code>forward_backward</code> and the M-step is the three lines after it, one per piece of <span class="math inline">\(Q\)</span>.</p>
+</div>
+</section>
+<section id="the-code-you-are-given" class="slide level2">
+<h2>The code you are given</h2>
+<div id="da40ecdc" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="kw">class</span> Categorical:</span>
+<span id="cb9-2"><a href=""></a>    <span class="co">"""y_t | z_t = k ~ Categorical(B[k, :]) on the symbols 1, ..., M."""</span></span>
+<span id="cb9-3"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, M):</span>
+<span id="cb9-4"><a href=""></a>        <span class="va">self</span>.M <span class="op">=</span> M</span>
+<span id="cb9-5"><a href=""></a>    <span class="kw">def</span> init(<span class="va">self</span>, y, K, rng):</span>
+<span id="cb9-6"><a href=""></a>        <span class="cf">return</span> <span class="bu">dict</span>(B<span class="op">=</span>rng.dirichlet(np.full(<span class="va">self</span>.M, <span class="fl">5.0</span>), size<span class="op">=</span>K))</span>
+<span id="cb9-7"><a href=""></a>    <span class="kw">def</span> logB(<span class="va">self</span>, y, phi):</span>
+<span id="cb9-8"><a href=""></a>        <span class="cf">return</span> np.log(phi[<span class="st">"B"</span>][:, y <span class="op">-</span> <span class="dv">1</span>].T)</span>
+<span id="cb9-9"><a href=""></a>    <span class="kw">def</span> update(<span class="va">self</span>, y, gamma):</span>
+<span id="cb9-10"><a href=""></a>        counts <span class="op">=</span> np.column_stack([gamma[y <span class="op">==</span> m].<span class="bu">sum</span>(<span class="dv">0</span>) <span class="cf">for</span> m <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="va">self</span>.M <span class="op">+</span> <span class="dv">1</span>)])</span>
+<span id="cb9-11"><a href=""></a>        <span class="cf">return</span> <span class="bu">dict</span>(B<span class="op">=</span>counts <span class="op">/</span> counts.<span class="bu">sum</span>(<span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb9-12"><a href=""></a></span>
+<span id="cb9-13"><a href=""></a><span class="kw">def</span> baum_welch(y, K, emission, seed<span class="op">=</span><span class="dv">0</span>, max_iter<span class="op">=</span><span class="dv">500</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, init<span class="op">=</span><span class="va">None</span>, prior_A<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb9-14"><a href=""></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb9-15"><a href=""></a>    <span class="cf">if</span> init <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb9-16"><a href=""></a>        pi, A, phi <span class="op">=</span> np.repeat(<span class="dv">1</span><span class="op">/</span>K, K), rng.dirichlet(np.full(K, <span class="fl">5.0</span>), size<span class="op">=</span>K), emission.init(y, K, rng)</span>
+<span id="cb9-17"><a href=""></a>    <span class="cf">else</span>:</span>
+<span id="cb9-18"><a href=""></a>        pi, A, phi <span class="op">=</span> init</span>
+<span id="cb9-19"><a href=""></a>    trace, objective <span class="op">=</span> [], []</span>
+<span id="cb9-20"><a href=""></a>    <span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb9-21"><a href=""></a>        gamma, xi, ll, _ <span class="op">=</span> forward_backward(emission.logB(y, phi), pi, A)    <span class="co"># E-step</span></span>
+<span id="cb9-22"><a href=""></a>        trace.append(ll)</span>
+<span id="cb9-23"><a href=""></a>        objective.append(ll <span class="cf">if</span> prior_A <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> ll <span class="op">+</span> ((prior_A <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> np.log(A)).<span class="bu">sum</span>())</span>
+<span id="cb9-24"><a href=""></a>        <span class="cf">if</span> it <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> objective[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> objective[<span class="op">-</span><span class="dv">2</span>] <span class="op">&lt;</span> tol:</span>
+<span id="cb9-25"><a href=""></a>            <span class="cf">break</span></span>
+<span id="cb9-26"><a href=""></a>        pi <span class="op">=</span> gamma[<span class="dv">0</span>]                                                         <span class="co"># M-step</span></span>
+<span id="cb9-27"><a href=""></a>        n_trans <span class="op">=</span> xi.<span class="bu">sum</span>(<span class="dv">0</span>)</span>
+<span id="cb9-28"><a href=""></a>        <span class="cf">if</span> prior_A <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:                                               <span class="co"># MAP variant, see later</span></span>
+<span id="cb9-29"><a href=""></a>            n_trans <span class="op">=</span> n_trans <span class="op">+</span> prior_A <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb9-30"><a href=""></a>        A <span class="op">=</span> n_trans <span class="op">/</span> n_trans.<span class="bu">sum</span>(<span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-31"><a href=""></a>        phi <span class="op">=</span> emission.update(y, gamma)</span>
+<span id="cb9-32"><a href=""></a>    <span class="cf">return</span> <span class="bu">dict</span>(pi<span class="op">=</span>pi, A<span class="op">=</span>A, phi<span class="op">=</span>phi, gamma<span class="op">=</span>gamma, ll<span class="op">=</span>ll, iters<span class="op">=</span>it <span class="op">+</span> <span class="dv">1</span>, trace<span class="op">=</span>np.array(trace))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="all-at-once">
+<p>The E-step is one call to Monday’s <code>forward_backward</code>; the M-step is the three lines after it. <code>Categorical</code> supplies a random start, the matrix <span class="math inline">\(\log B_t(k)\)</span>, and the update from the soft counts. Run it on your rolls.</p>
+</div>
+</section>
+<section id="watch-one-run" class="slide level2">
+<h2>Watch one run</h2>
+<div id="f2adf0fc" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>fit0 <span class="op">=</span> baum_welch(y_cas, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), seed<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-2"><a href=""></a></span>
+<span id="cb10-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb10-4"><a href=""></a>ax.plot(fit0[<span class="st">"trace"</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span>M1)</span>
+<span id="cb10-5"><a href=""></a>ax.set_xlabel(<span class="st">"iteration"</span>)<span class="op">;</span> ax.set_ylabel(<span class="vs">r"$\ell(\theta^{(s)})$"</span>)</span>
+<span id="cb10-6"><a href=""></a>ax.set_title(<span class="ss">f"</span><span class="sc">{</span>fit0[<span class="st">'iters'</span>]<span class="sc">}</span><span class="ss"> iterations (the cap); last increase </span><span class="sc">{</span>np<span class="sc">.</span>diff(fit0[<span class="st">'trace'</span>])[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.1e}</span><span class="ss"> nats"</span>, loc<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="dv">13</span>)</span>
+<span id="cb10-7"><a href=""></a>plt.tight_layout()<span class="op">;</span> plt.show()</span>
+<span id="cb10-8"><a href=""></a></span>
+<span id="cb10-9"><a href=""></a><span class="bu">print</span>(<span class="ss">f"monotone: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">all</span>(np.diff(fit0[<span class="st">'trace'</span>]) <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">1e-9</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-10"><a href=""></a><span class="bu">print</span>(<span class="ss">f"final log likelihood </span><span class="sc">{</span>fit0[<span class="st">'ll'</span>]<span class="sc">:.2f}</span><span class="ss">, versus </span><span class="sc">{</span>forward_backward(np.log(B_cas[:, y_cas<span class="op">-</span><span class="dv">1</span>].T), pi_cas, A_cas)[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss"> at the true parameters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="4_baum_welch_files/figure-revealjs/cell-10-output-1.png" width="1142" height="375"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>monotone: True
+final log likelihood -526.62, versus -530.56 at the true parameters</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>The likelihood never goes down. A big jump in the first few iterations, then a crawl that is still going when the iteration cap stops it, each step adding a fraction of a thousandth of a nat. Does yours look the same? Keep the shape in mind; we come back to it.</p>
+</div>
+</section>
+<section id="ten-restarts-on-my-rolls" class="slide level2">
+<h2>Ten restarts on my rolls</h2>
+<div id="226490b4" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>fits_cas <span class="op">=</span> [baum_welch(y_cas, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), seed<span class="op">=</span>s) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
+<span id="cb12-2"><a href=""></a></span>
+<span id="cb12-3"><a href=""></a><span class="kw">def</span> ordered(fit):</span>
+<span id="cb12-4"><a href=""></a>    <span class="co">"""Relabel so that state 1 is the die with the higher probability of a six."""</span></span>
+<span id="cb12-5"><a href=""></a>    o <span class="op">=</span> np.argsort(fit[<span class="st">"phi"</span>][<span class="st">"B"</span>][:, <span class="dv">5</span>])</span>
+<span id="cb12-6"><a href=""></a>    <span class="cf">return</span> fit[<span class="st">"A"</span>][np.ix_(o, o)], fit[<span class="st">"phi"</span>][<span class="st">"B"</span>][o]</span>
+<span id="cb12-7"><a href=""></a></span>
+<span id="cb12-8"><a href=""></a>rows <span class="op">=</span> []</span>
+<span id="cb12-9"><a href=""></a><span class="cf">for</span> s, f <span class="kw">in</span> <span class="bu">enumerate</span>(fits_cas):</span>
+<span id="cb12-10"><a href=""></a>    A_o, B_o <span class="op">=</span> ordered(f)</span>
+<span id="cb12-11"><a href=""></a>    rows.append({<span class="st">"seed"</span>: s, <span class="st">"iterations"</span>: f[<span class="st">"iters"</span>], <span class="st">"log likelihood"</span>: <span class="bu">round</span>(f[<span class="st">"ll"</span>], <span class="dv">2</span>),</span>
+<span id="cb12-12"><a href=""></a>                 <span class="st">"A_00"</span>: <span class="bu">round</span>(A_o[<span class="dv">0</span>, <span class="dv">0</span>], <span class="dv">2</span>), <span class="st">"A_11"</span>: <span class="bu">round</span>(A_o[<span class="dv">1</span>, <span class="dv">1</span>], <span class="dv">2</span>),</span>
+<span id="cb12-13"><a href=""></a>                 <span class="st">"p(6 | state 0)"</span>: <span class="bu">round</span>(B_o[<span class="dv">0</span>, <span class="dv">5</span>], <span class="dv">2</span>), <span class="st">"p(6 | state 1)"</span>: <span class="bu">round</span>(B_o[<span class="dv">1</span>, <span class="dv">5</span>], <span class="dv">2</span>)})</span>
+<span id="cb12-14"><a href=""></a>md_table(pd.DataFrame(rows).sort_values(<span class="st">"log likelihood"</span>, ascending<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="10">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>seed</th>
+<th>iterations</th>
+<th>log likelihood</th>
+<th>A_00</th>
+<th>A_11</th>
+<th>p(6 | state 0)</th>
+<th>p(6 | state 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>500</td>
+<td>-525.83</td>
+<td>0.63</td>
+<td>0.02</td>
+<td>0.24</td>
+<td>0.25</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>500</td>
+<td>-525.84</td>
+<td>0.62</td>
+<td>0.04</td>
+<td>0.24</td>
+<td>0.25</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>500</td>
+<td>-525.84</td>
+<td>0.63</td>
+<td>0.02</td>
+<td>0.24</td>
+<td>0.25</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>500</td>
+<td>-525.88</td>
+<td>0.6</td>
+<td>0.1</td>
+<td>0.24</td>
+<td>0.24</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>446</td>
+<td>-526.54</td>
+<td>0.92</td>
+<td>0.74</td>
+<td>0.16</td>
+<td>0.53</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>372</td>
+<td>-526.54</td>
+<td>0.92</td>
+<td>0.74</td>
+<td>0.16</td>
+<td>0.53</td>
+</tr>
+<tr class="odd">
+<td>0</td>
+<td>500</td>
+<td>-526.62</td>
+<td>0.6</td>
+<td>0.64</td>
+<td>0.0</td>
+<td>0.46</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>338</td>
+<td>-526.71</td>
+<td>0.92</td>
+<td>0.87</td>
+<td>0.13</td>
+<td>0.43</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>500</td>
+<td>-526.94</td>
+<td>0.75</td>
+<td>0.63</td>
+<td>0.06</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>500</td>
+<td>-526.99</td>
+<td>0.67</td>
+<td>0.61</td>
+<td>0.0</td>
+<td>0.53</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="all-at-once">
+<p>Several solutions, and most runs were still creeping when the cap stopped them. The ones that look like the casino, two sticky states and one die with a six near <span class="math inline">\(0.5\)</span>, sit about half a nat below the best. The best likelihood belongs to something that looks like nothing we put in.</p>
+</div>
+</section>
+<section id="exercise-did-it-recover-your-values" class="slide level2">
+<h2>Exercise: did it recover your values?</h2>
+<div id="4ee8f90a" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a>best_cas <span class="op">=</span> <span class="bu">max</span>(fits_cas, key<span class="op">=</span><span class="kw">lambda</span> f: f[<span class="st">"ll"</span>])</span>
+<span id="cb13-2"><a href=""></a>A_o, B_o <span class="op">=</span> ordered(best_cas)</span>
+<span id="cb13-3"><a href=""></a><span class="bu">print</span>(<span class="st">"A:</span><span class="ch">\n</span><span class="st">"</span>, np.<span class="bu">round</span>(A_o, <span class="dv">3</span>))</span>
+<span id="cb13-4"><a href=""></a><span class="bu">print</span>(<span class="st">"B (rows: states, columns: faces 1..6):</span><span class="ch">\n</span><span class="st">"</span>, np.<span class="bu">round</span>(B_o, <span class="dv">3</span>))</span>
+<span id="cb13-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">log likelihood </span><span class="sc">{</span>best_cas[<span class="st">'ll'</span>]<span class="sc">:.2f}</span><span class="ss">   true parameters: </span><span class="sc">{</span>forward_backward(np.log(B_cas[:, y_cas<span class="op">-</span><span class="dv">1</span>].T), pi_cas, A_cas)[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb13-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"agreement with the true states: </span><span class="sc">{</span><span class="bu">max</span>((best_cas[<span class="st">'gamma'</span>].argmax(<span class="dv">1</span>) <span class="op">==</span> x_cas).mean(), (best_cas[<span class="st">'gamma'</span>].argmax(<span class="dv">1</span>) <span class="op">!=</span> x_cas).mean())<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>A:
+ [[0.632 0.368]
+ [0.98  0.02 ]]
+B (rows: states, columns: faces 1..6):
+ [[0.024 0.122 0.179 0.218 0.222 0.236]
+ [0.399 0.261 0.    0.031 0.058 0.251]]
+
+log likelihood -525.83   true parameters: -530.56
+agreement with the true states: 56.7%</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>Mine: a solution that explains these rolls <em>better</em> than the truth, by five nats, and looks like nothing I put in. Not a bug. Maximum likelihood explains this sample, and 300 weakly informative rolls do not pin down 13 parameters.</p>
+</div>
+<div class="all-at-once">
+<div class="question">
+<p>Run ten restarts on your rolls. Compare the best fit with your three numbers. Which came out closest, and does your <span class="math inline">\(p_6\)</span> or your <span class="math inline">\(T\)</span> explain what you see? Keep your answer; the rest of the lecture is about it.</p>
+</div>
+</div>
+</section></section>
+<section>
+<section id="old-faithful-learned-from-scratch" class="title-slide slide level1 center">
+<h1>Old Faithful, learned from scratch</h1>
+
+</section>
+<section id="gaussian-emissions" class="slide level2">
+<h2>Gaussian emissions</h2>
+<p>The only thing that changes for Old Faithful. The M-step for a Gaussian family is the weighted mean and variance with weights <span class="math inline">\(\gamma_t(k)\)</span>, exactly Week 3’s update with <span class="math inline">\(\gamma\)</span> in place of <span class="math inline">\(r\)</span>:</p>
+<p><span class="math display">\[
+\mu_k = \frac{\sum_t \gamma_t(k) \, y_t}{\bar{n}_k}, \qquad
+\sigma_k^2 = \frac{\sum_t \gamma_t(k) \, (y_t - \mu_k)^2}{\bar{n}_k}.
+\]</span></p>
+<div id="b855d8be" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a><span class="kw">class</span> Gaussian:</span>
+<span id="cb15-2"><a href=""></a>    <span class="co">"""y_t | z_t = k ~ Normal(mu_k, sd_k^2)."""</span></span>
+<span id="cb15-3"><a href=""></a>    <span class="kw">def</span> init(<span class="va">self</span>, y, K, rng):</span>
+<span id="cb15-4"><a href=""></a>        <span class="cf">return</span> <span class="bu">dict</span>(mu<span class="op">=</span>rng.choice(y, K, replace<span class="op">=</span><span class="va">False</span>), sd<span class="op">=</span>np.repeat(y.std(), K))</span>
+<span id="cb15-5"><a href=""></a>    <span class="kw">def</span> logB(<span class="va">self</span>, y, phi):</span>
+<span id="cb15-6"><a href=""></a>        <span class="cf">return</span> np.column_stack([norm.logpdf(y, m, s) <span class="cf">for</span> m, s <span class="kw">in</span> <span class="bu">zip</span>(phi[<span class="st">"mu"</span>], phi[<span class="st">"sd"</span>])])</span>
+<span id="cb15-7"><a href=""></a>    <span class="kw">def</span> update(<span class="va">self</span>, y, gamma):</span>
+<span id="cb15-8"><a href=""></a>        n_bar <span class="op">=</span> gamma.<span class="bu">sum</span>(<span class="dv">0</span>)</span>
+<span id="cb15-9"><a href=""></a>        mu <span class="op">=</span> gamma.T <span class="op">@</span> y <span class="op">/</span> n_bar</span>
+<span id="cb15-10"><a href=""></a>        sd <span class="op">=</span> np.sqrt((gamma <span class="op">*</span> (y[:, <span class="va">None</span>] <span class="op">-</span> mu)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>(<span class="dv">0</span>) <span class="op">/</span> n_bar)</span>
+<span id="cb15-11"><a href=""></a>        <span class="cf">return</span> <span class="bu">dict</span>(mu<span class="op">=</span>mu, sd<span class="op">=</span>sd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-fit" class="slide level2">
+<h2>The fit</h2>
+<div id="05392af8" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>fits_of <span class="op">=</span> [baum_welch(dur, <span class="dv">2</span>, Gaussian(), seed<span class="op">=</span>s) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
+<span id="cb16-2"><a href=""></a>hmm_of <span class="op">=</span> <span class="bu">max</span>(fits_of, key<span class="op">=</span><span class="kw">lambda</span> f: f[<span class="st">"ll"</span>])</span>
+<span id="cb16-3"><a href=""></a>order <span class="op">=</span> np.argsort(hmm_of[<span class="st">"phi"</span>][<span class="st">"mu"</span>])              <span class="co"># state 0 = short, state 1 = long</span></span>
+<span id="cb16-4"><a href=""></a></span>
+<span id="cb16-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"iterations per restart : </span><span class="sc">{</span>[f[<span class="st">'iters'</span>] <span class="cf">for</span> f <span class="kw">in</span> fits_of]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"log likelihoods        : </span><span class="sc">{</span>pd<span class="sc">.</span>Series(np.<span class="bu">round</span>([f[<span class="st">'ll'</span>] <span class="cf">for</span> f <span class="kw">in</span> fits_of], <span class="dv">2</span>))<span class="sc">.</span>value_counts()<span class="sc">.</span>to_dict()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-7"><a href=""></a><span class="bu">print</span>(<span class="ss">f"mu = </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">round</span>(hmm_of[<span class="st">'phi'</span>][<span class="st">'mu'</span>][order], <span class="dv">2</span>)<span class="sc">}</span><span class="ss">,  sd = </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">round</span>(hmm_of[<span class="st">'phi'</span>][<span class="st">'sd'</span>][order], <span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-8"><a href=""></a><span class="bu">print</span>(<span class="st">"learned transition matrix (short, long):"</span>)</span>
+<span id="cb16-9"><a href=""></a><span class="bu">print</span>(np.<span class="bu">round</span>(hmm_of[<span class="st">"A"</span>][np.ix_(order, order)], <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>iterations per restart : [358, 17, 19, 14, 26, 17, 500, 30, 23, 20]
+log likelihoods        : {-243.59: 8, -421.42: 2}
+mu = [2.04 4.29],  sd = [0.26 0.41]
+learned transition matrix (short, long):
+[[0.062 0.938]
+ [0.521 0.479]]</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<p>Compare with the table we built on Monday <strong>from the labels</strong>:</p>
+<div id="03479961" class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="14">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>from</th>
+<th>to short</th>
+<th>to long</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>short</td>
+<td>0.07</td>
+<td>0.93</td>
+</tr>
+<tr class="even">
+<td>long</td>
+<td>0.544</td>
+<td>0.456</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Baum-Welch never saw the labels. It recovered the transition structure from the durations alone, and eight of ten random starts reached this solution, most within a few dozen iterations.</p>
+<p>The other two stopped at a likelihood of <span class="math inline">\(-421\)</span> with two <em>identical</em> states, both at <span class="math inline">\(3.5\)</span> minutes with a huge variance. Durations repeat in this data set, the initializer drew the same value twice, and a symmetric start is a fixed point of EM. Restarts are not optional.</p>
+</div>
+</section>
+<section id="was-the-ordering-worth-it" class="slide level2">
+<h2>Was the ordering worth it?</h2>
+<div id="82c07ea2" class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="15">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>model</th>
+<th>parameters</th>
+<th>log likelihood</th>
+<th>agreement with kind</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>mixture (ignores order)</td>
+<td>5</td>
+<td>-276.4</td>
+<td>97.4%</td>
+</tr>
+<tr class="even">
+<td>HMM (uses order)</td>
+<td>7</td>
+<td>-243.6</td>
+<td>98.2%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="all-at-once">
+<p>Thirty three nats for two extra parameters, almost exactly the gain we predicted on Monday from the label sequence alone. The model found the same structure without supervision.</p>
+<p>The mixture is the HMM with both rows of <span class="math inline">\(A\)</span> forced equal, so this is a nested comparison and the likelihood ratio test from Monday applies.</p>
+</div>
+</section>
+<section id="the-learned-dynamics-unrolled" class="slide level2">
+<h2>The learned dynamics, unrolled</h2>
+<div id="033639b4" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">4</span>))</span>
+<span id="cb18-2"><a href=""></a>ax.plot(dur, color<span class="op">=</span><span class="st">"0.7"</span>, lw<span class="op">=</span><span class="dv">1</span>, zorder<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb18-3"><a href=""></a>ax.scatter(np.arange(<span class="bu">len</span>(dur)), dur, c<span class="op">=</span>hmm_of[<span class="st">"gamma"</span>][:, order[<span class="dv">1</span>]], cmap<span class="op">=</span><span class="st">"coolwarm"</span>, s<span class="op">=</span><span class="dv">32</span>, zorder<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb18-4"><a href=""></a>           vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb18-5"><a href=""></a>ax.set_xlim(<span class="dv">0</span>, <span class="dv">80</span>)<span class="op">;</span> ax.set_xlabel(<span class="st">"eruption number"</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">"duration (min)"</span>)</span>
+<span id="cb18-6"><a href=""></a>ax.set_title(<span class="vs">r"colour: $\gamma_t(\mathrm</span><span class="sc">{long}</span><span class="vs">)$ from the fitted HMM"</span>, loc<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="dv">13</span>)</span>
+<span id="cb18-7"><a href=""></a>plt.tight_layout()<span class="op">;</span> plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="4_baum_welch_files/figure-revealjs/cell-17-output-1.png" width="1238" height="372"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="all-at-once">
+<p>Same first eighty eruptions as Monday’s opening slide, coloured by the posterior instead of the recorded label. The ambiguous durations around three minutes are where the ordering helps: the mixture judges them by duration alone, and the HMM also asks what came before and after.</p>
+</div>
+</section></section>
+<section>
+<section id="the-casino-continued" class="title-slide slide level1 center">
+<h1>The casino, continued</h1>
+
+</section>
+<section id="more-data" class="slide level2">
+<h2>More data</h2>
+<p>Simulate longer sequences from my casino and fit from a fixed, deliberately vague start: symmetric sticky <span class="math inline">\(A\)</span>, one fair die, one die mildly favouring six.</p>
+<div id="3e539efc" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>start <span class="op">=</span> (np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>]), np.array([[<span class="fl">0.8</span>, <span class="fl">0.2</span>], [<span class="fl">0.2</span>, <span class="fl">0.8</span>]]),</span>
+<span id="cb19-2"><a href=""></a>         <span class="bu">dict</span>(B<span class="op">=</span>np.vstack([np.ones(<span class="dv">6</span>) <span class="op">/</span> <span class="dv">6</span>, [<span class="fl">.14</span>, <span class="fl">.14</span>, <span class="fl">.14</span>, <span class="fl">.14</span>, <span class="fl">.14</span>, <span class="fl">.30</span>]])))</span>
+<span id="cb19-3"><a href=""></a></span>
+<span id="cb19-4"><a href=""></a>rows <span class="op">=</span> []</span>
+<span id="cb19-5"><a href=""></a><span class="cf">for</span> T, (z_T, y_T) <span class="kw">in</span> [(<span class="dv">300</span>, (x_cas, y_cas)), (<span class="dv">1000</span>, simulate_casino(<span class="dv">1000</span>, pi_cas, A_cas, B_cas, <span class="dv">11</span>)), (<span class="dv">5000</span>, simulate_casino(<span class="dv">5000</span>, pi_cas, A_cas, B_cas, <span class="dv">11</span>))]:</span>
+<span id="cb19-6"><a href=""></a>    f <span class="op">=</span> baum_welch(y_T, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), init<span class="op">=</span>start, max_iter<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb19-7"><a href=""></a>    A_o, B_o <span class="op">=</span> ordered(f)</span>
+<span id="cb19-8"><a href=""></a>    ll_true <span class="op">=</span> forward_backward(np.log(B_cas[:, y_T<span class="op">-</span><span class="dv">1</span>].T), pi_cas, A_cas)[<span class="dv">2</span>]</span>
+<span id="cb19-9"><a href=""></a>    rows.append({<span class="st">"T"</span>: T, <span class="st">"iterations"</span>: f[<span class="st">"iters"</span>], <span class="st">"A_00"</span>: <span class="bu">round</span>(A_o[<span class="dv">0</span>, <span class="dv">0</span>], <span class="dv">3</span>), <span class="st">"A_11"</span>: <span class="bu">round</span>(A_o[<span class="dv">1</span>, <span class="dv">1</span>], <span class="dv">3</span>),</span>
+<span id="cb19-10"><a href=""></a>                 <span class="st">"p(6 | fair)"</span>: <span class="bu">round</span>(B_o[<span class="dv">0</span>, <span class="dv">5</span>], <span class="dv">3</span>), <span class="st">"p(6 | loaded)"</span>: <span class="bu">round</span>(B_o[<span class="dv">1</span>, <span class="dv">5</span>], <span class="dv">3</span>),</span>
+<span id="cb19-11"><a href=""></a>                 <span class="st">"ll(learned) - ll(truth)"</span>: <span class="bu">round</span>(f[<span class="st">"ll"</span>] <span class="op">-</span> ll_true, <span class="dv">1</span>)})</span>
+<span id="cb19-12"><a href=""></a>md_table(pd.DataFrame(rows))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="17">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>T</th>
+<th>iterations</th>
+<th>A_00</th>
+<th>A_11</th>
+<th>p(6 | fair)</th>
+<th>p(6 | loaded)</th>
+<th>ll(learned) - ll(truth)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>300</td>
+<td>116</td>
+<td>0.937</td>
+<td>0.901</td>
+<td>0.126</td>
+<td>0.408</td>
+<td>4.2</td>
+</tr>
+<tr class="even">
+<td>1000</td>
+<td>125</td>
+<td>0.973</td>
+<td>0.863</td>
+<td>0.181</td>
+<td>0.577</td>
+<td>8.3</td>
+</tr>
+<tr class="odd">
+<td>5000</td>
+<td>300</td>
+<td>0.938</td>
+<td>0.844</td>
+<td>0.166</td>
+<td>0.496</td>
+<td>6.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="all-at-once">
+<ul>
+<li>Truth: <span class="math inline">\(A_{00} = 0.9\)</span>, <span class="math inline">\(A_{11} = 0.8\)</span>, <span class="math inline">\(p(6 \mid \text{fair}) = 0.167\)</span>, <span class="math inline">\(p(6 \mid \text{loaded}) = 0.5\)</span>. The estimates approach it as <span class="math inline">\(T\)</span> grows. Maximum likelihood is consistent; it is just not magic at <span class="math inline">\(T = 300\)</span>. If your casino was not recovered, try your own parameters with <span class="math inline">\(T = 5000\)</span>.</li>
+<li>The learned likelihood beats the truth’s on every sequence. It always will on the data it was fitted to. That is what “maximum” means, and it is why the likelihood cannot be used to check whether the truth was found.</li>
+</ul>
+</div>
+</section>
+<section id="a-prior-fixes-the-small-sample" class="slide level2">
+<h2>A prior fixes the small sample</h2>
+<p>We know more than the likelihood does: a dealer who switches dice on every roll is not the story. Put a Dirichlet prior on each row of <span class="math inline">\(A\)</span> and maximize the posterior instead.</p>
+<p><span class="math display">\[
+A_{j, \cdot} \sim \text{Dirichlet}(\alpha_{j, \cdot})
+\quad\Longrightarrow\quad
+A_{jk}^{(s+1)} = \frac{\bar{n}_{jk} + \alpha_{jk} - 1}{\sum_{k'} \big( \bar{n}_{jk'} + \alpha_{jk'} - 1 \big)}.
+\]</span></p>
+<div class="all-at-once">
+<p>The pseudo-counts <span class="math inline">\(\alpha_{jk} - 1\)</span> are added to the expected counts and nothing else changes. Week 2’s conjugacy, inside the M-step. EM is now maximizing <span class="math inline">\(\ell(\theta) + \log p(\theta)\)</span>, the monotonicity argument goes through unchanged, and that is the quantity the stopping rule must watch: <span class="math inline">\(\ell\)</span> alone may dip.</p>
+</div>
+</section>
+<section id="what-the-prior-did" class="slide level2">
+<h2>What the prior did</h2>
+<div id="2bdfa617" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a>prior_A <span class="op">=</span> np.array([[<span class="dv">11</span>, <span class="dv">2</span>], [<span class="dv">2</span>, <span class="dv">11</span>]])         <span class="co"># ten pseudo-transitions of persistence per state</span></span>
+<span id="cb20-2"><a href=""></a>fits_map <span class="op">=</span> [baum_welch(y_cas, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), seed<span class="op">=</span>s, prior_A<span class="op">=</span>prior_A) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
+<span id="cb20-3"><a href=""></a>best_map <span class="op">=</span> <span class="bu">max</span>(fits_map, key<span class="op">=</span><span class="kw">lambda</span> f: f[<span class="st">"ll"</span>])</span>
+<span id="cb20-4"><a href=""></a>A_o, B_o <span class="op">=</span> ordered(best_map)</span>
+<span id="cb20-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"log likelihood by restart : </span><span class="sc">{</span>pd<span class="sc">.</span>Series(np.<span class="bu">round</span>([f[<span class="st">'ll'</span>] <span class="cf">for</span> f <span class="kw">in</span> fits_map], <span class="dv">1</span>))<span class="sc">.</span>value_counts()<span class="sc">.</span>to_dict()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"iterations by restart     : </span><span class="sc">{</span>[f[<span class="st">'iters'</span>] <span class="cf">for</span> f <span class="kw">in</span> fits_map]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-7"><a href=""></a><span class="bu">print</span>(<span class="ss">f"A (fair, loaded):</span><span class="ch">\n</span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">round</span>(A_o, <span class="dv">3</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-8"><a href=""></a><span class="bu">print</span>(<span class="ss">f"p(6 | fair) = </span><span class="sc">{</span>B_o[<span class="dv">0</span>, <span class="dv">5</span>]<span class="sc">:.3f}</span><span class="ss">,   p(6 | loaded) = </span><span class="sc">{</span>B_o[<span class="dv">1</span>, <span class="dv">5</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb20-9"><a href=""></a><span class="bu">print</span>(<span class="ss">f"agreement with the true states: </span><span class="sc">{</span><span class="bu">max</span>((best_map[<span class="st">'gamma'</span>].argmax(<span class="dv">1</span>) <span class="op">==</span> x_cas).mean(), (best_map[<span class="st">'gamma'</span>].argmax(<span class="dv">1</span>) <span class="op">!=</span> x_cas).mean())<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>log likelihood by restart : {-526.4: 9, -526.7: 1}
+iterations by restart     : [98, 117, 113, 171, 89, 132, 64, 170, 158, 139]
+A (fair, loaded):
+[[0.926 0.074]
+ [0.099 0.901]]
+p(6 | fair) = 0.120,   p(6 | loaded) = 0.398
+agreement with the true states: 76.0%</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<ul>
+<li>All ten restarts now reach the same solution, nine of them to three decimals. It has the structure that generated the rolls: one fair die, one die that favours six, and a dealer who keeps each die for a stretch. The numbers are still off, <span class="math inline">\(p_6 \approx 0.4\)</span> rather than <span class="math inline">\(0.5\)</span> and <span class="math inline">\(A_{11} \approx 0.9\)</span> rather than <span class="math inline">\(0.8\)</span>, but the story is the right one, which the unpenalized fit’s was not.</li>
+<li>The alternating solution is not forbidden, only penalized. Switching dice on nearly every roll is exactly what ten pseudo-counts of persistence make implausible, so it no longer has the highest posterior.</li>
+<li>The prior is weak: ten imaginary transitions per state against about 300 real ones. It does not pull <span class="math inline">\(A\)</span> toward any particular value; it rules out one story.</li>
+</ul>
+</div>
+</section>
+<section id="why-the-casino-crawls-and-the-geyser-sprints" class="slide level2">
+<h2>Why the casino crawls and the geyser sprints</h2>
+<div id="f2a6035d" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>f_geyser <span class="op">=</span> fits_of[<span class="dv">1</span>]</span>
+<span id="cb22-2"><a href=""></a>f_casino <span class="op">=</span> <span class="bu">max</span>(fits_cas, key<span class="op">=</span><span class="kw">lambda</span> f: f[<span class="st">"ll"</span>])</span>
+<span id="cb22-3"><a href=""></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="fl">4.2</span>))</span>
+<span id="cb22-4"><a href=""></a><span class="cf">for</span> ax, f, name, col <span class="kw">in</span> [(axes[<span class="dv">0</span>], f_geyser, <span class="st">"Old Faithful"</span>, M2), (axes[<span class="dv">1</span>], f_casino, <span class="st">"casino, 300 rolls"</span>, M1)]:</span>
+<span id="cb22-5"><a href=""></a>    ax.plot(f[<span class="st">"trace"</span>] <span class="op">-</span> f[<span class="st">"trace"</span>][<span class="op">-</span><span class="dv">1</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span>col)</span>
+<span id="cb22-6"><a href=""></a>    ax.set_yscale(<span class="st">"symlog"</span>, linthresh<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb22-7"><a href=""></a>    ax.set_xlabel(<span class="st">"iteration"</span>)<span class="op">;</span> ax.set_ylabel(<span class="vs">r"$\ell(\theta^{(s)}) - \ell(\hat\theta)$"</span>)</span>
+<span id="cb22-8"><a href=""></a>    ax.set_title(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>f[<span class="st">'iters'</span>]<span class="sc">}</span><span class="ss"> iterations"</span>, loc<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="dv">13</span>)</span>
+<span id="cb22-9"><a href=""></a>plt.tight_layout()<span class="op">;</span> plt.show()</span>
+<span id="cb22-10"><a href=""></a></span>
+<span id="cb22-11"><a href=""></a><span class="bu">print</span>(<span class="ss">f"average max_k gamma_t(k):  Old Faithful </span><span class="sc">{</span>f_geyser[<span class="st">'gamma'</span>]<span class="sc">.</span><span class="bu">max</span>(<span class="dv">1</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">,   casino </span><span class="sc">{</span>f_casino[<span class="st">'gamma'</span>]<span class="sc">.</span><span class="bu">max</span>(<span class="dv">1</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="4_baum_welch_files/figure-revealjs/cell-20-output-1.png" width="1331" height="395"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>average max_k gamma_t(k):  Old Faithful 0.998,   casino 0.832</code></pre>
+</div>
+</div>
+<div class="all-at-once">
+<ul>
+<li>Week 3: EM converges linearly at a rate set by the <strong>fraction of missing information</strong>.</li>
+<li>A duration nearly <em>is</em> a label: the posterior is almost certain at almost every <span class="math inline">\(t\)</span>, so the soft counts are almost the true counts and EM behaves like the one-shot complete data MLE.</li>
+<li>A roll is barely a label. Even a six leaves the posterior in doubt, the soft counts change a little each round, and EM crawls. The algorithm is not slow; the data are uninformative.</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="summary" class="title-slide slide level1 center">
+<h1>Summary</h1>
+
+</section>
+<section id="baum-welch-in-three-lines" class="slide level2">
+<h2>Baum-Welch in three lines</h2>
+<div class="all-at-once">
+<ul>
+<li>The complete data log likelihood of an HMM is linear in the indicators <span class="math inline">\(1[z_t = k]\)</span> and <span class="math inline">\(1[z_{t-1} = j, z_t = k]\)</span>, so its expectation under the posterior needs only <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(\xi\)</span>. <strong>That is why forward-backward is the E-step.</strong></li>
+<li>The M-step is counting with expected counts: transitions for <span class="math inline">\(A\)</span>, symbol or moment counts for the emissions.</li>
+<li>Everything about EM carries over: monotone, local, sensitive to initialization, and cheap to regularize with conjugate pseudo-counts.</li>
+</ul>
+</div>
+</section>
+<section id="what-to-carry-into-week-5" class="slide level2">
+<h2>What to carry into Week 5</h2>
+<div class="all-at-once">
+<ul>
+<li>Forward-backward is <strong>variable elimination on a chain</strong>: sums pushed inward, intermediate results reused. The only property of the chain we used is that it has no cycles.</li>
+<li>The same two passes on a <strong>tree</strong> are called belief propagation. Felsenstein’s pruning algorithm for phylogenies is the forward pass; the backward pass gives the posterior at every internal node.</li>
+<li>EM on a tree is Baum-Welch with tree-shaped marginals: the E-step returns <span class="math inline">\(\gamma\)</span> at every node and <span class="math inline">\(\xi\)</span> on every edge. Nothing else changes.</li>
+</ul>
+</div>
+</section>
+<section id="reading" class="slide level2">
+<h2>Reading</h2>
+<div class="all-at-once">
+<ul>
+<li><strong>Today.</strong> Bishop, <em>Pattern Recognition and Machine Learning</em> (2006), §13.2.1, <em>Maximum likelihood for the HMM</em>. MLaPP §17.5, <em>Learning for HMMs</em>, including §17.5.2 on Baum-Welch and §17.5.3 on initialization.</li>
+<li><strong>Next week: sum-product on trees.</strong> Bishop §8.4.1 to §8.4.4, <em>Inference in graphical models</em>, which builds the algorithm on factor graphs. For the same algorithm stated directly on a tree, Murphy, <em>Probabilistic Machine Learning: Advanced Topics</em> (2023), §9.2, <em>Belief propagation on chains</em>, and §9.3, <em>Belief propagation on trees</em>.</li>
+</ul>
+</div>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="4_baum_welch_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="4_baum_welch_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="4_baum_welch_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="4_baum_welch_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 8.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
