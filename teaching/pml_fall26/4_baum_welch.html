@@ -354,7 +354,7 @@ p(y_{1:T}, z_t = k) = \underbrace{p(y_{1:t}, z_t=k)}_{\alpha_t(k)} \cdot \underb
 </section>
 <section id="mondays-code-which-you-will-need" class="slide level2">
 <h2>Monday’s code, which you will need</h2>
-<div id="f6dab100" class="cell" data-execution_count="2">
+<div id="95a9a279" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="kw">def</span> forward(logB, pi, A):</span>
 <span id="cb1-2"><a href=""></a>    T, K <span class="op">=</span> logB.shape</span>
 <span id="cb1-3"><a href=""></a>    B <span class="op">=</span> np.exp(logB)</span>
@@ -393,7 +393,7 @@ p(y_{1:T}, z_t = k) = \underbrace{p(y_{1:t}, z_t=k)}_{\alpha_t(k)} \cdot \underb
 <li><span class="math inline">\(a_{LL}\)</span>: the probability that the dealer keeps the loaded die.</li>
 </ul>
 </div>
-<div id="f400be67" class="cell" data-execution_count="3">
+<div id="ec788758" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="kw">def</span> make_casino(p_six, stay_fair, stay_loaded):</span>
 <span id="cb2-2"><a href=""></a>    pi <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>])</span>
 <span id="cb2-3"><a href=""></a>    A <span class="op">=</span> np.array([[stay_fair, <span class="dv">1</span> <span class="op">-</span> stay_fair],</span>
@@ -419,7 +419,7 @@ B =
 </section>
 <section id="simulate-it" class="slide level2">
 <h2>Simulate it</h2>
-<div id="cb63facd" class="cell" data-execution_count="4">
+<div id="7961d9fb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a><span class="kw">def</span> simulate_casino(T, pi, A, B, seed):</span>
 <span id="cb4-2"><a href=""></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
 <span id="cb4-3"><a href=""></a>    z, y <span class="op">=</span> np.zeros(T, dtype<span class="op">=</span><span class="bu">int</span>), np.zeros(T, dtype<span class="op">=</span><span class="bu">int</span>)</span>
@@ -451,7 +451,7 @@ die   : L...........LL........................................LLLLLLLLL...LLLL
 <li>Wrap it in a function of <code>(y, pi, A, B)</code>. You will call it many times today.</li>
 </ul>
 </div>
-<div id="11b2c054" class="cell" data-execution_count="5">
+<div id="49f12192" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-stdout">
 <pre><code>my casino, my rolls :  -530.56</code></pre>
 </div>
@@ -468,7 +468,7 @@ die   : L...........LL........................................LLLLLLLLL...LLLL
 <li>Two routes. Write down the closed form, or notice that this is a one-state HMM and feed <code>forward</code> a <span class="math inline">\(1 \times 1\)</span> transition matrix. They must agree.</li>
 </ul>
 </div>
-<div id="5b593a49" class="cell" data-execution_count="6">
+<div id="dae25c81" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-stdout">
 <pre><code>one fair die :  -537.53
 my casino    :  -530.56
@@ -481,7 +481,7 @@ difference   :     6.96 nats, or 0.023 per roll</code></pre>
 </section>
 <section id="how-well-did-yours-hide" class="slide level2">
 <h2>How well did yours hide?</h2>
-<div id="5c4282a7" class="cell" data-execution_count="7">
+<div id="67dd2ad2" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>rows <span class="op">=</span> []</span>
@@ -755,7 +755,7 @@ B_{km} = \frac{\sum_t \gamma_t(k) \, 1[y_t = m]}{\bar{n}_k}
 </section>
 <section id="the-code-you-are-given" class="slide level2">
 <h2>The code you are given</h2>
-<div id="da40ecdc" class="cell" data-execution_count="8">
+<div id="061f2904" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="kw">class</span> Categorical:</span>
 <span id="cb9-2"><a href=""></a>    <span class="co">"""y_t | z_t = k ~ Categorical(B[k, :]) on the symbols 1, ..., M."""</span></span>
 <span id="cb9-3"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, M):</span>
@@ -795,19 +795,22 @@ B_{km} = \frac{\sum_t \gamma_t(k) \, 1[y_t = m]}{\bar{n}_k}
 </section>
 <section id="watch-one-run" class="slide level2">
 <h2>Watch one run</h2>
-<div id="f2adf0fc" class="cell" data-execution_count="9">
+<div id="6b02674d" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>fit0 <span class="op">=</span> baum_welch(y_cas, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), seed<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb10-2"><a href=""></a></span>
-<span id="cb10-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
-<span id="cb10-4"><a href=""></a>ax.plot(fit0[<span class="st">"trace"</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span>M1)</span>
-<span id="cb10-5"><a href=""></a>ax.set_xlabel(<span class="st">"iteration"</span>)<span class="op">;</span> ax.set_ylabel(<span class="vs">r"$\ell(\theta^{(s)})$"</span>)</span>
-<span id="cb10-6"><a href=""></a>ax.set_title(<span class="ss">f"</span><span class="sc">{</span>fit0[<span class="st">'iters'</span>]<span class="sc">}</span><span class="ss"> iterations (the cap); last increase </span><span class="sc">{</span>np<span class="sc">.</span>diff(fit0[<span class="st">'trace'</span>])[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.1e}</span><span class="ss"> nats"</span>, loc<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="dv">13</span>)</span>
-<span id="cb10-7"><a href=""></a>plt.tight_layout()<span class="op">;</span> plt.show()</span>
-<span id="cb10-8"><a href=""></a></span>
-<span id="cb10-9"><a href=""></a><span class="bu">print</span>(<span class="ss">f"monotone: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">all</span>(np.diff(fit0[<span class="st">'trace'</span>]) <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">1e-9</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-10"><a href=""></a><span class="bu">print</span>(<span class="ss">f"final log likelihood </span><span class="sc">{</span>fit0[<span class="st">'ll'</span>]<span class="sc">:.2f}</span><span class="ss">, versus </span><span class="sc">{</span>forward_backward(np.log(B_cas[:, y_cas<span class="op">-</span><span class="dv">1</span>].T), pi_cas, A_cas)[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss"> at the true parameters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="co"># Uncomment below to import the plotting library.</span></span>
+<span id="cb10-2"><a href=""></a><span class="co">#import matplotlib.pyplot as plt</span></span>
+<span id="cb10-3"><a href=""></a></span>
+<span id="cb10-4"><a href=""></a>fit0 <span class="op">=</span> baum_welch(y_cas, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), seed<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-5"><a href=""></a></span>
+<span id="cb10-6"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb10-7"><a href=""></a>ax.plot(fit0[<span class="st">"trace"</span>], marker<span class="op">=</span><span class="st">"o"</span>, ms<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb10-8"><a href=""></a>ax.set_xlabel(<span class="st">"iteration"</span>)<span class="op">;</span> ax.set_ylabel(<span class="vs">r"$\ell(\theta^{(s)})$"</span>)</span>
+<span id="cb10-9"><a href=""></a>ax.set_title(<span class="ss">f"</span><span class="sc">{</span>fit0[<span class="st">'iters'</span>]<span class="sc">}</span><span class="ss"> iterations (the cap); last increase </span><span class="sc">{</span>np<span class="sc">.</span>diff(fit0[<span class="st">'trace'</span>])[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.1e}</span><span class="ss"> nats"</span>, loc<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="dv">13</span>)</span>
+<span id="cb10-10"><a href=""></a>plt.tight_layout()<span class="op">;</span> plt.show()</span>
+<span id="cb10-11"><a href=""></a></span>
+<span id="cb10-12"><a href=""></a><span class="bu">print</span>(<span class="ss">f"monotone: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">all</span>(np.diff(fit0[<span class="st">'trace'</span>]) <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">1e-9</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-13"><a href=""></a><span class="bu">print</span>(<span class="ss">f"final log likelihood </span><span class="sc">{</span>fit0[<span class="st">'ll'</span>]<span class="sc">:.2f}</span><span class="ss">, versus </span><span class="sc">{</span>forward_backward(np.log(B_cas[:, y_cas<span class="op">-</span><span class="dv">1</span>].T), pi_cas, A_cas)[<span class="dv">2</span>]<span class="sc">:.2f}</span><span class="ss"> at the true parameters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -827,7 +830,7 @@ final log likelihood -526.62, versus -530.56 at the true parameters</code></pre>
 </section>
 <section id="ten-restarts-on-my-rolls" class="slide level2">
 <h2>Ten restarts on my rolls</h2>
-<div id="226490b4" class="cell" data-execution_count="10">
+<div id="529a822f" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>fits_cas <span class="op">=</span> [baum_welch(y_cas, <span class="dv">2</span>, Categorical(<span class="dv">6</span>), seed<span class="op">=</span>s) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
@@ -968,7 +971,7 @@ final log likelihood -526.62, versus -530.56 at the true parameters</code></pre>
 </section>
 <section id="exercise-did-it-recover-your-values" class="slide level2">
 <h2>Exercise: did it recover your values?</h2>
-<div id="4ee8f90a" class="cell" data-execution_count="11">
+<div id="f2631001" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a>best_cas <span class="op">=</span> <span class="bu">max</span>(fits_cas, key<span class="op">=</span><span class="kw">lambda</span> f: f[<span class="st">"ll"</span>])</span>
@@ -1011,7 +1014,7 @@ agreement with the true states: 56.7%</code></pre>
 \mu_k = \frac{\sum_t \gamma_t(k) \, y_t}{\bar{n}_k}, \qquad
 \sigma_k^2 = \frac{\sum_t \gamma_t(k) \, (y_t - \mu_k)^2}{\bar{n}_k}.
 \]</span></p>
-<div id="b855d8be" class="cell" data-execution_count="12">
+<div id="1068a43e" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a><span class="kw">class</span> Gaussian:</span>
 <span id="cb15-2"><a href=""></a>    <span class="co">"""y_t | z_t = k ~ Normal(mu_k, sd_k^2)."""</span></span>
 <span id="cb15-3"><a href=""></a>    <span class="kw">def</span> init(<span class="va">self</span>, y, K, rng):</span>
@@ -1027,7 +1030,7 @@ agreement with the true states: 56.7%</code></pre>
 </section>
 <section id="the-fit" class="slide level2">
 <h2>The fit</h2>
-<div id="05392af8" class="cell" data-execution_count="13">
+<div id="516c018a" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>fits_of <span class="op">=</span> [baum_welch(dur, <span class="dv">2</span>, Gaussian(), seed<span class="op">=</span>s) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
@@ -1051,7 +1054,7 @@ learned transition matrix (short, long):
 </div>
 <div class="all-at-once">
 <p>Compare with the table we built on Monday <strong>from the labels</strong>:</p>
-<div id="03479961" class="cell" data-execution_count="14">
+<div id="6c0fbfac" class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="14">
 <table class="caption-top">
 <thead>
@@ -1082,7 +1085,7 @@ learned transition matrix (short, long):
 </section>
 <section id="was-the-ordering-worth-it" class="slide level2">
 <h2>Was the ordering worth it?</h2>
-<div id="82c07ea2" class="cell" data-execution_count="15">
+<div id="3b0bc94c" class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="15">
 <table class="caption-top">
 <thead>
@@ -1117,7 +1120,7 @@ learned transition matrix (short, long):
 </section>
 <section id="the-learned-dynamics-unrolled" class="slide level2">
 <h2>The learned dynamics, unrolled</h2>
-<div id="033639b4" class="cell" data-execution_count="16">
+<div id="e9f5ac81" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">4</span>))</span>
@@ -1148,7 +1151,7 @@ learned transition matrix (short, long):
 <section id="more-data" class="slide level2">
 <h2>More data</h2>
 <p>Simulate longer sequences from my casino and fit from a fixed, deliberately vague start: symmetric sticky <span class="math inline">\(A\)</span>, one fair die, one die mildly favouring six.</p>
-<div id="3e539efc" class="cell" data-execution_count="17">
+<div id="fddb62e1" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>start <span class="op">=</span> (np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>]), np.array([[<span class="fl">0.8</span>, <span class="fl">0.2</span>], [<span class="fl">0.2</span>, <span class="fl">0.8</span>]]),</span>
@@ -1239,7 +1242,7 @@ A_{jk}^{(s+1)} = \frac{\bar{n}_{jk} + \alpha_{jk} - 1}{\sum_{k'} \big( \bar{n}_{
 </section>
 <section id="what-the-prior-did" class="slide level2">
 <h2>What the prior did</h2>
-<div id="2bdfa617" class="cell" data-execution_count="18">
+<div id="c636de0d" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a>prior_A <span class="op">=</span> np.array([[<span class="dv">11</span>, <span class="dv">2</span>], [<span class="dv">2</span>, <span class="dv">11</span>]])         <span class="co"># ten pseudo-transitions of persistence per state</span></span>
@@ -1272,7 +1275,7 @@ agreement with the true states: 76.0%</code></pre>
 </section>
 <section id="why-the-casino-crawls-and-the-geyser-sprints" class="slide level2">
 <h2>Why the casino crawls and the geyser sprints</h2>
-<div id="f2a6035d" class="cell" data-execution_count="19">
+<div id="a3629d7a" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>f_geyser <span class="op">=</span> fits_of[<span class="dv">1</span>]</span>
