@@ -7,12 +7,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Scribbles</title>
-  <meta name="description" content="">
+  <title>Setting up Bluehive.</title>
+  <meta name="description" content="To allocate resources:">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="canonical" href="junseonghwan.github.io/scribbles/">
+  <link rel="canonical" href="junseonghwan.github.io/computing/2026/09/21/setting-up-bluehive.html">
   <link rel="alternate" type="application/rss+xml" title="Seong-Hwan Jun" href="junseonghwan.github.io/feed.xml" />
 
   <script type="text/javascript" async
@@ -85,8 +85,6 @@
         
           
         
-          
-        
       </div>
     </nav>
 
@@ -99,65 +97,36 @@
       <div class="wrapper">
         <div class="post">
 
-<!--
   <header class="post-header">
-    <h1 class="post-title">Scribbles</h1>
+    <h1 class="post-title">Setting up Bluehive.</h1>
+    <p class="post-meta">Sep 21, 2026</p>
   </header>
--->
 
   <article class="post-content">
-    
-<h3>computing</h3>
-<ul>
-    
-      <li><a href="/computing/2026/09/21/setting-up-bluehive.html">Setting up Bluehive.</a></li>
-    
-      <li><a href="/computing/2026/07/22/empire-ai.html">Empire AI Setup</a></li>
-    
-      <li><a href="/computing/2021/02/04/r-package-notes.html">R package notes</a></li>
-    
-      <li><a href="/computing/2019/11/25/compiling-c-plus-plus-code-on-tetralith.html">Compiling C++ code on Tetralith</a></li>
-    
-      <li><a href="/computing/2017/01/11/useful-commands.html">Useful commands</a></li>
-    
-  </ul>
+    <p>To allocate resources:</p>
 
-<h3>bioinformatics</h3>
-<ul>
-    
-      <li><a href="/bioinformatics/2020/05/25/notes-on-snakemake.html">Notes on snakemake</a></li>
-    
-      <li><a href="/bioinformatics/2020/02/23/processing-melanoma-data.html">Processing Melanoma Data</a></li>
-    
-      <li><a href="/bioinformatics/2019/07/08/ascat.html">Ascat</a></li>
-    
-      <li><a href="/bioinformatics/2018/10/08/titancna.html">Configuring TitanCNA (manually)</a></li>
-    
-      <li><a href="/bioinformatics/2018/07/07/variant-calling.html">Variant calling</a></li>
-    
-      <li><a href="/bioinformatics/2018/06/24/explore-master-file-downloaded-from-european-nucleotide-archive.html">Explore master file downloaded from European Nucleotide Archive</a></li>
-    
-      <li><a href="/bioinformatics/2018/06/22/writing-python-script-to-download-sra-data.html">How to download large number of single cell data</a></li>
-    
-      <li><a href="/bioinformatics/2018/06/11/notes-on-processing-bulk-dna-sequence.html">Processing raw DNA-seq data</a></li>
-    
-  </ul>
+<pre><code class="language-{bash}">salloc --no-shell --cpus-per-task=2 --mem-per-cpu=4G --time=08:00:00
+</code></pre>
 
-<h3>papers</h3>
-<ul>
-    
-      <li><a href="/papers/2021/01/29/phylex.html">PhylEx: Clonal tree reconstruction via integration of bulk DNA-seq and scRNA-seq data</a></li>
-    
-      <li><a href="/papers/2019/03/18/chemoresistance-evolution-in-tnbc-delineated-by-single-cell-sequencing.html">Chemoresistance Evolution in TNBC Delineated by Single-Cell Sequencing</a></li>
-    
-  </ul>
+<p>Change the number of cpus, memory, and adjust the time as needed.
+The <code class="language-plaintext highlighter-rouge">--no-shell</code> command decouples the allocation from any shell and more robust as you can attach/detach as needed as long as the resource is still allocated.</p>
 
-<h3>test</h3>
-<ul>
-    
-      <li><a href="/test/2024/06/01/test.html">test</a></li>
-    
-  </ul>
+<p>Then, run <code class="language-plaintext highlighter-rouge">tmux</code>, which creates a persistent session on the login node (login node stays on except for maintenance reasons). Then, allocate resources and access the node:</p>
+
+<pre><code class="language-{bash}">tmux
+srun --jobid xxx --pty bash
+</code></pre>
+
+<p>Note the job id or you can retrieve by <code class="language-plaintext highlighter-rouge">squeue -u $USER</code> (or if <code class="language-plaintext highlighter-rouge">$USER</code> is not set, type in your user ID).</p>
+
+<p>With the job running, detach from the tmux session <code class="language-plaintext highlighter-rouge">ctrl+b</code>.
+And later re-attach with</p>
+
+<pre><code class="language-{bash}">tmux ls
+tmux attach -t &lt;name&gt;
+</code></pre>
+
+<p>CIRC instructs not to run AI on the login node and they recommend to follow the above to allocate resources and then run your AI for a coding session.</p>
 
 
   </article>
