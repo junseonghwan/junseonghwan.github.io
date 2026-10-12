@@ -105,16 +105,24 @@
   <article class="post-content">
     <p>To allocate resources:</p>
 
+<pre><code class="language-{bash}">tmux
+salloc --cpus-per-task=2 --mem-per-cpu=4G --time=08:00:00
+srun --pty bash
+</code></pre>
+
+<p>Change the number of cpus, memory, and adjust the time as needed.</p>
+
+<p>Alternatively,</p>
+
 <pre><code class="language-{bash}">salloc --no-shell --cpus-per-task=2 --mem-per-cpu=4G --time=08:00:00
 </code></pre>
 
-<p>Change the number of cpus, memory, and adjust the time as needed.
-The <code class="language-plaintext highlighter-rouge">--no-shell</code> command decouples the allocation from any shell and more robust as you can attach/detach as needed as long as the resource is still allocated.</p>
+<p>The <code class="language-plaintext highlighter-rouge">--no-shell</code> command decouples the allocation from any shell and more robust as you can attach/detach as needed as long as the resource is still allocated.</p>
 
 <p>Then, run <code class="language-plaintext highlighter-rouge">tmux</code>, which creates a persistent session on the login node (login node stays on except for maintenance reasons). Then, allocate resources and access the node:</p>
 
 <pre><code class="language-{bash}">tmux
-srun --jobid xxx --pty bash
+srun --jobid xxx --cpus-per-task=2 --mem-per-cpu=4G --pty bash
 </code></pre>
 
 <p>Note the job id or you can retrieve by <code class="language-plaintext highlighter-rouge">squeue -u $USER</code> (or if <code class="language-plaintext highlighter-rouge">$USER</code> is not set, type in your user ID).</p>
