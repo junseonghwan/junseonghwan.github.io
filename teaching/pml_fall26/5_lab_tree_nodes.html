@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="5_tree_nodes_files/libs/clipboard/clipboard.min.js"></script>
-<script src="5_tree_nodes_files/libs/quarto-html/tabby.min.js"></script>
-<script src="5_tree_nodes_files/libs/quarto-html/popper.min.js"></script>
-<script src="5_tree_nodes_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="5_tree_nodes_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="5_tree_nodes_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="5_tree_nodes_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="5_lab_tree_nodes_files/libs/clipboard/clipboard.min.js"></script>
+<script src="5_lab_tree_nodes_files/libs/quarto-html/tabby.min.js"></script>
+<script src="5_lab_tree_nodes_files/libs/quarto-html/popper.min.js"></script>
+<script src="5_lab_tree_nodes_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="5_lab_tree_nodes_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="5_lab_tree_nodes_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="5_lab_tree_nodes_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.6.40">
 
   <meta name="author" content="Seong-Hwan Jun">
@@ -14,8 +14,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="5_tree_nodes_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="5_tree_nodes_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="5_lab_tree_nodes_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="5_lab_tree_nodes_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -94,13 +94,13 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="5_tree_nodes_files/libs/revealjs/dist/theme/quarto-8651012f02df9268b4f164d78f1a96f0.css">
-  <link href="5_tree_nodes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="5_tree_nodes_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="5_tree_nodes_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="5_tree_nodes_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
-  <link href="5_tree_nodes_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
-  <link href="5_tree_nodes_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="5_lab_tree_nodes_files/libs/revealjs/dist/theme/quarto-8651012f02df9268b4f164d78f1a96f0.css">
+  <link href="5_lab_tree_nodes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="5_lab_tree_nodes_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -221,24 +221,24 @@ Seong-Hwan Jun
 </section>
 <section id="the-tree-we-will-build" class="slide level2">
 <h2>The tree we will build</h2>
-<div id="7ae71748" class="cell" data-execution_count="2">
+<div id="55adabed" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_tree_nodes_files/figure-revealjs/cell-3-output-1.png" width="484" height="336"></p>
+<p><img data-src="5_lab_tree_nodes_files/figure-revealjs/cell-3-output-1.png" width="484" height="336"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>A phylogeny on four taxa, <code>A</code> to <code>D</code>. Round nodes are the unobserved ancestors. The number on each branch is its <strong>length</strong>, which the substitution model will turn into a probability of change.</p>
+<p>A phylogeny on four taxa, <code>A</code> to <code>D</code>. The shaded nodes are the observed taxa (leaves); the unshaded nodes are their unobserved ancestors. The number on each branch is its <strong>length</strong>, which the substitution model will turn into transition probabilities.</p>
 </section>
 <section id="the-anatomy-of-a-tree" class="slide level2">
 <h2>The anatomy of a tree</h2>
-<div id="94af5d8e" class="cell" data-execution_count="3">
+<div id="8026c683" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_tree_nodes_files/figure-revealjs/cell-4-output-1.png" width="928" height="352"></p>
+<p><img data-src="5_lab_tree_nodes_files/figure-revealjs/cell-4-output-1.png" width="928" height="352"></p>
 </figure>
 </div>
 </div>
@@ -256,11 +256,11 @@ Seong-Hwan Jun
 <h2>Evolutionary trees</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="fff6f99f" class="cell" data-execution_count="4">
+<div id="2d6b8970" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_tree_nodes_files/figure-revealjs/cell-5-output-1.png" width="710" height="394"></p>
+<p><img data-src="5_lab_tree_nodes_files/figure-revealjs/cell-5-output-1.png" width="710" height="394"></p>
 </figure>
 </div>
 </div>
@@ -297,11 +297,11 @@ Seong-Hwan Jun
 </section>
 <section id="trees-without-a-model-behind-them" class="slide level2">
 <h2>Trees without a model behind them</h2>
-<div id="6e4e9b8b" class="cell" data-execution_count="5">
+<div id="7b206876" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_tree_nodes_files/figure-revealjs/cell-6-output-1.png" width="1237" height="335"></p>
+<p><img data-src="5_lab_tree_nodes_files/figure-revealjs/cell-6-output-1.png" width="1237" height="335"></p>
 </figure>
 </div>
 </div>
@@ -321,7 +321,7 @@ Seong-Hwan Jun
 </section>
 <section id="the-class-methods-left-out" class="slide level2">
 <h2>The class, methods left out</h2>
-<div id="e3dc59d0" class="cell" data-execution_count="6">
+<div id="67ff2929" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="kw">class</span> Node:</span>
 <span id="cb1-2"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, branch_length<span class="op">=</span><span class="fl">0.0</span>):</span>
 <span id="cb1-3"><a href=""></a>        <span class="va">self</span>.name <span class="op">=</span> name                     <span class="co"># a label: "root", "i1", "A", ...</span></span>
@@ -339,7 +339,7 @@ Seong-Hwan Jun
 </section>
 <section id="a-new-type" class="slide level2">
 <h2>A new type</h2>
-<div id="2b7e8b4f" class="cell" data-execution_count="7">
+<div id="94816f42" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="kw">class</span> Node:</span>
 <span id="cb2-2"><a href=""></a>    ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -353,7 +353,7 @@ Seong-Hwan Jun
 </section>
 <section id="the-constructor" class="slide level2">
 <h2>The constructor</h2>
-<div id="969b4312" class="cell" data-execution_count="8">
+<div id="7143c85c" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="kw">class</span> Node:</span>
 <span id="cb3-2"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, branch_length<span class="op">=</span><span class="fl">0.0</span>):</span>
 <span id="cb3-3"><a href=""></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
@@ -372,7 +372,7 @@ Seong-Hwan Jun
 </section>
 <section id="creating-an-object" class="slide level2">
 <h2>Creating an object</h2>
-<div id="8b9a0e24" class="cell" data-execution_count="9">
+<div id="097121d0" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>root <span class="op">=</span> Node(<span class="st">"root"</span>)</span>
 <span id="cb4-2"><a href=""></a>i1 <span class="op">=</span> Node(<span class="st">"i1"</span>, <span class="fl">0.10</span>)</span>
 <span id="cb4-3"><a href=""></a></span>
@@ -384,7 +384,7 @@ Seong-Hwan Jun
 i1 0.1</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="8">
-<pre><code>&lt;__main__.Node at 0x11040b3d0&gt;</code></pre>
+<pre><code>&lt;__main__.Node at 0x15263bfd0&gt;</code></pre>
 </div>
 </div>
 <div class="all-at-once">
@@ -397,7 +397,7 @@ i1 0.1</code></pre>
 </section>
 <section id="attributes-can-be-set-from-outside" class="slide level2">
 <h2>Attributes can be set from outside</h2>
-<div id="c881600b" class="cell" data-execution_count="10">
+<div id="6776708e" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a>root.children.append(i1)</span>
 <span id="cb7-2"><a href=""></a>i1.parent <span class="op">=</span> root</span>
 <span id="cb7-3"><a href=""></a></span>
@@ -418,7 +418,7 @@ True</code></pre>
 </section>
 <section id="a-method" class="slide level2">
 <h2>A method</h2>
-<div id="50450eca" class="cell" data-execution_count="11">
+<div id="7f02597d" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="kw">class</span> Node:</span>
 <span id="cb9-2"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, branch_length<span class="op">=</span><span class="fl">0.0</span>):</span>
 <span id="cb9-3"><a href=""></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
@@ -438,15 +438,14 @@ True</code></pre>
 <div class="all-at-once">
 <ul>
 <li>A method is a function defined inside the class. <code>root.is_leaf()</code> is shorthand for <code>Node.is_leaf(root)</code>: the object before the dot becomes <code>self</code>, and the parentheses are empty because there is nothing else to pass.</li>
-<li>Inside the method, <code>self.children</code> is <code>root.children</code>. The method reads the object’s own attributes without being told which object; <code>self</code> already says.</li>
-<li>A method that changes the object, like <code>add_child</code>, does so by assigning to <code>self.&lt;attribute&gt;</code> or to the attributes of what it was handed.</li>
+<li>Inside a method, <code>self</code> refers to the particular object on which the method was called, so <code>self.children</code> accesses that object’s own <code>children</code> attribute.</li>
 </ul>
 </div>
 </section>
 <section id="task-1-is_root" class="slide level2">
 <h2>Task 1: <code>is_root</code></h2>
 <p>Add a second method to the class on the previous slide, and make the assertions pass.</p>
-<div id="d4b721aa" class="cell" data-execution_count="12">
+<div id="a0372aef" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>    <span class="kw">def</span> is_root(<span class="va">self</span>):</span>
 <span id="cb11-2"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: a node is the root when nothing is above it</span></span>
 <span id="cb11-3"><a href=""></a>        <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
@@ -468,7 +467,7 @@ True</code></pre>
 </section>
 <section id="repr__" class="slide level2">
 <h2><code>__repr__</code></h2>
-<div id="9ade7a38" class="cell" data-execution_count="13">
+<div id="0c205b50" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="kw">class</span> Node:</span>
 <span id="cb12-2"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, branch_length<span class="op">=</span><span class="fl">0.0</span>):</span>
 <span id="cb12-3"><a href=""></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
@@ -502,7 +501,7 @@ True</code></pre>
 <section id="task-2-assemble-the-class" class="slide level2">
 <h2>Task 2: assemble the class</h2>
 <p>Everything above, plus one more method of your own.</p>
-<div id="9b8039fc" class="cell" data-execution_count="15">
+<div id="60b94b1a" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a><span class="kw">class</span> Node:</span>
 <span id="cb14-2"><a href=""></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, branch_length<span class="op">=</span><span class="fl">0.0</span>):</span>
 <span id="cb14-3"><a href=""></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
@@ -530,7 +529,7 @@ True</code></pre>
 </section>
 <section id="task-3-build-the-tree-by-hand" class="slide level2">
 <h2>Task 3: build the tree by hand</h2>
-<div id="ead754c4" class="cell" data-execution_count="16">
+<div id="83f6e8f5" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>root <span class="op">=</span> Node(<span class="st">"root"</span>)</span>
 <span id="cb15-2"><a href=""></a>i1 <span class="op">=</span> root.add_child(Node(<span class="st">"i1"</span>, <span class="fl">0.10</span>))</span>
 <span id="cb15-3"><a href=""></a>i2 <span class="op">=</span> root.add_child(Node(<span class="st">"i2"</span>, <span class="fl">0.15</span>))</span>
@@ -543,7 +542,7 @@ True</code></pre>
 <span id="cb15-10"><a href=""></a><span class="cf">assert</span> <span class="bu">all</span>(c.parent <span class="kw">is</span> i2 <span class="cf">for</span> c <span class="kw">in</span> i2.children)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then print what you built. This helper is yours to keep:</p>
-<div id="bdb9cb0d" class="cell" data-execution_count="17">
+<div id="1c0043d7" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a><span class="kw">def</span> show(node, depth<span class="op">=</span><span class="dv">0</span>):</span>
 <span id="cb16-2"><a href=""></a>    <span class="bu">print</span>(<span class="st">"  "</span> <span class="op">*</span> depth <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>node<span class="sc">.</span>name<span class="sc">}</span><span class="ss">  (</span><span class="sc">{</span>node<span class="sc">.</span>branch_length<span class="sc">}</span><span class="ss">)"</span>)</span>
 <span id="cb16-3"><a href=""></a>    <span class="cf">for</span> c <span class="kw">in</span> node.children:</span>
@@ -551,7 +550,7 @@ True</code></pre>
 <span id="cb16-5"><a href=""></a></span>
 <span id="cb16-6"><a href=""></a>show(root)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="e061b447" class="cell" data-execution_count="18">
+<div id="52347298" class="cell" data-execution_count="18">
 <div class="cell-output cell-output-stdout">
 <pre><code>root  (0.0)
   i1  (0.1)
@@ -580,11 +579,11 @@ True</code></pre>
 <li><strong>Post-order</strong>: visit the children, then the node. The root comes last. Information flows <strong>up</strong>: a node is visited only after everything below it has been.</li>
 </ul>
 </div>
-<div id="783fdf44" class="cell" data-execution_count="19">
+<div id="cdef154c" class="cell" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_tree_nodes_files/figure-revealjs/cell-20-output-1.png" width="1075" height="336"></p>
+<p><img data-src="5_lab_tree_nodes_files/figure-revealjs/cell-20-output-1.png" width="1075" height="336"></p>
 </figure>
 </div>
 </div>
@@ -593,7 +592,7 @@ True</code></pre>
 <section id="a-stack" class="slide level2">
 <h2>A stack</h2>
 <p>A <strong>stack</strong> is a list that is only touched at one end. <code>append</code> pushes an item on top; <code>pop</code> removes the item on top and returns it. The last item pushed is the first one back out.</p>
-<div id="e02d29e0" class="cell" data-execution_count="20">
+<div id="2b8e3e4f" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>stack <span class="op">=</span> []</span>
 <span id="cb18-2"><a href=""></a>stack.append(<span class="st">"root"</span>)</span>
 <span id="cb18-3"><a href=""></a>stack.append(<span class="st">"i1"</span>)</span>
@@ -609,11 +608,11 @@ i2 ['root', 'i1']
 i1 ['root']</code></pre>
 </div>
 </div>
-<div id="80699502" class="cell" data-execution_count="21">
+<div id="2926bd61" class="cell" data-execution_count="21">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_tree_nodes_files/figure-revealjs/cell-22-output-1.png" width="1430" height="279"></p>
+<p><img data-src="5_lab_tree_nodes_files/figure-revealjs/cell-22-output-1.png" width="1430" height="279"></p>
 </figure>
 </div>
 </div>
@@ -622,7 +621,7 @@ i1 ['root']</code></pre>
 <section id="task-4-write-them-with-a-stack" class="slide level2">
 <h2>Task 4: write them with a stack</h2>
 <p>No recursion here. Keep a list of nodes still to be visited, and loop until it is empty.</p>
-<div id="82112709" class="cell" data-execution_count="22">
+<div id="9fffbc5c" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a><span class="kw">def</span> preorder(node):</span>
 <span id="cb20-2"><a href=""></a>    <span class="co">"""Return a list of nodes, each parent before its children."""</span></span>
 <span id="cb20-3"><a href=""></a>    order <span class="op">=</span> []</span>
@@ -643,7 +642,7 @@ i1 ['root']</code></pre>
 <span id="cb20-18"><a href=""></a><span class="bu">print</span>([v.name <span class="cf">for</span> v <span class="kw">in</span> preorder(root)])</span>
 <span id="cb20-19"><a href=""></a><span class="bu">print</span>([v.name <span class="cf">for</span> v <span class="kw">in</span> postorder(root)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="95c8737e" class="cell" data-execution_count="23">
+<div id="d980519a" class="cell" data-execution_count="23">
 <div class="cell-output cell-output-stdout">
 <pre><code>['root', 'i1', 'A', 'B', 'i2', 'C', 'D']
 ['A', 'B', 'i1', 'C', 'D', 'i2', 'root']</code></pre>
@@ -656,7 +655,6 @@ i1 ['root']</code></pre>
 <ul>
 <li>A traversal keeps a stack of nodes waiting to be visited. Pop one, record it, push its children. The children now sit on top, so they are visited before anything that was waiting below them: the loop goes deep before it goes wide.</li>
 <li><code>while stack:</code> runs until the list is empty, since an empty list counts as false.</li>
-<li>A recursive function uses a stack too, the one Python keeps of the calls in progress. Writing it yourself just moves it into a list, with no limit on how deep it can go.</li>
 </ul>
 </div>
 <div class="callout callout-note callout-titled callout-style-default">
@@ -675,7 +673,7 @@ i1 ['root']</code></pre>
 </section>
 <section id="run-them-on-your-tree" class="slide level2">
 <h2>Run them on your tree</h2>
-<div id="721dc438" class="cell" data-execution_count="24">
+<div id="cdce8ab4" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a><span class="bu">print</span>(<span class="st">"pre-order :"</span>, [v.name <span class="cf">for</span> v <span class="kw">in</span> preorder(root)])</span>
 <span id="cb22-2"><a href=""></a><span class="bu">print</span>(<span class="st">"post-order:"</span>, [v.name <span class="cf">for</span> v <span class="kw">in</span> postorder(root)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -684,7 +682,7 @@ post-order: ['A', 'B', 'i1', 'C', 'D', 'i2', 'root']</code></pre>
 </div>
 </div>
 <p>Then check the two properties that matter, rather than eyeballing the lists:</p>
-<div id="8ce24c43" class="cell" data-execution_count="25">
+<div id="cbd3eb02" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a>pre, post <span class="op">=</span> preorder(root), postorder(root)</span>
 <span id="cb24-2"><a href=""></a><span class="cf">assert</span> pre[<span class="dv">0</span>] <span class="kw">is</span> root <span class="kw">and</span> post[<span class="op">-</span><span class="dv">1</span>] <span class="kw">is</span> root          <span class="co"># root first in pre-order, last in post-order</span></span>
 <span id="cb24-3"><a href=""></a><span class="cf">for</span> v <span class="kw">in</span> post:</span>
@@ -705,7 +703,7 @@ post-order: ['A', 'B', 'i1', 'C', 'D', 'i2', 'root']</code></pre>
 <section id="task-5-properties-by-traversal" class="slide level2">
 <h2>Task 5: properties by traversal</h2>
 <p>Write each of these with a traversal, not by reading the picture.</p>
-<div id="62d807dd" class="cell" data-execution_count="26">
+<div id="4ac72384" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a><span class="kw">def</span> leaves(node):         <span class="co"># list of leaf nodes, in pre-order</span></span>
 <span id="cb26-2"><a href=""></a>    ...</span>
 <span id="cb26-3"><a href=""></a><span class="kw">def</span> total_length(node):   <span class="co"># sum of every branch length in the subtree</span></span>
@@ -751,7 +749,7 @@ p(x_{v, s} = b \mid x_{\text{pa}(v), s} = a) = P_{ab}(t_v).
 <p><span class="math display">\[
 P_{aa}(t) = \tfrac14 + \tfrac34 e^{-4t/3}, \qquad P_{ab}(t) = \tfrac14 - \tfrac14 e^{-4t/3} \;\; (a \neq b).
 \]</span></p>
-<div id="a922bc66" class="cell" data-execution_count="27">
+<div id="35eb935c" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a><span class="kw">def</span> jc69(t):</span>
 <span id="cb27-2"><a href=""></a>    e <span class="op">=</span> np.exp(<span class="op">-</span><span class="dv">4</span> <span class="op">*</span> t <span class="op">/</span> <span class="dv">3</span>)</span>
 <span id="cb27-3"><a href=""></a>    P <span class="op">=</span> np.full((<span class="dv">4</span>, <span class="dv">4</span>), <span class="fl">0.25</span> <span class="op">-</span> <span class="fl">0.25</span> <span class="op">*</span> e)</span>
@@ -778,7 +776,7 @@ P_{aa}(t) = \tfrac14 + \tfrac34 e^{-4t/3}, \qquad P_{ab}(t) = \tfrac14 - \tfrac1
 <section id="task-6-evolve-sequences-down-the-tree" class="slide level2">
 <h2>Task 6: evolve sequences down the tree</h2>
 <p>Store the sequence on the node itself, for <strong>every</strong> node, so that the truth at the ancestors is kept for grading later.</p>
-<div id="1fc2edbe" class="cell" data-execution_count="28">
+<div id="d8be840e" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="kw">def</span> simulate_sites(root, n_sites, rng):</span>
 <span id="cb29-2"><a href=""></a>    <span class="co">"""Attach `seq`, an integer array of length n_sites with A,C,G,T = 0,1,2,3,</span></span>
 <span id="cb29-3"><a href=""></a><span class="co">       to every node in the tree."""</span></span>
@@ -800,7 +798,7 @@ P_{aa}(t) = \tfrac14 + \tfrac34 e^{-4t/3}, \qquad P_{ab}(t) = \tfrac14 - \tfrac1
 <span id="cb29-19"><a href=""></a><span class="cf">for</span> v <span class="kw">in</span> preorder(root):</span>
 <span id="cb29-20"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>v<span class="sc">.</span>name<span class="sc">:&gt;5}</span><span class="ss">  </span><span class="sc">{</span>to_string(v.seq[:<span class="dv">40</span>])<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="38a05e53" class="cell" data-execution_count="29">
+<div id="0703941f" class="cell" data-execution_count="29">
 <div class="cell-output cell-output-stdout">
 <pre><code> root  GTATCGGCTACCGCAAAAATAGTACCCTATTTACGCGGGA
    i1  GTATCCCCTAACGCAAAAATAGTTCGCTACATACGCGGGA
@@ -843,7 +841,7 @@ P_{aa}(t) = \tfrac14 + \tfrac34 e^{-4t/3}, \qquad P_{ab}(t) = \tfrac14 - \tfrac1
 </section>
 <section id="what-to-submit" class="slide level2">
 <h2>What to submit</h2>
-<p>A Quarto document <code>lab4.qmd</code> with your solutions to tasks 1 to 6 with their assertions passing and the alignment printed. Due at the start of next Wednesday’s class. Discuss freely; write your own code.</p>
+<p>A Quarto document <code>lab4.qmd</code> with your solutions to tasks 1 to 6 with their assertions passing and the alignment printed. Due at the start of next Thursday’s class. Discuss freely; write your own code.</p>
 <div class="all-at-once">
 <div class="question">
 <p>Your simulator draws every site independently and walks the tree once per site. Next lecture computes the likelihood of the leaf rows by summing over the joint ancestral states. Why does that sum factorize over sites, and what about the model would have to change for it not to?</p>
@@ -857,7 +855,7 @@ P_{aa}(t) = \tfrac14 + \tfrac34 e^{-4t/3}, \qquad P_{ab}(t) = \tfrac14 - \tfrac1
 </section>
 <section id="task-4-a-solution" class="slide level2">
 <h2>Task 4: a solution</h2>
-<div id="556d8e18" class="cell" data-execution_count="30">
+<div id="1fc6b9e1" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a><span class="kw">def</span> preorder(node):</span>
 <span id="cb31-2"><a href=""></a>    order, stack <span class="op">=</span> [], [node]</span>
 <span id="cb31-3"><a href=""></a>    <span class="cf">while</span> stack:</span>
@@ -891,20 +889,20 @@ P_{aa}(t) = \tfrac14 + \tfrac34 e^{-4t/3}, \qquad P_{ab}(t) = \tfrac14 - \tfrac1
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="5_tree_nodes_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="5_tree_nodes_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="5_lab_tree_nodes_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
