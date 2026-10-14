@@ -221,16 +221,16 @@ Seong-Hwan Jun
 </ul>
 </div>
 <div class="all-at-once">
-<p>In Lab 4 you built the data structure, wrote the two traversals, and simulated an alignment down a phylogeny. Today we hang the inference on that code, and then take the oldest tree model in biology seriously.</p>
+<p>In Lab 4 you built the data structure, wrote the two traversals, and simulated an alignment down a phylogeny. Today we hang the inference on that code, then apply it to compute a likelihood of a phylogeny.</p>
 </div>
 </section>
 <section id="goals" class="slide level2">
 <h2>Goals</h2>
 <ul>
 <li>State what a tree structured model assumes, and why that assumption lets sums be pushed inward.</li>
-<li>Derive the message rule, and the collect and distribute passes, by pushing sums inward on a small tree.</li>
-<li>Implement belief propagation on the <code>Node</code> class and verify it against brute force and against forward-backward.</li>
-<li>Recognize Felsenstein’s pruning algorithm as the collect pass, use it to score phylogenies, and use the distribute pass to infer ancestral states.</li>
+<li>Derive the message rule and the bottom-up (collect) and top-down (distribute) passes by pushing sums inward on a small tree.</li>
+<li>Relate belief propagation on a tree to forward-backward on a chain.</li>
+<li>Recognize Felsenstein’s pruning algorithm as the bottom-up pass, use it to score phylogenies, and use the top-down pass to infer ancestral states.</li>
 </ul>
 </section>
 <section>
@@ -254,7 +254,7 @@ Seong-Hwan Jun
 </section>
 <section id="a-latent-tree-model" class="slide level2">
 <h2>A latent tree model</h2>
-<div id="bda69c90" class="cell" data-execution_count="3">
+<div id="b1ac2ba9" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -270,6 +270,7 @@ Seong-Hwan Jun
 </section>
 <section id="the-joint-distribution" class="slide level2">
 <h2>The joint distribution</h2>
+<p>For a uniform message-passing notation, place a state <span class="math inline">\(z_v\)</span> at every node and attach data through <span class="math inline">\(p(y_v \mid z_v)\)</span>. At an observed leaf, deterministic observation makes this equivalent to the collapsed picture on the previous slide.</p>
 <p>Write <span class="math inline">\(\mathbf{z} = (z_1, \ldots, z_n)\)</span> for the latent variables at the <span class="math inline">\(n\)</span> nodes, one multivariate variable, and <span class="math inline">\(\mathbf{y}\)</span> for the observations. For a directed tree with root <span class="math inline">\(r\)</span>, the chain rule along the arrows gives</p>
 <p><span class="math display">\[
 p(\mathbf{z}) = p(z_r) \prod_{v \neq r} p\big(z_v \mid z_{\text{pa}(v)}\big).
@@ -286,7 +287,7 @@ p(\mathbf{z}, \mathbf{y}) = p(z_r) \prod_{v \neq r} p\big(z_v \mid z_{\text{pa}(
 <h2>The assumption that does the work</h2>
 <div class="columns">
 <div class="column" style="width:35%;">
-<div id="f3390795" class="cell" data-execution_count="4">
+<div id="5c82d375" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -303,13 +304,10 @@ p(z_{T_1}, z_{T_2} \mid z_v) = p(z_{T_1} \mid z_v) \; p(z_{T_2} \mid z_v).
 </div></div>
 <div class="all-at-once">
 <ul>
-<li>No factor touches both <span class="math inline">\(T_1\)</span> and <span class="math inline">\(T_2\)</span>: every factor is a node or an edge, and the only route between the two subtrees runs through <span class="math inline">\(v\)</span>. Fix <span class="math inline">\(z_v\)</span> and the joint splits into a piece on each side.</li>
+<li>Once <span class="math inline">\(z_v\)</span> is fixed, no term in the joint distribution involves variables from both <span class="math inline">\(T_1\)</span> and <span class="math inline">\(T_2\)</span>. The only path between the two subtrees runs through <span class="math inline">\(v\)</span>, so the joint distribution separates into one part for each subtree.</li>
 <li>So a sum over <span class="math inline">\(T_1\)</span> and a sum over <span class="math inline">\(T_2\)</span> can be done <strong>separately</strong> and multiplied. That is the conditional independence we used on the chain, where <span class="math inline">\(z_t\)</span> separated the past from the future.</li>
 <li>With a cycle there would be two routes between some pair of variables, one node would not separate them, and the sums would not split.</li>
 </ul>
-</div>
-<div class="all-at-once">
-<p>The tree records this structure so we can read it off. Everything that follows is bookkeeping on top of this one fact.</p>
 </div>
 </section>
 <section id="the-same-problem-as-before" class="slide level2">
@@ -325,7 +323,7 @@ p(\mathbf{y}) = \sum_{z_1} \cdots \sum_{z_n} p(z_r) \prod_{v \neq r} p\big(z_v \
 </section>
 <section id="trees-are-not-an-exotic-special-case" class="slide level2">
 <h2>Trees are not an exotic special case</h2>
-<div id="5954b4fb" class="cell" data-execution_count="5">
+<div id="6e01489c" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -339,7 +337,6 @@ p(\mathbf{y}) = \sum_{z_1} \cdots \sum_{z_n} p(z_r) \prod_{v \neq r} p\big(z_v \
 <li><strong>Phylogenies and clonal trees</strong>, from the lab: species, viral lineages, B cell receptors, tumour subclones. Ancestors at the internal nodes, sequenced data at the leaves. The second half of today.</li>
 <li><strong>Hierarchical models.</strong> Patients within clinics within regions. The latent variables are the group level parameters, and observing one clinic tells you about the others only through their shared parent. Same shape, no evolution.</li>
 <li><strong>Hierarchical labels.</strong> A taxonomy of diagnoses or cell types, where a label at a leaf implies every ancestor label.</li>
-<li><strong>Pedigrees.</strong> Almost a tree, and next week we see why “almost” matters.</li>
 </ul>
 </div>
 </section></section>
@@ -381,8 +378,8 @@ m_{1 \to 0}(z_0) = \sum_{z_1} p(z_1 \mid z_0) \, m_{3 \to 1}(z_1) \, m_{4 \to 1}
 </ul>
 </div>
 </section>
-<section id="what-a-message-is" class="slide level2">
-<h2>What a message is</h2>
+<section id="what-a-message-represents" class="slide level2">
+<h2>What a message represents</h2>
 <p>Write <span class="math inline">\(\mathbf{y}_{\lfloor v \rfloor}\)</span> for the observations in the subtree rooted at <span class="math inline">\(v\)</span>, <span class="math inline">\(v\)</span> included.</p>
 <p><span class="math display">\[
 m_{v \to u}(z_u) = p(\mathbf{y}_{\lfloor v \rfloor} \mid z_u), \qquad
@@ -391,13 +388,13 @@ p(y_v \mid z_v) \prod_{c \,\in\, \text{children}(v)} m_{c \to v}(z_v) = p(\mathb
 <div class="all-at-once">
 <ul>
 <li>A message is a <strong>likelihood</strong>: what the data below <span class="math inline">\(v\)</span> say about the state at the far end of the edge. On the small tree, <span class="math inline">\(m_{1 \to 0}(z_0) = p(y_3, y_4 \mid z_0)\)</span>.</li>
-<li>The product inside the rule is the same likelihood one level down, conditioned on <span class="math inline">\(z_v\)</span>; the sum over <span class="math inline">\(z_v\)</span> against <span class="math inline">\(p(z_v \mid z_u)\)</span> moves the conditioning up to <span class="math inline">\(z_u\)</span>.</li>
 <li>On the chain this was <span class="math inline">\(\beta_t(k) = p(y_{t+1:T} \mid z_t = k)\)</span>. Same object, read on a tree.</li>
+<li><strong>Exercise.</strong> Prove the two identities above by induction from the leaves to the root. For the inductive step, condition on <span class="math inline">\(z_v\)</span>, use the independence of its child subtrees, and then sum over <span class="math inline">\(z_v\)</span>.</li>
 </ul>
 </div>
 </section>
-<section id="the-collect-pass" class="slide level2">
-<h2>The collect pass</h2>
+<section id="the-bottom-up-collect-pass" class="slide level2">
+<h2>The bottom-up (collect) pass</h2>
 <p>Run the rule once per non-root node, children before parents. At the root nothing is left to send, so sum instead:</p>
 <p><span class="math display">\[
 p(\mathbf{y}) = \sum_{z_r} p(z_r) \, \underbrace{p(y_r \mid z_r) \prod_{c \,\in\, \text{children}(r)} m_{c \to r}(z_r)}_{p(\mathbf{y}_{\lfloor r \rfloor} \mid z_r) \;=\; p(\mathbf{y} \mid z_r)}.
@@ -405,7 +402,7 @@ p(\mathbf{y}) = \sum_{z_r} p(z_r) \, \underbrace{p(y_r \mid z_r) \prod_{c \,\in\
 <div class="all-at-once">
 <ul>
 <li>One message per edge, each a sum over <span class="math inline">\(K\)</span> values for each of <span class="math inline">\(K\)</span> outputs: <span class="math inline">\(O(K^2)\)</span> per edge, <span class="math inline">\(O(nK^2)\)</span> in all.</li>
-<li>Everything below the root is everything, so the last line is the prior times the likelihood given the root state, summed over the root state.</li>
+<li>The root’s subtree is the whole tree, so the final step multiplies the likelihood given the root state by its prior and sums over that state.</li>
 <li>This is the whole likelihood computation. For the phylogenetics half of today it is the only pass we need.</li>
 </ul>
 </div>
@@ -414,7 +411,7 @@ p(\mathbf{y}) = \sum_{z_r} p(z_r) \, \underbrace{p(y_r \mid z_r) \prod_{c \,\in\
 <h2>Marginals need the other direction</h2>
 <div class="columns">
 <div class="column" style="width:40%;">
-<div id="1a2f9c6a" class="cell" data-execution_count="6">
+<div id="ef710509" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -431,11 +428,11 @@ p(z_v, \mathbf{y}) \;=\; \underbrace{p(\mathbf{y}_{\lceil v \rceil}, z_v)}_{\tex
 <p>Write <span class="math inline">\(\mathbf{y}_{\lceil v \rceil}\)</span> for every observation <strong>not</strong> in the subtree below <span class="math inline">\(v\)</span>. Given <span class="math inline">\(z_v\)</span> the two sides are independent, so the joint factorizes as shown, and <span class="math inline">\(p(z_v \mid \mathbf{y})\)</span> is this divided by <span class="math inline">\(p(\mathbf{y})\)</span>.</p>
 </div></div>
 <div class="all-at-once">
-<p>The second factor exists after the collect pass. The first, <span class="math inline">\(m_{u \to v}(z_v) := p(\mathbf{y}_{\lceil v \rceil}, z_v)\)</span>, does not, yet. It is <span class="math inline">\(\alpha\)</span> from the chain: the data on the far side, jointly with the state at this end.</p>
+<p>The subtree likelihood <span class="math inline">\(p(\mathbf{y}_{\lfloor v \rfloor} \mid z_v)\)</span> is available after the bottom-up pass. The missing term is <span class="math inline">\(m_{u \to v}(z_v) := p(\mathbf{y}_{\lceil v \rceil}, z_v)\)</span>: the data outside <span class="math inline">\(v\)</span>’s subtree, jointly with <span class="math inline">\(z_v\)</span>.</p>
 </div>
 </section>
-<section id="the-downward-message" class="slide level2">
-<h2>The downward message</h2>
+<section id="the-top-down-message" class="slide level2">
+<h2>The top-down message</h2>
 <p>“Above <span class="math inline">\(v\)</span>” is the rest of the tree once the edge <span class="math inline">\((u, v)\)</span> is cut. Seen from <span class="math inline">\(u\)</span>, that is three things, all functions of <span class="math inline">\(z_u\)</span>: <span class="math inline">\(u\)</span>’s own evidence, whatever came down to <span class="math inline">\(u\)</span> from its parent, and the subtrees of <span class="math inline">\(v\)</span>’s <strong>siblings</strong>. Multiply them, attach the edge, and sum out <span class="math inline">\(z_u\)</span>:</p>
 <p><span class="math display">\[
 \boxed{\; m_{u \to v}(z_v) = \sum_{z_u} p(z_v \mid z_u) \, \underbrace{p(y_u \mid z_u)}_{\text{evidence at } u} \, \underbrace{m_{\text{pa}(u) \to u}(z_u)}_{\text{from above } u} \underbrace{\prod_{s \,\in\, \text{children}(u),\; s \neq v} m_{s \to u}(z_u)}_{\text{from the siblings of } v} \;}
@@ -443,7 +440,7 @@ p(z_v, \mathbf{y}) \;=\; \underbrace{p(\mathbf{y}_{\lceil v \rceil}, z_v)}_{\tex
 <div class="all-at-once">
 <ul>
 <li>At the root nothing is above, <span class="math inline">\(\mathbf{y}_{\lceil r \rceil}\)</span> is empty, and <span class="math inline">\(p(\mathbf{y}_{\lceil r \rceil}, z_r) = p(z_r)\)</span>: the prior is what the root “hears from above”. Set <span class="math inline">\(m_{\text{pa}(r) \to r}(z_r) := p(z_r)\)</span>.</li>
-<li>A node’s downward message needs its parent’s first: <strong>pre-order</strong>, the mirror image of the collect pass.</li>
+<li>A node’s top-down message needs its parent’s first: <strong>pre-order</strong>, the mirror image of the bottom-up pass.</li>
 </ul>
 </div>
 </section>
@@ -457,14 +454,14 @@ p(z_v, \mathbf{y}) \;=\; \underbrace{p(\mathbf{y}_{\lceil v \rceil}, z_v)}_{\tex
 <div class="all-at-once">
 <ul>
 <li>Take everything <span class="math inline">\(i\)</span> knows, its own evidence and every incoming message <strong>except the one from <span class="math inline">\(j\)</span></strong>, multiply, attach the edge, sum out <span class="math inline">\(z_i\)</span>.</li>
-<li>Excluding <span class="math inline">\(j\)</span>’s message is what keeps the subtree on <span class="math inline">\(j\)</span>’s side from being counted twice. On a tree the two sides of an edge share nothing else, so this is exactly right. On a graph with cycles it is not enough, and next week we see what happens when people run it anyway.</li>
+<li>Excluding <span class="math inline">\(j\)</span>’s message is what keeps the subtree on <span class="math inline">\(j\)</span>’s side from being counted twice. On a tree the two sides of an edge share nothing else, so this is exactly right.</li>
 <li>Parent or child, up or down: one rule, applied once per edge per direction.</li>
 </ul>
 </div>
 </section>
 <section id="the-schedule" class="slide level2">
 <h2>The schedule</h2>
-<div id="c5d37dbb" class="cell" data-execution_count="7">
+<div id="ac536fc1" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -473,165 +470,18 @@ p(z_v, \mathbf{y}) \;=\; \underbrace{p(\mathbf{y}_{\lceil v \rceil}, z_v)}_{\tex
 </div>
 </div>
 </div>
-<p>Pick any node as root. Collect inward, distribute outward. Each edge carries one message in each direction: <span class="math inline">\(2(n - 1)\)</span> messages at <span class="math inline">\(O(K^2)\)</span> apiece, and then every marginal in the model is a product of vectors.</p>
+<p>Pick any node as root. Pass messages bottom-up, then top-down. Each edge carries one message in each direction: <span class="math inline">\(2(n - 1)\)</span> messages at <span class="math inline">\(O(K^2)\)</span> apiece, and then every marginal in the model is a product of vectors.</p>
 </section>
 <section id="exercise-it-really-is-the-marginal" class="slide level2 scrollable">
 <h2>Exercise: it really is the marginal</h2>
 <p>Throughout, <span class="math inline">\(v\)</span> is a node and <span class="math inline">\(u = \text{pa}(v)\)</span> is its parent, so <span class="math inline">\(m_{v \to u}\)</span> travels up and <span class="math inline">\(m_{u \to v}\)</span> travels down. Everything needed is the factorization of <span class="math inline">\(p(\mathbf{z}, \mathbf{y})\)</span> and the separation property, used once per step.</p>
 <div class="all-at-once">
 <ol type="1">
-<li><strong>Upward.</strong> Show by induction from the leaves that <span class="math inline">\(m_{v \to u}(z_u) = p(\mathbf{y}_{\lfloor v \rfloor} \mid z_u)\)</span>. The leaf case is one line; for an internal node use that, given <span class="math inline">\(z_v\)</span>, the children’s subtrees are independent of each other.</li>
-<li><strong>Downward.</strong> Show that <span class="math inline">\(m_{u \to v}(z_v) = p(\mathbf{y}_{\lceil v \rceil}, z_v)\)</span>, by induction from the root. You will need <span class="math inline">\(\mathbf{y}_{\lceil v \rceil} = \mathbf{y}_{\lceil u \rceil} \cup \{y_u\} \cup \bigcup_{s \neq v} \mathbf{y}_{\lfloor s \rfloor}\)</span> and that these pieces are independent given <span class="math inline">\(z_u\)</span>.</li>
+<li><strong>Bottom-up.</strong> Show by induction from the leaves that <span class="math inline">\(m_{v \to u}(z_u) = p(\mathbf{y}_{\lfloor v \rfloor} \mid z_u)\)</span>. The leaf case is one line; for an internal node use that, given <span class="math inline">\(z_v\)</span>, the children’s subtrees are independent of each other.</li>
+<li><strong>Top-down.</strong> Show that <span class="math inline">\(m_{u \to v}(z_v) = p(\mathbf{y}_{\lceil v \rceil}, z_v)\)</span>, by induction from the root. You will need <span class="math inline">\(\mathbf{y}_{\lceil v \rceil} = \mathbf{y}_{\lceil u \rceil} \cup \{y_u\} \cup \bigcup_{s \neq v} \mathbf{y}_{\lfloor s \rfloor}\)</span> and that these pieces are independent given <span class="math inline">\(z_u\)</span>.</li>
 <li><strong>Together.</strong> Conclude that <span class="math inline">\(p(y_v \mid z_v) \prod_c m_{c \to v}(z_v) \, m_{u \to v}(z_v) = p(z_v, \mathbf{y})\)</span> at <strong>every</strong> node, so that summing it over <span class="math inline">\(z_v\)</span> gives <span class="math inline">\(p(\mathbf{y})\)</span> at every node, not only at the root. On the chain this was <span class="math inline">\(\sum_k \alpha_t(k) \beta_t(k) = p(y_{1:T})\)</span> for every <span class="math inline">\(t\)</span>.</li>
-<li><strong>Edges.</strong> Write <span class="math inline">\(p(z_u, z_v, \mathbf{y})\)</span> for the edge from <span class="math inline">\(u\)</span> down to <span class="math inline">\(v\)</span> as a product of messages, the edge conditional <span class="math inline">\(p(z_v \mid z_u)\)</span>, and evidence. This is <span class="math inline">\(\xi\)</span> on a tree.</li>
+<li><strong>Edges.</strong> Write <span class="math inline">\(p(z_u, z_v, \mathbf{y})\)</span> for the edge from <span class="math inline">\(u\)</span> down to <span class="math inline">\(v\)</span> as a product of messages, the edge conditional <span class="math inline">\(p(z_v \mid z_u)\)</span>, and evidence. Dividing by <span class="math inline">\(p(\mathbf{y})\)</span> gives the edge posterior <span class="math inline">\(p(z_u, z_v \mid \mathbf{y})\)</span>, the tree analogue of <span class="math inline">\(\xi_t(i,j) = p(z_{t-1}=i, z_t=j \mid y_{1:T})\)</span> in an HMM.</li>
 </ol>
-</div>
-</section></section>
-<section>
-<section id="implementation" class="title-slide slide level1 center">
-<h1>Implementation</h1>
-
-</section>
-<section id="on-the-node-class" class="slide level2">
-<h2>On the <code>Node</code> class</h2>
-<p>Each node carries <code>pot</code>, its evidence <span class="math inline">\(p(y_v \mid z_v)\)</span> as a vector over its own states, with the prior <span class="math inline">\(p(z_r)\)</span> multiplied in at the root, and each non-root node carries <code>edge</code>, the conditional <span class="math inline">\(p(z_v \mid z_{\text{pa}(v)})\)</span> on the branch to its parent, a matrix indexed <code>[parent state, own state]</code>. Messages live on the node that sends them up or receives them from above.</p>
-<div id="06b01479" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="kw">def</span> collect(root):</span>
-<span id="cb1-2"><a href=""></a>    <span class="co">"""Post-order. Leaves v.below = p(y_v | z_v) times every message from below,</span></span>
-<span id="cb1-3"><a href=""></a><span class="co">       and v.up, the message from v to its parent. Returns p(y)."""</span></span>
-<span id="cb1-4"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> postorder(root):</span>
-<span id="cb1-5"><a href=""></a>        below <span class="op">=</span> v.pot.copy()</span>
-<span id="cb1-6"><a href=""></a>        <span class="cf">for</span> c <span class="kw">in</span> v.children:</span>
-<span id="cb1-7"><a href=""></a>            below <span class="op">=</span> below <span class="op">*</span> c.up</span>
-<span id="cb1-8"><a href=""></a>        v.below <span class="op">=</span> below</span>
-<span id="cb1-9"><a href=""></a>        <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb1-10"><a href=""></a>            v.up <span class="op">=</span> v.edge <span class="op">@</span> below                <span class="co"># sum_{z_v} p(z_v | z_pa) below(z_v)</span></span>
-<span id="cb1-11"><a href=""></a>    <span class="cf">return</span> root.below.<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="all-at-once">
-<ul>
-<li><code>below</code> is the boxed upward rule before the sum: evidence times the children’s messages. The matrix product does the sum over <span class="math inline">\(z_v\)</span> and returns a vector over the parent’s states.</li>
-<li>Ten lines, and the post-order traversal from Lab 4 is doing the scheduling. Nothing here is specific to phylogenies, chains, or <span class="math inline">\(K\)</span>.</li>
-</ul>
-</div>
-</section>
-<section id="exercise-write-distribute" class="slide level2">
-<h2>Exercise: write <code>distribute</code></h2>
-<p>The downward rule, one node at a time in pre-order. For each child <code>c</code> of <code>v</code>, assemble everything <code>v</code> knows <strong>except</strong> what came from <code>c</code>, then push it through the edge.</p>
-<div id="8a515939" class="cell" data-execution_count="9">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="kw">def</span> distribute(root):</span>
-<span id="cb2-2"><a href=""></a>    <span class="co">"""Pre-order. Sets c.down = p(y_ceil(c), z_c), the message from v to each child c."""</span></span>
-<span id="cb2-3"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> preorder(root):</span>
-<span id="cb2-4"><a href=""></a>        <span class="cf">for</span> c <span class="kw">in</span> v.children:</span>
-<span id="cb2-5"><a href=""></a>            <span class="co"># </span><span class="al">TODO</span><span class="co"> 1: start from v's evidence, times v.down if v has a parent</span></span>
-<span id="cb2-6"><a href=""></a>            <span class="co">#         (at the root, the prior is already inside v.pot)</span></span>
-<span id="cb2-7"><a href=""></a>            <span class="co"># </span><span class="al">TODO</span><span class="co"> 2: multiply in s.up for every child s of v other than c</span></span>
-<span id="cb2-8"><a href=""></a>            <span class="co"># </span><span class="al">TODO</span><span class="co"> 3: c.down = the sum over z_v of p(z_c | z_v) times that vector</span></span>
-<span id="cb2-9"><a href=""></a>            <span class="co">#         -- compare with the matrix product in collect, and mind the transpose</span></span>
-<span id="cb2-10"><a href=""></a>            <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
-<span id="cb2-11"><a href=""></a></span>
-<span id="cb2-12"><a href=""></a><span class="kw">def</span> marginals(root):</span>
-<span id="cb2-13"><a href=""></a>    <span class="co">"""p(z_v | y) on every node: below times down, normalized."""</span></span>
-<span id="cb2-14"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> preorder(root):</span>
-<span id="cb2-15"><a href=""></a>        b <span class="op">=</span> v.below <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> v.below <span class="op">*</span> v.down</span>
-<span id="cb2-16"><a href=""></a>        v.marginal <span class="op">=</span> b <span class="op">/</span> b.<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="all-at-once">
-<p><code>marginals</code> is given, and it is the exercise’s conclusion in two lines: <span class="math inline">\(p(\mathbf{y}_{\lfloor v \rfloor} \mid z_v)\)</span> is <code>below</code>, <span class="math inline">\(p(\mathbf{y}_{\lceil v \rceil}, z_v)\)</span> is <code>down</code>, and their product normalized is <span class="math inline">\(p(z_v \mid \mathbf{y})\)</span>. The next slide tells you whether your <code>distribute</code> is right.</p>
-</div>
-</section>
-<section id="does-it-work" class="slide level2">
-<h2>Does it work?</h2>
-<p>A random directed tree model on the seven node tree, <span class="math inline">\(K = 3\)</span>: a random root distribution, a random conditional table on every edge, and an observation with a random likelihood vector at every node. Against a brute force sum over all <span class="math inline">\(3^7\)</span> latent configurations.</p>
-<div id="26d063fc" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>)<span class="op">;</span> K <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb3-2"><a href=""></a>nodes <span class="op">=</span> {v: Node(v) <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">7</span>)}</span>
-<span id="cb3-3"><a href=""></a><span class="cf">for</span> a, b <span class="kw">in</span> TREE_EDGES:</span>
-<span id="cb3-4"><a href=""></a>    nodes[a].add_child(nodes[b])</span>
-<span id="cb3-5"><a href=""></a><span class="cf">for</span> v <span class="kw">in</span> nodes.values():</span>
-<span id="cb3-6"><a href=""></a>    v.pot <span class="op">=</span> rng.random(K)                                   <span class="co"># p(y_v | z_v), one value per state</span></span>
-<span id="cb3-7"><a href=""></a>    <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb3-8"><a href=""></a>        v.edge <span class="op">=</span> rng.dirichlet(np.ones(K), size<span class="op">=</span>K)          <span class="co"># p(z_v | z_pa): rows sum to one</span></span>
-<span id="cb3-9"><a href=""></a>root <span class="op">=</span> nodes[<span class="dv">0</span>]</span>
-<span id="cb3-10"><a href=""></a>root.pot <span class="op">=</span> root.pot <span class="op">*</span> rng.dirichlet(np.ones(K))             <span class="co"># p(z_r) folded into the root's evidence</span></span>
-<span id="cb3-11"><a href=""></a></span>
-<span id="cb3-12"><a href=""></a>lik <span class="op">=</span> collect(root)<span class="op">;</span> distribute(root)<span class="op">;</span> marginals(root)</span>
-<span id="cb3-13"><a href=""></a></span>
-<span id="cb3-14"><a href=""></a>lik_bf, marg <span class="op">=</span> <span class="fl">0.0</span>, {v: np.zeros(K) <span class="cf">for</span> v <span class="kw">in</span> nodes}</span>
-<span id="cb3-15"><a href=""></a><span class="cf">for</span> cfg <span class="kw">in</span> itertools.product(<span class="bu">range</span>(K), repeat<span class="op">=</span><span class="dv">7</span>):</span>
-<span id="cb3-16"><a href=""></a>    p <span class="op">=</span> np.prod([nodes[v].pot[cfg[v]] <span class="cf">for</span> v <span class="kw">in</span> nodes])</span>
-<span id="cb3-17"><a href=""></a>    p <span class="op">*=</span> np.prod([nodes[b].edge[cfg[a], cfg[b]] <span class="cf">for</span> a, b <span class="kw">in</span> TREE_EDGES])</span>
-<span id="cb3-18"><a href=""></a>    lik_bf <span class="op">+=</span> p</span>
-<span id="cb3-19"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> nodes: marg[v][cfg[v]] <span class="op">+=</span> p</span>
-<span id="cb3-20"><a href=""></a></span>
-<span id="cb3-21"><a href=""></a><span class="bu">print</span>(<span class="ss">f"BP           p(y) = </span><span class="sc">{</span>lik<span class="sc">:.10e}</span><span class="ss">"</span>)</span>
-<span id="cb3-22"><a href=""></a><span class="bu">print</span>(<span class="ss">f"brute force  p(y) = </span><span class="sc">{</span>lik_bf<span class="sc">:.10e}</span><span class="ss">   over </span><span class="sc">{</span>K<span class="op">**</span><span class="dv">7</span><span class="sc">}</span><span class="ss"> configurations"</span>)</span>
-<span id="cb3-23"><a href=""></a><span class="bu">print</span>(<span class="ss">f"posteriors agree at every node : </span><span class="sc">{</span><span class="bu">all</span>(np.allclose(nodes[v].marginal, marg[v] <span class="op">/</span> lik_bf) <span class="cf">for</span> v <span class="kw">in</span> nodes)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-24"><a href=""></a><span class="bu">print</span>(<span class="ss">f"p(y) from every node           : </span><span class="sc">{</span>np<span class="sc">.</span>allclose([(nodes[v].below <span class="op">*</span> (<span class="dv">1</span> <span class="cf">if</span> v <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> nodes[v].down)).<span class="bu">sum</span>() <span class="cf">for</span> v <span class="kw">in</span> nodes], lik)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>BP           p(y) = 5.7218358873e-03
-brute force  p(y) = 5.7218358873e-03   over 2187 configurations
-posteriors agree at every node : True
-p(y) from every node           : True</code></pre>
-</div>
-</div>
-<div class="all-at-once">
-<ul>
-<li>Run it. The first line tests <code>collect</code> alone; the third tests your <code>distribute</code>, and the last is part 3 of the exercise: <code>below</code> times <code>down</code> sums to <span class="math inline">\(p(\mathbf{y})\)</span> at every node.</li>
-<li>Then break it on purpose: drop the <code>if s is not c</code> exclusion so that <code>c</code>’s own message is multiplied back in, and run again. The likelihood is untouched and every posterior is wrong. That is the “echo” the one-rule slide warned about.</li>
-</ul>
-</div>
-</section>
-<section id="exercise-an-hmm-as-a-tree" class="slide level2">
-<h2>Exercise: an HMM as a tree</h2>
-<p>A chain is a tree in which every node has one child. For the HMM the evidence at node <span class="math inline">\(t\)</span> is <span class="math inline">\(p(y_t \mid z_t)\)</span>, the conditional on every edge is <span class="math inline">\(A\)</span>, and the prior at the root is <span class="math inline">\(\pi\)</span>. Build it out of <code>Node</code> objects and run the same code against last week’s forward-backward.</p>
-<div id="d6153bb5" class="cell" data-execution_count="12">
-<details class="code-fold">
-<summary>forward-backward from week 4, and a random HMM</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a><span class="kw">def</span> forward_backward(logB, pi, A):</span>
-<span id="cb5-2"><a href=""></a>    T, K_ <span class="op">=</span> logB.shape<span class="op">;</span> B <span class="op">=</span> np.exp(logB)</span>
-<span id="cb5-3"><a href=""></a>    al, c <span class="op">=</span> np.zeros((T, K_)), np.zeros(T)</span>
-<span id="cb5-4"><a href=""></a>    a <span class="op">=</span> pi <span class="op">*</span> B[<span class="dv">0</span>]<span class="op">;</span> c[<span class="dv">0</span>] <span class="op">=</span> a.<span class="bu">sum</span>()<span class="op">;</span> al[<span class="dv">0</span>] <span class="op">=</span> a <span class="op">/</span> c[<span class="dv">0</span>]</span>
-<span id="cb5-5"><a href=""></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, T):</span>
-<span id="cb5-6"><a href=""></a>        a <span class="op">=</span> (al[t<span class="op">-</span><span class="dv">1</span>] <span class="op">@</span> A) <span class="op">*</span> B[t]<span class="op">;</span> c[t] <span class="op">=</span> a.<span class="bu">sum</span>()<span class="op">;</span> al[t] <span class="op">=</span> a <span class="op">/</span> c[t]</span>
-<span id="cb5-7"><a href=""></a>    be <span class="op">=</span> np.zeros((T, K_))<span class="op">;</span> be[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb5-8"><a href=""></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(T<span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>):</span>
-<span id="cb5-9"><a href=""></a>        be[t] <span class="op">=</span> (A <span class="op">@</span> (B[t<span class="op">+</span><span class="dv">1</span>] <span class="op">*</span> be[t<span class="op">+</span><span class="dv">1</span>])) <span class="op">/</span> c[t<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb5-10"><a href=""></a>    <span class="cf">return</span> al <span class="op">*</span> be, np.log(c).<span class="bu">sum</span>()</span>
-<span id="cb5-11"><a href=""></a></span>
-<span id="cb5-12"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)<span class="op">;</span> Kc, T <span class="op">=</span> <span class="dv">3</span>, <span class="dv">9</span></span>
-<span id="cb5-13"><a href=""></a>pi_c <span class="op">=</span> rng.random(Kc)<span class="op">;</span> pi_c <span class="op">/=</span> pi_c.<span class="bu">sum</span>()</span>
-<span id="cb5-14"><a href=""></a>A_c <span class="op">=</span> rng.random((Kc, Kc))<span class="op">;</span> A_c <span class="op">/=</span> A_c.<span class="bu">sum</span>(<span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-15"><a href=""></a>y_c <span class="op">=</span> rng.normal(<span class="dv">0</span>, <span class="fl">2.5</span>, T)</span>
-<span id="cb5-16"><a href=""></a>Bc <span class="op">=</span> np.exp(np.column_stack([norm.logpdf(y_c, m, <span class="fl">1.0</span>) <span class="cf">for</span> m <span class="kw">in</span> (<span class="fl">0.</span>, <span class="fl">2.</span>, <span class="fl">5.</span>)]))   <span class="co"># Bc[t, k] = p(y_t | z_t = k)</span></span>
-<span id="cb5-17"><a href=""></a>gamma, ll <span class="op">=</span> forward_backward(np.log(Bc), pi_c, A_c)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div id="5738a383" class="cell" data-execution_count="13">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>chain <span class="op">=</span> [Node(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(T)]</span>
-<span id="cb6-2"><a href=""></a><span class="co"># </span><span class="al">TODO</span><span class="co">: link chain[t-1] -&gt; chain[t] with add_child; set each node's pot to its row of Bc</span></span>
-<span id="cb6-3"><a href=""></a><span class="co">#       and each non-root node's edge to A_c; fold pi_c into the root's pot</span></span>
-<span id="cb6-4"><a href=""></a>Zc <span class="op">=</span> collect(chain[<span class="dv">0</span>])<span class="op">;</span> distribute(chain[<span class="dv">0</span>])<span class="op">;</span> marginals(chain[<span class="dv">0</span>])</span>
-<span id="cb6-5"><a href=""></a></span>
-<span id="cb6-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"forward-backward log likelihood : </span><span class="sc">{</span>ll<span class="sc">:.10f}</span><span class="ss">"</span>)</span>
-<span id="cb6-7"><a href=""></a><span class="bu">print</span>(<span class="ss">f"belief propagation log p(y)     : </span><span class="sc">{</span>np<span class="sc">.</span>log(Zc)<span class="sc">:.10f}</span><span class="ss">"</span>)</span>
-<span id="cb6-8"><a href=""></a><span class="bu">print</span>(<span class="ss">f"gamma equals the node marginals : </span><span class="sc">{</span><span class="bu">all</span>(np.allclose(gamma[t], chain[t].marginal) <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(T))<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div id="de593bcc" class="cell" data-execution_count="14">
-<div class="cell-output cell-output-stdout">
-<pre><code>forward-backward log likelihood : -61.4647307182
-belief propagation log p(y)     : -61.4647307182
-gamma equals the node marginals : True</code></pre>
-</div>
-</div>
-<div class="all-at-once">
-<p>When it agrees: which attribute of node <span class="math inline">\(t\)</span> is <span class="math inline">\(\alpha_t\)</span>, which is <span class="math inline">\(\beta_t\)</span>, and where did the scaling constants <span class="math inline">\(c_t\)</span> go? Last week’s algorithm was this week’s algorithm on a line.</p>
 </div>
 </section>
 <section id="one-algorithm-many-names" class="slide level2">
@@ -692,19 +542,19 @@ gamma equals the node marginals : True</code></pre>
 </ul>
 </div>
 <div class="all-at-once">
-<p>In every case the ancestors are unobserved. That is what makes it a latent variable problem, and its inference algorithm, published in 1981, is <strong>exactly the collect pass</strong> we just derived.</p>
+<p>In every case the ancestors are unobserved. That is what makes it a latent variable problem, and its inference algorithm, published in 1981, is <strong>exactly the bottom-up pass</strong> we just derived.</p>
 </div>
 </section>
 <section id="the-data" class="slide level2">
 <h2>The data</h2>
-<div id="c673bdc6" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>tree <span class="op">=</span> build_tree()</span>
-<span id="cb8-2"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">5</span>)</span>
-<span id="cb8-3"><a href=""></a>simulate_sites(tree, n_sites<span class="op">=</span><span class="dv">300</span>, rng<span class="op">=</span>rng)</span>
-<span id="cb8-4"><a href=""></a>by_name <span class="op">=</span> {v.name: v <span class="cf">for</span> v <span class="kw">in</span> preorder(tree)}</span>
-<span id="cb8-5"><a href=""></a></span>
-<span id="cb8-6"><a href=""></a><span class="cf">for</span> name <span class="kw">in</span> <span class="st">"ABCD"</span>:</span>
-<span id="cb8-7"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">  </span><span class="sc">{</span>to_string(by_name[name].seq[:<span class="dv">48</span>])<span class="sc">}</span><span class="ss"> ..."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="1fae5883" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>tree <span class="op">=</span> build_tree()</span>
+<span id="cb1-2"><a href=""></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">5</span>)</span>
+<span id="cb1-3"><a href=""></a>simulate_sites(tree, n_sites<span class="op">=</span><span class="dv">300</span>, rng<span class="op">=</span>rng)</span>
+<span id="cb1-4"><a href=""></a>by_name <span class="op">=</span> {v.name: v <span class="cf">for</span> v <span class="kw">in</span> preorder(tree)}</span>
+<span id="cb1-5"><a href=""></a></span>
+<span id="cb1-6"><a href=""></a><span class="cf">for</span> name <span class="kw">in</span> <span class="st">"ABCD"</span>:</span>
+<span id="cb1-7"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">  </span><span class="sc">{</span>to_string(by_name[name].seq[:<span class="dv">48</span>])<span class="sc">}</span><span class="ss"> ..."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>A  GTATCTCCTAACGCAAAAATAGTGCGCTACATACGCGGGATGTCCTAA ...
 B  GTAACCACTACTGCCTTAACGATTCGCTACATACGCGGCATGTCCTAA ...
@@ -722,11 +572,11 @@ D  GTATCGGCTACCGCATAAATACTTCCCAATTGAGCACGTATGATCTAA ...</code></pre>
 </section>
 <section id="the-tree-is-two-unknowns" class="slide level2">
 <h2>The tree is two unknowns</h2>
-<div id="bcd652e5" class="cell" data-execution_count="16">
+<div id="4f72d109" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="5_belief_propagation_files/figure-revealjs/cell-17-output-1.png" width="484" height="336"></p>
+<p><img data-src="5_belief_propagation_files/figure-revealjs/cell-10-output-1.png" width="484" height="336"></p>
 </figure>
 </div>
 </div>
@@ -742,8 +592,8 @@ D  GTATCGGCTACCGCATAAATACTTCCCAATTGAGCACGTATGATCTAA ...</code></pre>
 </section>
 <section id="how-many-topologies" class="slide level2">
 <h2>How many topologies?</h2>
-<div id="15a6784a" class="cell" data-execution_count="17">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="15">
+<div id="a5a6168c" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="10">
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -824,8 +674,23 @@ L_v(s) = p\big(\text{leaves below } v \mid z_v = s\big).
 <p>One post-order traversal. <span class="math inline">\(O(nK^2)\)</span> instead of <span class="math inline">\(O(K^n)\)</span>.</p>
 </div>
 </section>
-<section id="this-is-the-collect-pass" class="slide level2">
-<h2>This is the collect pass</h2>
+<section id="exercise-pruning-is-message-passing" class="slide level2 scrollable">
+<h2>Exercise: pruning is message passing</h2>
+<p>Let <span class="math inline">\(v\)</span> be an internal node in state <span class="math inline">\(s\)</span>, with children <span class="math inline">\(c\)</span>. Starting from the bottom-up message rule:</p>
+<div class="all-at-once">
+<ol type="1">
+<li>Explain why the local evidence at <span class="math inline">\(v\)</span> is <span class="math inline">\(p(y_v \mid z_v=s)=1\)</span>.</li>
+<li>If the conditional likelihood below child <span class="math inline">\(c\)</span> is <span class="math inline">\(L_c(s')\)</span>, show that <span class="math display">\[
+m_{c \to v}(s)=\sum_{s'} P_{ss'}(t_c)L_c(s').
+\]</span></li>
+<li>Multiply the child messages and recover the internal-node pruning rule <span class="math display">\[
+L_v(s)=\prod_c m_{c \to v}(s).
+\]</span></li>
+</ol>
+</div>
+</section>
+<section id="this-is-the-bottom-up-collect-pass" class="slide level2">
+<h2>This is the bottom-up (collect) pass</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -839,16 +704,16 @@ L_v(s) = p\big(\text{leaves below } v \mid z_v = s\big).
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>v.below</code> = <span class="math inline">\(p(y_v \mid z_v) \prod_c m_{c \to v}\)</span></td>
-<td>conditional likelihood <span class="math inline">\(L_v\)</span></td>
+<td><span class="math inline">\(p(y_v \mid z_v=s) \prod_c m_{c \to v}(s)\)</span></td>
+<td>conditional likelihood <span class="math inline">\(L_v(s)\)</span></td>
 </tr>
 <tr class="even">
-<td>message <code>c.up</code> = <span class="math inline">\(P(t_c) \, L_c\)</span></td>
-<td>the bracket <span class="math inline">\(\sum_{s'} P_{ss'}(t_c) L_c(s')\)</span></td>
+<td><span class="math inline">\(m_{c \to v}(s)=\sum_{s'}p(z_c=s'\mid z_v=s)L_c(s')\)</span></td>
+<td><span class="math inline">\(\sum_{s'} P_{ss'}(t_c)L_c(s')\)</span></td>
 </tr>
 <tr class="odd">
-<td>evidence <span class="math inline">\(p(y_v \mid z_v)\)</span></td>
-<td>indicator at a leaf, <span class="math inline">\(\mathbb{1}\)</span> at an internal node</td>
+<td>evidence <span class="math inline">\(p(y_v \mid z_v=s)\)</span></td>
+<td><span class="math inline">\(\mathbb{1}[s=y_v]\)</span> at a leaf, <span class="math inline">\(1\)</span> at an internal node</td>
 </tr>
 <tr class="even">
 <td>conditional <span class="math inline">\(p(z_v \mid z_{\text{pa}(v)})\)</span></td>
@@ -866,28 +731,28 @@ L_v(s) = p\big(\text{leaves below } v \mid z_v = s\big).
 </section>
 <section id="exercise-evidence-for-one-column" class="slide level2">
 <h2>Exercise: evidence for one column</h2>
-<p>Everything the algorithm needs is set on the nodes. Fill in the four pieces, then call the <code>collect</code> you already have.</p>
-<div id="95af2218" class="cell" data-execution_count="18">
+<p>To use the bottom-up pass for phylogenetics, set these four pieces on the nodes.</p>
+<div id="8f0697e5" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="kw">def</span> set_site(root, site, pi<span class="op">=</span>np.full(<span class="dv">4</span>, <span class="fl">0.25</span>)):</span>
-<span id="cb10-2"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> preorder(root):</span>
-<span id="cb10-3"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 1: a leaf's pot is a point mass on its nucleotide v.seq[site]</span></span>
-<span id="cb10-4"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 2: an internal node's pot is all ones (nothing observed there)</span></span>
-<span id="cb10-5"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 3: every non-root node's edge is jc69 of its branch length</span></span>
-<span id="cb10-6"><a href=""></a>        <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
-<span id="cb10-7"><a href=""></a>    <span class="co"># </span><span class="al">TODO</span><span class="co"> 4: multiply the prior pi into the root's pot</span></span>
-<span id="cb10-8"><a href=""></a></span>
-<span id="cb10-9"><a href=""></a><span class="kw">def</span> site_likelihood(root, site):</span>
-<span id="cb10-10"><a href=""></a>    set_site(root, site)</span>
-<span id="cb10-11"><a href=""></a>    <span class="cf">return</span> collect(root)</span>
-<span id="cb10-12"><a href=""></a></span>
-<span id="cb10-13"><a href=""></a>lik <span class="op">=</span> site_likelihood(tree, site<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb10-14"><a href=""></a><span class="bu">print</span>(<span class="ss">f"column 0 is </span><span class="sc">{</span><span class="st">''</span><span class="sc">.</span>join(<span class="st">'ACGT'</span>[by_name[k].seq[<span class="dv">0</span>]] <span class="cf">for</span> k <span class="kw">in</span> <span class="st">'ABCD'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-15"><a href=""></a><span class="bu">print</span>(<span class="ss">f"pruning: p(column 0) = </span><span class="sc">{</span>lik<span class="sc">:.10e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="kw">def</span> set_site(root, site, pi<span class="op">=</span>np.full(<span class="dv">4</span>, <span class="fl">0.25</span>)):</span>
+<span id="cb3-2"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> preorder(root):</span>
+<span id="cb3-3"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 1: a leaf's pot is a point mass on its nucleotide v.seq[site]</span></span>
+<span id="cb3-4"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 2: an internal node's pot is all ones (nothing observed there)</span></span>
+<span id="cb3-5"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co"> 3: every non-root node's edge is jc69 of its branch length</span></span>
+<span id="cb3-6"><a href=""></a>        <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
+<span id="cb3-7"><a href=""></a>    <span class="co"># </span><span class="al">TODO</span><span class="co"> 4: multiply the prior pi into the root's pot</span></span>
+<span id="cb3-8"><a href=""></a></span>
+<span id="cb3-9"><a href=""></a><span class="kw">def</span> site_likelihood(root, site):</span>
+<span id="cb3-10"><a href=""></a>    set_site(root, site)</span>
+<span id="cb3-11"><a href=""></a>    <span class="cf">return</span> collect(root)</span>
+<span id="cb3-12"><a href=""></a></span>
+<span id="cb3-13"><a href=""></a>lik <span class="op">=</span> site_likelihood(tree, site<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-14"><a href=""></a><span class="bu">print</span>(<span class="ss">f"column 0 is </span><span class="sc">{</span><span class="st">''</span><span class="sc">.</span>join(<span class="st">'ACGT'</span>[by_name[k].seq[<span class="dv">0</span>]] <span class="cf">for</span> k <span class="kw">in</span> <span class="st">'ABCD'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-15"><a href=""></a><span class="bu">print</span>(<span class="ss">f"pruning: p(column 0) = </span><span class="sc">{</span>lik<span class="sc">:.10e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="d773d53b" class="cell" data-execution_count="19">
+<div id="4f4720c1" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-stdout">
 <pre><code>column 0 is GGGG
 pruning: p(column 0) = 1.0754462052e-01</code></pre>
@@ -897,21 +762,21 @@ pruning: p(column 0) = 1.0754462052e-01</code></pre>
 <section id="is-it-right" class="slide level2">
 <h2>Is it right?</h2>
 <p>The brute force sum over the <span class="math inline">\(4^3\)</span> ancestral configurations, for the same column.</p>
-<div id="479b2d03" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>internal <span class="op">=</span> [<span class="st">"root"</span>, <span class="st">"i1"</span>, <span class="st">"i2"</span>]</span>
-<span id="cb12-2"><a href=""></a>total <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb12-3"><a href=""></a><span class="cf">for</span> states <span class="kw">in</span> itertools.product(<span class="bu">range</span>(<span class="dv">4</span>), repeat<span class="op">=</span><span class="dv">3</span>):</span>
-<span id="cb12-4"><a href=""></a>    st <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(internal, states))</span>
-<span id="cb12-5"><a href=""></a>    p <span class="op">=</span> <span class="fl">0.25</span></span>
-<span id="cb12-6"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> preorder(tree):</span>
-<span id="cb12-7"><a href=""></a>        <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb12-8"><a href=""></a>            child_state <span class="op">=</span> v.seq[<span class="dv">0</span>] <span class="cf">if</span> v.is_leaf() <span class="cf">else</span> st[v.name]</span>
-<span id="cb12-9"><a href=""></a>            p <span class="op">*=</span> jc69(v.branch_length)[st[v.parent.name], child_state]</span>
-<span id="cb12-10"><a href=""></a>    total <span class="op">+=</span> p</span>
-<span id="cb12-11"><a href=""></a></span>
-<span id="cb12-12"><a href=""></a><span class="bu">print</span>(<span class="ss">f"pruning     : </span><span class="sc">{</span>lik<span class="sc">:.10e}</span><span class="ss">"</span>)</span>
-<span id="cb12-13"><a href=""></a><span class="bu">print</span>(<span class="ss">f"brute force : </span><span class="sc">{</span>total<span class="sc">:.10e}</span><span class="ss">   over </span><span class="sc">{</span><span class="dv">4</span><span class="op">**</span><span class="dv">3</span><span class="sc">}</span><span class="ss"> ancestral configurations"</span>)</span>
-<span id="cb12-14"><a href=""></a><span class="bu">print</span>(<span class="ss">f"relative difference: </span><span class="sc">{</span><span class="bu">abs</span>(lik <span class="op">-</span> total) <span class="op">/</span> total<span class="sc">:.1e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2e8307ee" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>internal <span class="op">=</span> [<span class="st">"root"</span>, <span class="st">"i1"</span>, <span class="st">"i2"</span>]</span>
+<span id="cb5-2"><a href=""></a>total <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb5-3"><a href=""></a><span class="cf">for</span> states <span class="kw">in</span> itertools.product(<span class="bu">range</span>(<span class="dv">4</span>), repeat<span class="op">=</span><span class="dv">3</span>):</span>
+<span id="cb5-4"><a href=""></a>    st <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(internal, states))</span>
+<span id="cb5-5"><a href=""></a>    p <span class="op">=</span> <span class="fl">0.25</span></span>
+<span id="cb5-6"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> preorder(tree):</span>
+<span id="cb5-7"><a href=""></a>        <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb5-8"><a href=""></a>            child_state <span class="op">=</span> v.seq[<span class="dv">0</span>] <span class="cf">if</span> v.is_leaf() <span class="cf">else</span> st[v.name]</span>
+<span id="cb5-9"><a href=""></a>            p <span class="op">*=</span> jc69(v.branch_length)[st[v.parent.name], child_state]</span>
+<span id="cb5-10"><a href=""></a>    total <span class="op">+=</span> p</span>
+<span id="cb5-11"><a href=""></a></span>
+<span id="cb5-12"><a href=""></a><span class="bu">print</span>(<span class="ss">f"pruning     : </span><span class="sc">{</span>lik<span class="sc">:.10e}</span><span class="ss">"</span>)</span>
+<span id="cb5-13"><a href=""></a><span class="bu">print</span>(<span class="ss">f"brute force : </span><span class="sc">{</span>total<span class="sc">:.10e}</span><span class="ss">   over </span><span class="sc">{</span><span class="dv">4</span><span class="op">**</span><span class="dv">3</span><span class="sc">}</span><span class="ss"> ancestral configurations"</span>)</span>
+<span id="cb5-14"><a href=""></a><span class="bu">print</span>(<span class="ss">f"relative difference: </span><span class="sc">{</span><span class="bu">abs</span>(lik <span class="op">-</span> total) <span class="op">/</span> total<span class="sc">:.1e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>pruning     : 1.0754462052e-01
 brute force : 1.0754462052e-01   over 64 ancestral configurations
@@ -925,11 +790,11 @@ relative difference: 2.6e-16</code></pre>
 <section id="a-whole-alignment" class="slide level2">
 <h2>A whole alignment</h2>
 <p>Sites are independent given the tree, so log likelihoods add.</p>
-<div id="20c477bf" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a><span class="kw">def</span> alignment_loglik(root, n_sites):</span>
-<span id="cb14-2"><a href=""></a>    <span class="cf">return</span> <span class="bu">sum</span>(np.log(site_likelihood(root, s)) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(n_sites))</span>
-<span id="cb14-3"><a href=""></a></span>
-<span id="cb14-4"><a href=""></a><span class="bu">print</span>(<span class="ss">f"log likelihood of the 300 column alignment: </span><span class="sc">{</span>alignment_loglik(tree, <span class="dv">300</span>)<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="79e3cfb9" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a><span class="kw">def</span> alignment_loglik(root, n_sites):</span>
+<span id="cb7-2"><a href=""></a>    <span class="cf">return</span> <span class="bu">sum</span>(np.log(site_likelihood(root, s)) <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(n_sites))</span>
+<span id="cb7-3"><a href=""></a></span>
+<span id="cb7-4"><a href=""></a><span class="bu">print</span>(<span class="ss">f"log likelihood of the 300 column alignment: </span><span class="sc">{</span>alignment_loglik(tree, <span class="dv">300</span>)<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>log likelihood of the 300 column alignment: -1222.80</code></pre>
 </div>
@@ -944,19 +809,19 @@ relative difference: 2.6e-16</code></pre>
 <section id="exercise-how-much-do-the-branch-lengths-matter" class="slide level2">
 <h2>Exercise: how much do the branch lengths matter?</h2>
 <p>Scale every branch length in the tree by a common factor and score the alignment again. The data were simulated at factor <span class="math inline">\(1\)</span>.</p>
-<div id="6af5b800" class="cell" data-execution_count="22">
+<div id="0cd24f97" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>original <span class="op">=</span> {v.name: v.branch_length <span class="cf">for</span> v <span class="kw">in</span> preorder(tree)}</span>
-<span id="cb16-2"><a href=""></a><span class="cf">for</span> factor <span class="kw">in</span> [<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">4.0</span>]:</span>
-<span id="cb16-3"><a href=""></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: set every node's branch_length to original[v.name] * factor,</span></span>
-<span id="cb16-4"><a href=""></a>    <span class="co">#       compute alignment_loglik(tree, 300), print factor and the value,</span></span>
-<span id="cb16-5"><a href=""></a>    <span class="co">#       then restore the original lengths</span></span>
-<span id="cb16-6"><a href=""></a>    <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>original <span class="op">=</span> {v.name: v.branch_length <span class="cf">for</span> v <span class="kw">in</span> preorder(tree)}</span>
+<span id="cb9-2"><a href=""></a><span class="cf">for</span> factor <span class="kw">in</span> [<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">4.0</span>]:</span>
+<span id="cb9-3"><a href=""></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: set every node's branch_length to original[v.name] * factor,</span></span>
+<span id="cb9-4"><a href=""></a>    <span class="co">#       compute alignment_loglik(tree, 300), print factor and the value,</span></span>
+<span id="cb9-5"><a href=""></a>    <span class="co">#       then restore the original lengths</span></span>
+<span id="cb9-6"><a href=""></a>    <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="11bf0f72" class="cell" data-execution_count="23">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="19">
+<div id="087867e6" class="cell" data-execution_count="16">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="14">
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -991,34 +856,33 @@ relative difference: 2.6e-16</code></pre>
 </div>
 <div class="all-at-once">
 <ul>
-<li>Before running: will the maximum be at factor <span class="math inline">\(1\)</span> exactly, near it, or somewhere else, and why?</li>
-<li>After: with every branch scaled together, the likelihood is a one dimensional function and this table is a crude line search over it. Real software optimizes each branch length separately, with pruning called inside the optimizer.</li>
+<li>This table varies one common scale. In practice, every branch length is optimized separately, with pruning used to evaluate the likelihood.</li>
 </ul>
 </div>
 </section>
 <section id="exercise-choosing-between-trees" class="slide level2">
 <h2>Exercise: choosing between trees</h2>
 <p>Four taxa admit exactly three unrooted topologies. <code>topology</code> builds one from a pairing of the leaves, every branch of the same length, so the comparison is about shape alone.</p>
-<div id="2ba5ab36" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a><span class="kw">def</span> topology(pairing, seqs, bl<span class="op">=</span><span class="fl">0.15</span>):</span>
-<span id="cb17-2"><a href=""></a>    (a, b), (c, d) <span class="op">=</span> pairing</span>
-<span id="cb17-3"><a href=""></a>    root <span class="op">=</span> Node(<span class="st">"root"</span>)</span>
-<span id="cb17-4"><a href=""></a>    i1 <span class="op">=</span> root.add_child(Node(<span class="st">"i1"</span>, bl))<span class="op">;</span> i2 <span class="op">=</span> root.add_child(Node(<span class="st">"i2"</span>, bl))</span>
-<span id="cb17-5"><a href=""></a>    <span class="cf">for</span> parent, name <span class="kw">in</span> [(i1, a), (i1, b), (i2, c), (i2, d)]:</span>
-<span id="cb17-6"><a href=""></a>        parent.add_child(Node(name, bl)).seq <span class="op">=</span> seqs[name]</span>
-<span id="cb17-7"><a href=""></a>    <span class="cf">return</span> root</span>
-<span id="cb17-8"><a href=""></a></span>
-<span id="cb17-9"><a href=""></a>leaf_seqs <span class="op">=</span> {k: by_name[k].seq <span class="cf">for</span> k <span class="kw">in</span> <span class="st">"ABCD"</span>}</span>
-<span id="cb17-10"><a href=""></a>candidates <span class="op">=</span> {<span class="st">"((A,B),(C,D))"</span>: ((<span class="st">"A"</span>, <span class="st">"B"</span>), (<span class="st">"C"</span>, <span class="st">"D"</span>)),</span>
-<span id="cb17-11"><a href=""></a>              <span class="st">"((A,C),(B,D))"</span>: ((<span class="st">"A"</span>, <span class="st">"C"</span>), (<span class="st">"B"</span>, <span class="st">"D"</span>)),</span>
-<span id="cb17-12"><a href=""></a>              <span class="st">"((A,D),(B,C))"</span>: ((<span class="st">"A"</span>, <span class="st">"D"</span>), (<span class="st">"B"</span>, <span class="st">"C"</span>))}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3864abbd" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="kw">def</span> topology(pairing, seqs, bl<span class="op">=</span><span class="fl">0.15</span>):</span>
+<span id="cb10-2"><a href=""></a>    (a, b), (c, d) <span class="op">=</span> pairing</span>
+<span id="cb10-3"><a href=""></a>    root <span class="op">=</span> Node(<span class="st">"root"</span>)</span>
+<span id="cb10-4"><a href=""></a>    i1 <span class="op">=</span> root.add_child(Node(<span class="st">"i1"</span>, bl))<span class="op">;</span> i2 <span class="op">=</span> root.add_child(Node(<span class="st">"i2"</span>, bl))</span>
+<span id="cb10-5"><a href=""></a>    <span class="cf">for</span> parent, name <span class="kw">in</span> [(i1, a), (i1, b), (i2, c), (i2, d)]:</span>
+<span id="cb10-6"><a href=""></a>        parent.add_child(Node(name, bl)).seq <span class="op">=</span> seqs[name]</span>
+<span id="cb10-7"><a href=""></a>    <span class="cf">return</span> root</span>
+<span id="cb10-8"><a href=""></a></span>
+<span id="cb10-9"><a href=""></a>leaf_seqs <span class="op">=</span> {k: by_name[k].seq <span class="cf">for</span> k <span class="kw">in</span> <span class="st">"ABCD"</span>}</span>
+<span id="cb10-10"><a href=""></a>candidates <span class="op">=</span> {<span class="st">"((A,B),(C,D))"</span>: ((<span class="st">"A"</span>, <span class="st">"B"</span>), (<span class="st">"C"</span>, <span class="st">"D"</span>)),</span>
+<span id="cb10-11"><a href=""></a>              <span class="st">"((A,C),(B,D))"</span>: ((<span class="st">"A"</span>, <span class="st">"C"</span>), (<span class="st">"B"</span>, <span class="st">"D"</span>)),</span>
+<span id="cb10-12"><a href=""></a>              <span class="st">"((A,D),(B,C))"</span>: ((<span class="st">"A"</span>, <span class="st">"D"</span>), (<span class="st">"B"</span>, <span class="st">"C"</span>))}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Before scoring: which pairing generated the data, and will it win by a little or a lot?</p>
-<div id="60bfbd01" class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>md_table(pd.DataFrame([{<span class="st">"topology"</span>: name,</span>
-<span id="cb18-2"><a href=""></a>                        <span class="st">"log likelihood"</span>: <span class="ss">f"</span><span class="sc">{</span>alignment_loglik(topology(pr, leaf_seqs), <span class="dv">300</span>)<span class="sc">:.1f}</span><span class="ss">"</span>}</span>
-<span id="cb18-3"><a href=""></a>                       <span class="cf">for</span> name, pr <span class="kw">in</span> candidates.items()]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="21">
+<div id="0b880df6" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>md_table(pd.DataFrame([{<span class="st">"topology"</span>: name,</span>
+<span id="cb11-2"><a href=""></a>                        <span class="st">"log likelihood"</span>: <span class="ss">f"</span><span class="sc">{</span>alignment_loglik(topology(pr, leaf_seqs), <span class="dv">300</span>)<span class="sc">:.1f}</span><span class="ss">"</span>}</span>
+<span id="cb11-3"><a href=""></a>                       <span class="cf">for</span> name, pr <span class="kw">in</span> candidates.items()]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="16">
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -1052,29 +916,29 @@ relative difference: 2.6e-16</code></pre>
 </section>
 <section id="exercise-ancestral-states-the-other-pass" class="slide level2">
 <h2>Exercise: ancestral states, the other pass</h2>
-<p>Pruning stopped at the root because the likelihood was all we wanted. Run <code>distribute</code> as well and the node marginals are posteriors over the ancestral nucleotides, <span class="math inline">\(p(z_v \mid \mathbf{y})\)</span> at every internal node. Your simulator kept the truth, so you can grade them.</p>
-<div id="1ad5b014" class="cell" data-execution_count="26">
+<p>Pruning stopped at the root because the likelihood was all we wanted. Run the top-down <code>distribute</code> pass as well and the node marginals are posteriors over the ancestral nucleotides, <span class="math inline">\(p(z_v \mid \mathbf{y})\)</span> at every internal node. Your simulator kept the truth, so you can grade them.</p>
+<div id="f1b20f21" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a><span class="kw">def</span> ancestral_posteriors(root, n_sites):</span>
-<span id="cb19-2"><a href=""></a>    <span class="co">"""post[name] is an (n_sites, 4) array: row s is p(z_v | column s) for internal node v."""</span></span>
-<span id="cb19-3"><a href=""></a>    post <span class="op">=</span> {v.name: np.zeros((n_sites, <span class="dv">4</span>)) <span class="cf">for</span> v <span class="kw">in</span> preorder(root) <span class="cf">if</span> <span class="kw">not</span> v.is_leaf()}</span>
-<span id="cb19-4"><a href=""></a>    <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(n_sites):</span>
-<span id="cb19-5"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: set the site, run the two passes and marginals, store each internal node's marginal</span></span>
-<span id="cb19-6"><a href=""></a>        <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
-<span id="cb19-7"><a href=""></a>    <span class="cf">return</span> post</span>
-<span id="cb19-8"><a href=""></a></span>
-<span id="cb19-9"><a href=""></a>post <span class="op">=</span> ancestral_posteriors(tree, <span class="dv">300</span>)</span>
-<span id="cb19-10"><a href=""></a><span class="cf">for</span> name <span class="kw">in</span> [<span class="st">"i1"</span>, <span class="st">"i2"</span>, <span class="st">"root"</span>]:</span>
-<span id="cb19-11"><a href=""></a>    truth <span class="op">=</span> by_name[name].seq</span>
-<span id="cb19-12"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;5}</span><span class="ss">:  argmax correct </span><span class="sc">{</span>np<span class="sc">.</span>mean(post[name].argmax(<span class="dv">1</span>) <span class="op">==</span> truth)<span class="sc">:.1%}</span><span class="ss">,"</span></span>
-<span id="cb19-13"><a href=""></a>          <span class="ss">f"   mean max posterior </span><span class="sc">{</span>post[name]<span class="sc">.</span><span class="bu">max</span>(<span class="dv">1</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="kw">def</span> ancestral_posteriors(root, n_sites):</span>
+<span id="cb12-2"><a href=""></a>    <span class="co">"""post[name] is an (n_sites, 4) array: row s is p(z_v | column s) for internal node v."""</span></span>
+<span id="cb12-3"><a href=""></a>    post <span class="op">=</span> {v.name: np.zeros((n_sites, <span class="dv">4</span>)) <span class="cf">for</span> v <span class="kw">in</span> preorder(root) <span class="cf">if</span> <span class="kw">not</span> v.is_leaf()}</span>
+<span id="cb12-4"><a href=""></a>    <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(n_sites):</span>
+<span id="cb12-5"><a href=""></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: set the site, run the two passes and marginals, store each internal node's marginal</span></span>
+<span id="cb12-6"><a href=""></a>        <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
+<span id="cb12-7"><a href=""></a>    <span class="cf">return</span> post</span>
+<span id="cb12-8"><a href=""></a></span>
+<span id="cb12-9"><a href=""></a>post <span class="op">=</span> ancestral_posteriors(tree, <span class="dv">300</span>)</span>
+<span id="cb12-10"><a href=""></a><span class="cf">for</span> name <span class="kw">in</span> [<span class="st">"i1"</span>, <span class="st">"i2"</span>, <span class="st">"root"</span>]:</span>
+<span id="cb12-11"><a href=""></a>    truth <span class="op">=</span> by_name[name].seq</span>
+<span id="cb12-12"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:&gt;5}</span><span class="ss">:  argmax correct </span><span class="sc">{</span>np<span class="sc">.</span>mean(post[name].argmax(<span class="dv">1</span>) <span class="op">==</span> truth)<span class="sc">:.1%}</span><span class="ss">,"</span></span>
+<span id="cb12-13"><a href=""></a>          <span class="ss">f"   mean max posterior </span><span class="sc">{</span>post[name]<span class="sc">.</span><span class="bu">max</span>(<span class="dv">1</span>)<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="1f2cb765" class="cell" data-execution_count="27">
+<div id="ca7b4f89" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-stdout">
 <pre><code>   i1:  argmax correct 94.7%,   mean max posterior 0.959
-   i2:  argmax correct 93.3%,   mean max posterior 0.953
+   i2:  argmax correct 93.7%,   mean max posterior 0.966
  root:  argmax correct 88.7%,   mean max posterior 0.888</code></pre>
 </div>
 </div>
@@ -1088,8 +952,8 @@ relative difference: 2.6e-16</code></pre>
 </section>
 <section id="reading-one-column" class="slide level2">
 <h2>Reading one column</h2>
-<div id="1bc9bed5" class="cell" data-execution_count="28">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="23">
+<div id="763ded7f" class="cell" data-execution_count="21">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="18">
 <table class="caption-top" style="width:100%;">
 <colgroup>
 <col style="width: 16%">
@@ -1171,30 +1035,30 @@ relative difference: 2.6e-16</code></pre>
 </section>
 <section id="exercise-max-product-in-one-line" class="slide level2">
 <h2>Exercise: max-product in one line</h2>
-<p>Swap the sum in the upward message for a max, and the collect pass returns the probability of the single best joint assignment of ancestral states instead of the sum over all of them.</p>
-<div id="2e789ec2" class="cell" data-execution_count="29">
+<p>Swap the sum in the bottom-up message for a max, and the bottom-up pass returns the probability of the single best joint assignment of ancestral states instead of the sum over all of them.</p>
+<div id="91e6c521" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a><span class="kw">def</span> collect_max(root):</span>
-<span id="cb21-2"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> postorder(root):</span>
-<span id="cb21-3"><a href=""></a>        below <span class="op">=</span> v.pot.copy()</span>
-<span id="cb21-4"><a href=""></a>        <span class="cf">for</span> c <span class="kw">in</span> v.children:</span>
-<span id="cb21-5"><a href=""></a>            below <span class="op">=</span> below <span class="op">*</span> c.up_max</span>
-<span id="cb21-6"><a href=""></a>        v.below_max <span class="op">=</span> below</span>
-<span id="cb21-7"><a href=""></a>        <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb21-8"><a href=""></a>            <span class="co"># </span><span class="al">TODO</span><span class="co">: v.up_max[z_pa] = max over z_v of p(z_v | z_pa) * below[z_v]</span></span>
-<span id="cb21-9"><a href=""></a>            <span class="co">#       hint: (v.edge * below[None, :]) is the K x K array of products</span></span>
-<span id="cb21-10"><a href=""></a>            <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
-<span id="cb21-11"><a href=""></a>    <span class="cf">return</span> root.below_max.<span class="bu">max</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a><span class="kw">def</span> collect_max(root):</span>
+<span id="cb14-2"><a href=""></a>    <span class="cf">for</span> v <span class="kw">in</span> postorder(root):</span>
+<span id="cb14-3"><a href=""></a>        below <span class="op">=</span> v.pot.copy()</span>
+<span id="cb14-4"><a href=""></a>        <span class="cf">for</span> c <span class="kw">in</span> v.children:</span>
+<span id="cb14-5"><a href=""></a>            below <span class="op">=</span> below <span class="op">*</span> c.up_max</span>
+<span id="cb14-6"><a href=""></a>        v.below_max <span class="op">=</span> below</span>
+<span id="cb14-7"><a href=""></a>        <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb14-8"><a href=""></a>            <span class="co"># </span><span class="al">TODO</span><span class="co">: v.up_max[z_pa] = max over z_v of p(z_v | z_pa) * below[z_v]</span></span>
+<span id="cb14-9"><a href=""></a>            <span class="co">#       hint: (v.edge * below[None, :]) is the K x K array of products</span></span>
+<span id="cb14-10"><a href=""></a>            <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
+<span id="cb14-11"><a href=""></a>    <span class="cf">return</span> root.below_max.<span class="bu">max</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="70633ac2" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>set_site(tree, <span class="dv">0</span>)</span>
-<span id="cb22-2"><a href=""></a>best_bf <span class="op">=</span> <span class="bu">max</span>(np.prod([<span class="fl">0.25</span>] <span class="op">+</span> [jc69(v.branch_length)[st[v.parent.name], v.seq[<span class="dv">0</span>] <span class="cf">if</span> v.is_leaf() <span class="cf">else</span> st[v.name]]</span>
-<span id="cb22-3"><a href=""></a>                                <span class="cf">for</span> v <span class="kw">in</span> preorder(tree) <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>])</span>
-<span id="cb22-4"><a href=""></a>              <span class="cf">for</span> st <span class="kw">in</span> (<span class="bu">dict</span>(<span class="bu">zip</span>(internal, cfg)) <span class="cf">for</span> cfg <span class="kw">in</span> itertools.product(<span class="bu">range</span>(<span class="dv">4</span>), repeat<span class="op">=</span><span class="dv">3</span>)))</span>
-<span id="cb22-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"max-product : </span><span class="sc">{</span>collect_max(tree)<span class="sc">:.10e}</span><span class="ss">"</span>)</span>
-<span id="cb22-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"brute force : </span><span class="sc">{</span>best_bf<span class="sc">:.10e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="239eeedc" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>set_site(tree, <span class="dv">0</span>)</span>
+<span id="cb15-2"><a href=""></a>best_bf <span class="op">=</span> <span class="bu">max</span>(np.prod([<span class="fl">0.25</span>] <span class="op">+</span> [jc69(v.branch_length)[st[v.parent.name], v.seq[<span class="dv">0</span>] <span class="cf">if</span> v.is_leaf() <span class="cf">else</span> st[v.name]]</span>
+<span id="cb15-3"><a href=""></a>                                <span class="cf">for</span> v <span class="kw">in</span> preorder(tree) <span class="cf">if</span> v.parent <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>])</span>
+<span id="cb15-4"><a href=""></a>              <span class="cf">for</span> st <span class="kw">in</span> (<span class="bu">dict</span>(<span class="bu">zip</span>(internal, cfg)) <span class="cf">for</span> cfg <span class="kw">in</span> itertools.product(<span class="bu">range</span>(<span class="dv">4</span>), repeat<span class="op">=</span><span class="dv">3</span>)))</span>
+<span id="cb15-5"><a href=""></a><span class="bu">print</span>(<span class="ss">f"max-product : </span><span class="sc">{</span>collect_max(tree)<span class="sc">:.10e}</span><span class="ss">"</span>)</span>
+<span id="cb15-6"><a href=""></a><span class="bu">print</span>(<span class="ss">f"brute force : </span><span class="sc">{</span>best_bf<span class="sc">:.10e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>max-product : 1.0685422040e-01
 brute force : 1.0685422040e-01</code></pre>
@@ -1202,7 +1066,7 @@ brute force : 1.0685422040e-01</code></pre>
 </div>
 <div class="all-at-once">
 <ul>
-<li>Recovering the assignment itself needs the argmax at each step and a backtrack, which is the distribute pass with <span class="math inline">\(\max\)</span> and <span class="math inline">\(\arg\max\)</span> in place of the sum. Viterbi, on a tree.</li>
+<li>Recovering the assignment itself needs the argmax at each step and a backtrack, which is the top-down pass with <span class="math inline">\(\max\)</span> and <span class="math inline">\(\arg\max\)</span> in place of the sum. Viterbi, on a tree.</li>
 <li>The marginal argmax, one node at a time from the sum-product marginals, and the joint argmax from max-product are different answers to different questions, exactly as on the chain.</li>
 </ul>
 </div>
@@ -1252,19 +1116,9 @@ brute force : 1.0685422040e-01</code></pre>
 <li>Forward-backward and Felsenstein pruning are the same rule on a line and on a phylogeny.</li>
 </ul>
 </div>
-</section>
-<section id="next-week" class="slide level2">
-<h2>Next week</h2>
-<div class="all-at-once">
-<ul>
-<li>Our rule assumed every factor sits on a node or an edge. A pedigree factor links mother, father and child; a parity check in an error correcting code constrains four bits at once. Neither is an edge.</li>
-<li><strong>Factor graphs</strong> make the factorization explicit and allow factors of any arity. The <strong>sum-product</strong> algorithm on a factor graph has forward-backward, pruning and today’s belief propagation as special cases.</li>
-<li>And an example where the graph is emphatically <em>not</em> a tree, and people run the algorithm anyway.</li>
-</ul>
-</div>
 <div class="all-at-once">
 <div class="question">
-<p>Branch lengths are measured in expected substitutions per site, not years. What does a phylogeny fitted this way tell you about <em>when</em> two lineages diverged, and what would you need to add to the model to say more?</p>
+<p>In phylogenetic inference, which quantities can belief propagation sum out exactly, and which quantities still require optimization or search?</p>
 </div>
 </div>
 </section>
@@ -1273,7 +1127,6 @@ brute force : 1.0685422040e-01</code></pre>
 <div class="all-at-once">
 <ul>
 <li><strong>Belief propagation.</strong> Murphy, <em>Probabilistic Machine Learning: Advanced Topics</em> (2023), §9.2 and §9.3, for the algorithm stated directly on chains and trees, as today.</li>
-<li><strong>Factor graphs and sum-product, for next week.</strong> Bishop, <em>Pattern Recognition and Machine Learning</em> (2006), §8.4.3 to §8.4.7: factor graphs, sum-product, max-sum, and loopy belief propagation. Kschischang, Frey and Loeliger, “Factor graphs and the sum-product algorithm”, <em>IEEE Transactions on Information Theory</em> 47 (2001), the paper that showed forward-backward, Viterbi, Pearl’s belief propagation, Kalman filtering and turbo decoding to be one algorithm.</li>
 <li><strong>Phylogenetics.</strong> Felsenstein, “Evolutionary trees from DNA sequences: a maximum likelihood approach”, <em>Journal of Molecular Evolution</em> 17 (1981). Six pages; the pruning algorithm is in section 3.</li>
 </ul>
 </div>
