@@ -131,7 +131,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">From Molecules to Compositions</h1>
-  <p class="subtitle">Bayesian Compositional Models for Sequencing Data</p>
+  <p class="subtitle">Negative binomial softmax regression for Bayesian compositional differential abundance</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -145,9 +145,81 @@ Seong-Hwan Jun
 </div>
 
 </section>
+<section id="roadmap-80-minutes" class="slide level2">
+<h2>Roadmap (≈ 80 minutes)</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th>Topic</th>
+<th>Multivariate theme</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Sequencing as a measurement process</td>
+<td>absolute vs.&nbsp;relative abundance</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Compositional data analysis</td>
+<td>simplex geometry, log-ratios, Aitchison</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Negative binomial softmax regression (NBSR)</td>
+<td>softmax <span class="math inline">\(=\)</span> inverse CLR, identifiability</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Scale: abundance-dependent dispersion</td>
+<td>mixture moments, regularisation by the likelihood</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>The estimand: the compositional shift</td>
+<td>a non-smooth functional of a <span class="math inline">\(K\)</span>-vector</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Inference: HMC, Laplace, per-draw estimand</td>
+<td>Gaussian approximations, Cholesky, decision rules</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Simulation design &amp; results</td>
+<td>logistic-normal covariance, low-rank + diagonal</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Open problems: shape and dependence</td>
+<td>latent factors on the simplex</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Timing guide: Part 1 ~9 min, Part 2 ~12, Part 3 ~10, Part 4 ~10, Part 5 ~8, Part 6 ~10, Part 7 ~15, Part 8 ~5 (≈ 79). Compositional-data extras (mean, positive spurious correlation, variation matrix, subcompositions) are in the backup slides. If running long, drop “Is the shift itself well estimated?” and the microbiome case-study slide. The talk is built so Parts 2–6 are the “lecture” and Part 7 is the “evidence”. If running long, skip the microbiome case-study slides in Part 1 and the backup-style slides marked “(optional)”.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section>
-<section id="from-biological-questions-to-statistical-models" class="title-slide slide level1 center">
-<h1>From biological questions to statistical models</h1>
+<section id="part-1-from-biological-questions-to-statistical-models" class="title-slide slide level1 center">
+<h1>Part 1 · From biological questions to statistical models</h1>
 
 </section>
 <section id="what-is-biostatistics" class="slide level2">
@@ -164,30 +236,12 @@ Seong-Hwan Jun
 \rightarrow
 \text{inference}
 \]</span></p>
-</section>
-<section id="why-statistical-inference" class="slide level2">
-<h2>Why statistical inference?</h2>
-<p>Biological data vary for several reasons:</p>
-<ul>
-<li><strong>Technical variability:</strong> repeated measurements of the same biological material may produce different sequencing counts.</li>
-<li><strong>Biological variability:</strong> cells, tissues, and individuals genuinely differ in their molecular abundance.</li>
-<li><strong>Population variability:</strong> even within the same disease or treatment group, individuals are not identical.</li>
-</ul>
 <div class="fragment">
-<p><strong>Statistical inference = Probabilistic modeling + Observed data.</strong></p>
-<p>A probabilistic model describes how these sources of variation generate the observed data.</p>
-<p>Observed data allow us to estimate the unknown parameters of a probabilistic model.</p>
-</div>
-<div class="fragment">
-<p>As the sample size increases, random variation averages out, uncertainty decreases, and we become more confident about systematic biological differences.</p>
-</div>
-<div class="fragment">
-<p>But inference is only meaningful after we define the biological quantity we want to learn.</p>
+<p>Today’s theme: <strong>the measurement process determines the estimand.</strong> Sequencing measures <em>compositions</em>, and that single fact reshapes every downstream multivariate question.</p>
 </div>
 </section>
 <section id="biological-systems-come-in-many-forms" class="slide level2">
 <h2>Biological systems come in many forms</h2>
-<p>Biostatistics may study:</p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><strong>Molecular systems</strong></p>
@@ -220,47 +274,37 @@ Seong-Hwan Jun
 <li>Which changes are direct, and which are induced by changes elsewhere in the system?</li>
 </ul>
 </div>
-</section>
-<section id="rna-biology-molecules-as-biological-signals" class="slide level2">
-<h2>RNA biology: molecules as biological signals</h2>
-<p>Central dogma of biology (information flow):</p>
-<p><span class="math display">\[
-\text{DNA} \Rightarrow \underbrace{\text{RNA}} \Rightarrow \text{Protein} \Rightarrow \text{Cellular function}.
-\]</span></p>
-<p>RNA abundance reflects:</p>
-<ul>
-<li>transcriptional regulation</li>
-<li>cell identity and cell state</li>
-<li>stress and immune response</li>
-<li>disease processes</li>
-<li>tissue and cell-type composition</li>
-</ul>
+<div class="fragment">
+<p>The last question is the one compositional data makes hard: <strong>a change in one feature appears as a change in all of them.</strong></p>
+</div>
 </section>
 <section id="from-biological-abundance-to-rna-seq-counts" class="slide level2">
 <h2>From biological abundance to RNA-seq counts</h2>
 <p>Tissue/cells <span class="math inline">\(\Rightarrow\)</span> RNA extraction <span class="math inline">\(\Rightarrow\)</span> library preparation <span class="math inline">\(\Rightarrow\)</span> sequencing <span class="math inline">\(\Rightarrow\)</span> read counts.</p>
 <div class="center">
-<p><img data-src="images/rna_seq_workflow.png" style="width:70.0%" alt="RNA-seq workflow from tissue and cells to read counts"></p>
+<p><img data-src="images/rna_seq_workflow.png" style="width:65.0%" alt="RNA-seq workflow from tissue and cells to read counts"></p>
 </div>
+<aside class="notes">
+<p>Small RNA-seq (miRNA) is our first application; 16S microbiome sequencing is the second. Both produce a <span class="math inline">\(K\)</span>-vector of counts per sample whose total is set by the sequencer, not by the biology.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="from-biological-abundance-to-rna-seq-counts-1" class="slide level2">
-<h2>From biological abundance to RNA-seq counts</h2>
-<ul>
-<li>RNA molecules are extracted from each sample (e.g., patient).</li>
-<li>Target different types of RNA using different library preparation protocols (e.g., messenger RNA, microRNA, rRNA, tRNA).</li>
-<li>Sequencing produces read counts for genes, transcripts, microRNAs, and other molecular features.</li>
-</ul>
-<div class="fragment">
-<p>These counts are imperfect measurements shaped by both biology and the sequencing process.</p>
-</div>
-</section>
-<section id="ways-to-measure-rna-molecules" class="slide level2">
-<h2>Ways to measure RNA molecules</h2>
+<section id="ways-to-measure-molecules-and-microbes" class="slide level2">
+<h2>Ways to measure molecules and microbes</h2>
 <table class="caption-top">
 <colgroup>
-<col style="width: 15%">
-<col style="width: 30%">
-<col style="width: 54%">
+<col style="width: 23%">
+<col style="width: 41%">
+<col style="width: 35%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -272,100 +316,30 @@ Seong-Hwan Jun
 <tbody>
 <tr class="odd">
 <td>Bulk mRNA-seq</td>
-<td>Messenger RNA pooled across many cells</td>
-<td>Which genes are expressed differently across samples or conditions?</td>
+<td>mRNA pooled across many cells</td>
+<td>Which genes change?</td>
 </tr>
 <tr class="even">
-<td>Total RNA-seq</td>
-<td>Coding and noncoding RNA pooled across many cells</td>
-<td>How does the broader transcriptome change?</td>
-</tr>
-<tr class="odd">
 <td>Single-cell RNA-seq</td>
 <td>RNA from individual cells</td>
-<td>Which cell types and cell states are present, and how do they differ?</td>
-</tr>
-<tr class="even">
-<td>Single-nucleus RNA-seq</td>
-<td>Nuclear RNA from individual nuclei</td>
-<td>How does gene expression vary across cells in tissues that are difficult to dissociate? e.g., brain.</td>
+<td>Which cell types and states?</td>
 </tr>
 <tr class="odd">
-<td>Spatial transcriptomics</td>
-<td>RNA abundance together with tissue location</td>
-<td>Where are genes expressed within the tissue?</td>
-</tr>
-<tr class="even">
 <td>Small RNA-seq</td>
 <td>miRNAs and other short RNAs</td>
-<td>Which regulatory small RNAs are present and differentially abundant?</td>
-</tr>
-<tr class="odd">
-<td>Long-read RNA sequencing</td>
-<td>Full-length RNA molecules and transcript isoforms</td>
-<td>Which transcript isoforms and splice variants are expressed?</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="microbial-communities-as-ecosystems" class="slide level2">
-<h2>Microbial communities as ecosystems</h2>
-<p>The human microbiome consists of communities of microorganisms—including bacteria, archaea, fungi, and viruses—that live in and on the body.</p>
-<p>These communities interact with one another and with the host. They can:</p>
-<ul>
-<li>help digest dietary components that human cells cannot process alone</li>
-<li>produce metabolites and vitamins</li>
-<li>influence immune-system development and regulation</li>
-<li>protect against colonization by harmful organisms</li>
-</ul>
-<div class="fragment">
-<p>The host and its microbiome form an interconnected biological system.</p>
-<p>Diet, antibiotics, infection, inflammation, and disease may alter individual microorganisms as well as the structure and function of the entire community.</p>
-</div>
-</section>
-<section id="case-study-restoring-a-disrupted-microbial-ecosystem" class="slide level2">
-<h2>Case study: restoring a disrupted microbial ecosystem</h2>
-
-<img data-src="images/NEJM.png" class="r-stretch quarto-figure-center"><p class="caption">van Nood et al (2013).</p></section>
-<section id="case-study-restoring-a-disrupted-microbial-ecosystem-1" class="slide level2">
-<h2>Case study: restoring a disrupted microbial ecosystem</h2>
-<div class="center">
-<p><img data-src="images/cdiff_ecosystem_2.png" style="width:85.0%"></p>
-</div>
-</section>
-<section id="case-study-restoring-a-disrupted-microbial-ecosystem-2" class="slide level2">
-<h2>Case study: restoring a disrupted microbial ecosystem</h2>
-<div class="center">
-<p><img data-src="images/microbiome_medicine.png" style="width:85.0%"></p>
-</div>
-</section>
-<section id="three-ways-to-study-microbial-communities" class="slide level2">
-<h2>Three ways to study microbial communities</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Assay</th>
-<th>What is measured</th>
-<th>Main question</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>16S / ITS sequencing</td>
-<td>Marker genes</td>
-<td>Who is present?</td>
+<td>Which small RNAs change?</td>
 </tr>
 <tr class="even">
-<td>Shotgun metagenomics</td>
-<td>Microbial DNA</td>
-<td>Which organisms and genes are present?</td>
+<td>16S / ITS sequencing</td>
+<td>Marker genes</td>
+<td>Which microbes are present?</td>
 </tr>
 <tr class="odd">
+<td>Shotgun metagenomics</td>
+<td>Microbial DNA</td>
+<td>Which organisms and genes?</td>
+</tr>
+<tr class="even">
 <td>Metatranscriptomics</td>
 <td>Microbial RNA</td>
 <td>Which microbial genes are active?</td>
@@ -373,17 +347,41 @@ Seong-Hwan Jun
 </tbody>
 </table>
 <div class="fragment">
-<p>Different biology, similar statistical measurement structure.</p>
+<p>Different biology, <strong>the same statistical measurement structure</strong>: a count vector <span class="math inline">\(y_i\in\mathbb{N}^K\)</span> whose total <span class="math inline">\(n_i=\sum_j y_{ij}\)</span> is fixed by the experiment.</p>
 </div>
+</section>
+<section id="case-study-restoring-a-disrupted-microbial-ecosystem" class="slide level2">
+<h2>Case study: restoring a disrupted microbial ecosystem</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/NEJM.png"></p>
+<figcaption>van Nood et al.&nbsp;(2013), NEJM.</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/cdiff_ecosystem_2.png"></p>
+</div></div>
+<aside class="notes">
+<p>Optional — 1 minute. Fecal microbiota transplant restores a community, not a single taxon. Motivates thinking about the system as a whole.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="a-shared-measurement-structure" class="slide level2">
 <h2>A shared measurement structure</h2>
-<p><span class="math display">\[a_{ij}=\text{underlying abundance of a feature }j\text{ in sample } i.\]</span></p>
+<p><span class="math display">\[a_{ij}=\text{underlying (absolute) abundance of feature }j\text{ in sample } i.\]</span></p>
 <div class="fragment question">
 <p>But we do <strong>not</strong> directly observe <span class="math inline">\(a_{ij}\)</span>.</p>
-</div>
-<div class="fragment">
-<p>Instead, library preparation and finite-depth sequencing produce read counts <span class="math inline">\(Y_{ij}\)</span>, whose distribution depends on the abundance of feature <span class="math inline">\(j\)</span> relative to all other sequenced features.</p>
 </div>
 <div class="fragment">
 <p><span class="math display">\[
@@ -396,73 +394,30 @@ y_{ij}
 <div class="columns">
 <div class="column" style="width:33%;">
 <p><strong>Absolute abundance</strong></p>
-<p><span class="math inline">\(a_i=(a_{i1},\ldots,a_{iK})\)</span></p>
+<p><span class="math inline">\(a_i=(a_{i1},\ldots,a_{iK})\)</span>, <span class="math inline">\(a_{ij}\ge0\)</span>, <span class="math inline">\(a_i\neq\mathbf 0\)</span></p>
 </div><div class="column" style="width:33%;">
 <p><strong>Composition</strong></p>
-<p><span class="math inline">\(\pi_i=(\pi_{i1},\ldots,\pi_{iK})\)</span></p>
+<p><span class="math inline">\(\pi_i=\mathcal{C}(a_i)\)</span>: <span class="math inline">\(\pi_{ij}\ge0\)</span>, <span class="math inline">\(\sum_j\pi_{ij}=1\)</span></p>
 </div><div class="column" style="width:33%;">
 <p><strong>Observed counts</strong></p>
-<p><span class="math inline">\(y_i=(y_{i1},\ldots,y_{iK})\)</span></p>
+<p><span class="math inline">\(y_i=(y_{i1},\ldots,y_{iK})\)</span>, <span class="math inline">\(\sum_j y_{ij}=n_i\)</span></p>
 </div></div>
 </div>
 <div class="fragment">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>A feature may refer to a gene, transcript, microRNA, isomiR, microbial taxon, microbial gene, or another molecular unit of interest.</p>
-</div>
-</div>
-</div>
+<p><span class="math inline">\(\mathcal{C}(a)=a/\mathbf 1^\top a\)</span> is the <strong>closure</strong> operator. It is scale invariant: <span class="math inline">\(\mathcal{C}(ta)=\mathcal{C}(a)\)</span> for every <span class="math inline">\(t&gt;0\)</span>.</p>
 </div>
 </section>
-<section id="the-total-abundance-may-also-change" class="slide level2">
-<h2>The total abundance may also change</h2>
-<p>Let</p>
-<p><span class="math display">\[
-A_i=\sum_{k=1}^K a_{ik}.
-\]</span></p>
-<p>Disease may change:</p>
-<ul>
-<li>individual feature abundance <span class="math inline">\(a_{ij}\)</span></li>
-<li>coordinated biological programs</li>
-<li>cell or community composition</li>
-<li>total abundance <span class="math inline">\(A_i\)</span></li>
-</ul>
-<div class="callout callout-important callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Important</strong></p>
-</div>
-<div class="callout-content">
-<p>The total abundance can be biologically meaningful, but standard sequencing data often do not identify it.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="illustration" class="slide level2">
-<h2>Illustration</h2>
-<p>Suppose two samples contain three RNA species:</p>
+<section id="illustration-the-sequencer-cannot-see-the-total" class="slide level2">
+<h2>Illustration: the sequencer cannot see the total</h2>
 <p><span class="math display">\[
 \begin{aligned}
-\text{Sample 1: } &amp; \boldsymbol{a}_1 = (10,80,10), \\
-\text{Sample 2: } &amp; \boldsymbol{a}_2 = (20,160,20).
+\text{Sample 1: } &amp; a_1 = (10,80,10), \\
+\text{Sample 2: } &amp; a_2 = (20,160,20).
 \end{aligned}
 \]</span></p>
-<p>Sample 2 contains twice as many molecules of every feature, but both samples have the same composition: <span class="math inline">\((0.1,0.8,0.1)\)</span>.</p>
+<p>Sample 2 contains twice as many molecules of every feature, but both samples have the same composition <span class="math inline">\((0.1,0.8,0.1)\)</span>.</p>
 <div class="fragment">
-<p>If both samples are sequenced to a depth of <span class="math inline">\(N=1000\)</span>, the expected read counts are approximately <span class="math inline">\(\boldsymbol{y}_1 \approx (100,800,100)\)</span>; <span class="math inline">\(\boldsymbol{y}_2 \approx (100,800,100)\)</span>.</p>
-</div>
-<div class="fragment">
-<p>The sequencer can recover how reads are distributed across features, but it cannot distinguish the overall twofold difference in total molecular abundance.</p>
+<p>Sequenced to depth <span class="math inline">\(n=1000\)</span>, both give <span class="math inline">\(\mathbb{E}[y] = (100,800,100)\)</span>.</p>
 </div>
 <div class="fragment">
 <div class="callout callout-note callout-titled callout-style-default">
@@ -474,226 +429,437 @@ A_i=\sum_{k=1}^K a_{ik}.
 <p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
-<p>Sequencing depth is largely determined by library preparation, pooling, and the experimental sequencing budget—not by the total number of RNA molecules originally present in the biological sample.</p>
+<p>Sequencing depth is set by library preparation, pooling, and budget — not by the number of molecules in the sample. The total <span class="math inline">\(A_i=\sum_k a_{ik}\)</span> is <strong>not identified</strong> from the counts.</p>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="so-what-do-we-want-to-infer" class="slide level2">
-<h2>So, what do we want to infer?</h2>
-<p>For a binary condition <span class="math inline">\(g \in \{0, 1\}\)</span>, a biological target might be the absolute-abundance log-fold change:</p>
+<section id="absolute-and-relative-effects-differ" class="slide level2">
+<h2>Absolute and relative effects differ</h2>
+<p>For conditions <span class="math inline">\(g\in\{0,1\}\)</span>, the scientific target is the <strong>absolute</strong> log-fold change <span class="math inline">\(\delta_j=\log\{a_j(1)/a_j(0)\}\)</span>. The counts inform only the <strong>relative</strong> change:</p>
 <p><span class="math display">\[
-\delta_j
+\underbrace{
+\log \frac{\pi_j(1)}{\pi_j(0)}
+}_{r_j\ (\text{relative})}
 =
-\log a_j^{(1)}-
-\log a_j^{(0)}.
-\]</span></p>
-<div class="fragment">
-<p><strong>But sequencing data more directly informs relative abundance</strong>:</p>
-<p><span class="math display">\[
-d_j
-=
-\log \pi_j^{(1)}-
-\log \pi_j^{(0)}.
-\]</span></p>
-</div>
-<div class="fragment question">
-<p>Are these the same? Does a change in relative abundance imply that the feature itself changed?</p>
-</div>
-</section>
-<section id="absolute-and-relative-change-differ" class="slide level2 scrollable">
-<h2>Absolute and relative change differ</h2>
-<p><span class="math display">\[
-\begin{aligned}
 \underbrace{
-\log \pi_j^{(1)}-\log \pi_j^{(0)}
-}_{\text{relative log-fold change}}
-&amp;=
+\log \frac{a_j(1)}{a_j(0)}
+}_{\delta_j\ (\text{absolute})}
++
 \underbrace{
-\left[\log a_j^{(1)}-\log a_j^{(0)}\right]
-}_{\text{absolute log-fold change}}
--
-\underbrace{
-\left[\log A^{(1)}-\log A^{(0)}\right]
-}_{\text{change in total abundance}}
-\\
-d_j
-&amp;=
-\delta_j-\Delta_{\text{total}}.
-\end{aligned}
+\left\{-\log \frac{A(1)}{A(0)}\right\}
+}_{c_{\text{rel}}\ (\text{common to all } j)}.
 \]</span></p>
-<div class="fragment">
-<p>Relative change combines:</p>
-<ol type="1">
-<li>a feature-specific biological change;</li>
-<li>a system-wide normalization shift.</li>
-</ol>
-</div>
-<div class="fragment">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>Without external information, absolute abundance is generally not identifiable from compositional counts alone.</p>
-</div>
-</div>
-</div>
-</div>
+
+<img data-src="images/recomb/fig_shift.png" style="width:95.0%" class="r-stretch quarto-figure-center"><p class="caption">Treatment doubles feature A only; every other feature <em>appears</em> to decrease by the common shift <span class="math inline">\(c_{\rm rel}=-\log(60/50)=-0.18\)</span>.</p><aside class="notes">
+<p>This one picture is the whole problem. Every method in this space is, at some level, a strategy for estimating that orange dashed line.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section></section>
 <section>
-<section id="compositional-data-analysis" class="title-slide slide level1 center">
-<h1>Compositional data analysis</h1>
+<section id="part-2-compositional-data-analysis" class="title-slide slide level1 center">
+<h1>Part 2 · Compositional data analysis</h1>
 
 </section>
-<section id="what-does-compositional-mean" class="slide level2">
-<h2>What does “compositional” mean?</h2>
-<p>A composition is a vector on the simplex:</p>
+<section id="the-simplex-as-a-sample-space" class="slide level2 scrollable">
+<h2>The simplex as a sample space</h2>
+<p>A composition lives on the simplex</p>
 <p><span class="math display">\[
-\pi_i=(\pi_{i1},\ldots,\pi_{iK}),
-\qquad
-\pi_{ij}&gt;0,
-\qquad
-\sum_{j=1}^K \pi_{ij}=1.
+\mathbb{S}^K=\Big\{\pi\in\mathbb{R}^K:\ \pi_j&gt;0,\ \textstyle\sum_{j}\pi_j=1\Big\},
 \]</span></p>
-<div class="fragment">
-<p>The composition records each feature <strong>relative to the total system</strong>.</p>
-</div>
-</section>
-<section id="why-ordinary-analysis-can-mislead" class="slide level2">
-<h2>Why ordinary analysis can mislead</h2>
-<p>Suppose three features have absolute abundances:</p>
-<p><span class="math display">\[
-a^{(0)}=(10,10,10),
-\qquad
-a^{(1)}=(20,10,10).
-\]</span></p>
-<p>Then the compositions are:</p>
-<p><span class="math display">\[
-\pi^{(0)}=\left(\frac13,\frac13,\frac13\right),
-\qquad
-\pi^{(1)}=\left(\frac12,\frac14,\frac14\right).
-\]</span></p>
-<div class="fragment">
-<p>Features 2 and 3 did not change in absolute abundance, but their relative abundances decreased.</p>
-</div>
-</section>
-<section id="the-geometry-of-compositions" class="slide level2">
-<h2>The geometry of compositions</h2>
-<div class="bigcenter">
-<p>Compositions live on a simplex, not ordinary Euclidean space.</p>
-</div>
-
-<img data-src="images/Dirichlet.pdf.jpg" class="r-stretch quarto-figure-center"><p class="caption">https://en.wikipedia.org/wiki/File:Dirichlet.pdf</p></section></section>
-<section>
-<section id="negative-binomial-softmax-regression" class="title-slide slide level1 center">
-<h1>Negative Binomial Softmax Regression</h1>
-
-</section>
-<section id="why-not-transform-proportions-and-run-regression" class="slide level2">
-<h2>Why not transform proportions and run regression?</h2>
-<p>Transformation-based approaches are useful, but they may not fully account for:</p>
-<ul>
-<li>zeros and low counts: log-ratios are undefined at zero and can be sensitive to pseudocounts;</li>
-<li>finite sequencing depth: the same observed proportion can have very different precision across samples – transformation hides this;</li>
-<li>heteroskedasticity: variability depends on abundance and sequencing depth;</li>
-<li>feature-specific overdispersion: some features are inherently more variable than others;</li>
-<li>the count-generating process: transformation separates the regression model from the mechanism that produced the observed counts.</li>
-</ul>
-<div class="fragment question">
-<p>Can we model counts directly while respecting compositional geometry?</p>
-</div>
-</section>
-<section id="the-nbsr-model" class="slide level2">
-<h2>The NBSR model</h2>
-<p><span class="math display">\[
-y_{ij}\mid \pi_{ij},\phi_j
-\sim
-NB(n_i\pi_{ij},\phi_j),
-\]</span></p>
-<p><span class="math display">\[
-\pi_i=\operatorname{softmax}(\eta_i),
-\qquad
-\eta_{ij}=x_i^\top\beta_j.
-\]</span></p>
+<p>a <span class="math inline">\((K-1)\)</span>-dimensional space embedded in <span class="math inline">\(\mathbb{R}^K\)</span>. Compositional data analysis works in this <strong>open</strong> simplex; a truly absent feature (<span class="math inline">\(a_{ij}=0\)</span>) puts <span class="math inline">\(\pi_i\)</span> on the boundary, where log-ratios are undefined.</p>
 <div class="columns">
-<div class="column" style="width:33%;">
-<p><strong>NB likelihood</strong></p>
-<p>Probability distribution over counts, includes zero in the support.</p>
-</div><div class="column" style="width:33%;">
-<p><strong>Softmax mean</strong></p>
-<p>Fitted proportions <span class="math inline">\(\pi_{ij}\)</span> lie on the simplex.</p>
-</div><div class="column" style="width:33%;">
-<p><strong>Regression</strong></p>
-<p>Covariates explain compositional change.</p>
+<div class="column" style="width:55%;">
+<div class="fragment">
+<p><strong>Why ordinary multivariate tools mislead</strong></p>
+<ol type="1">
+<li>Euclidean distance <strong>ignores relative change</strong>.</li>
+<li>The sum constraint <strong>forces the covariance</strong>.</li>
+</ol>
+<p>Related issues (backup slides): the arithmetic mean is not the natural centre; closure can induce <em>positive</em> spurious correlation; results change when some features are dropped and the rest rescaled to sum to 1 (subcompositional incoherence).</p>
+</div>
+</div><div class="column" style="width:45%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/Dirichlet.pdf.jpg" style="width:72.0%"></p>
+<figcaption>Dirichlet densities on <span class="math inline">\(\mathbb{S}^3\)</span> (Wikipedia).</figcaption>
+</figure>
+</div>
 </div></div>
+<aside class="notes">
+<p>Two pitfalls, one slide each, then log-ratios as the fix. The others are in the backup slides if a question comes up.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="how-nbsr-addresses-the-challenges" class="slide level2">
-<h2>How NBSR addresses the challenges</h2>
-<table class="caption-top">
+<section id="pitfall-1-euclidean-distance-ignores-relative-change" class="slide level2">
+<h2>Pitfall 1 · Euclidean distance ignores relative change</h2>
+<table class="caption-top" style="width:100%;">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 27%">
-<col style="width: 51%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Challenge</th>
-<th>NBSR component</th>
-<th>How it helps</th>
+<th>pair (<span class="math inline">\(K=2\)</span>)</th>
+<th>change in feature 1</th>
+<th style="text-align: right;">Euclidean</th>
+<th style="text-align: right;">Aitchison <span class="math inline">\(\|\operatorname{CLR}x-\operatorname{CLR}y\|\)</span></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Zeros and low counts</td>
-<td>Negative binomial likelihood</td>
-<td>Models counts directly without requiring log transformation or pseudocounts</td>
+<td><span class="math inline">\((0.01,\,0.99)\)</span> vs <span class="math inline">\((0.02,\,0.98)\)</span></td>
+<td><strong>doubled</strong></td>
+<td style="text-align: right;">0.0141</td>
+<td style="text-align: right;"><strong>0.4973</strong></td>
 </tr>
 <tr class="even">
-<td>Finite sequencing depth</td>
-<td>Mean structure (<span class="math inline">\(n_i \pi_{ij}\)</span>)</td>
-<td>Explicitly accounts for sample-specific sequencing depth</td>
-</tr>
-<tr class="odd">
-<td>Heteroskedasticity</td>
-<td>Negative binomial mean–variance relationship</td>
-<td>Variance changes naturally with the expected count: <span class="math inline">\(\text{Var}(Y_{ij}) = \mathbb{E}[Y_{ij}] + \phi_j \mathbb{E}[Y_{ij}]^2\)</span></td>
-</tr>
-<tr class="even">
-<td>Feature-specific overdispersion</td>
-<td>Feature-specific (<span class="math inline">\(\phi_j\)</span>)</td>
-<td>Allows different features to have different levels of extra-Poisson variation</td>
-</tr>
-<tr class="odd">
-<td>Compositional constraint</td>
-<td>Softmax link</td>
-<td>Ensures <span class="math inline">\(\pi_{ij}&gt;0\)</span> and <span class="math inline">\(\sum_j \pi_{ij}=1\)</span></td>
-</tr>
-<tr class="even">
-<td>Covariate effects</td>
-<td>Regression on <span class="math inline">\(\eta_{ij}=x_i^\top\beta_j\)</span></td>
-<td>Links predictors to changes in composition</td>
+<td><span class="math inline">\((0.49,\,0.51)\)</span> vs <span class="math inline">\((0.50,\,0.50)\)</span></td>
+<td>+2%</td>
+<td style="text-align: right;">0.0141</td>
+<td style="text-align: right;">0.0282</td>
 </tr>
 </tbody>
 </table>
-</section></section>
-<section>
-<section id="location-scale-and-shapedependence" class="title-slide slide level1 center">
-<h1>Location, scale, and shape/dependence</h1>
-
+<div class="fragment">
+<p>A doubling and a 2% change are the <strong>same</strong> Euclidean distance apart. The Aitchison distance, built on log-ratios, measures <strong>relative</strong> change and separates them.</p>
+</div>
+<aside class="notes">
+<p>Ask the class which pair is the “bigger” change biologically before revealing the takeaway. Note: once data are proportions, <em>scale</em> is already gone by closure; the real requirement is sensitivity to relative change (and, next slide, invariance to perturbation). Euclidean distance on raw counts additionally has a literal scale problem — it depends on sequencing depth.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="beyond-differential-abundance-location-scale-and-shapedependence" class="slide level2">
-<h2>Beyond differential abundance: location, scale, and shape/dependence</h2>
-<p>Many statistical models describe a distribution through three broad components:</p>
+<section id="pitfall-1-distances-should-not-depend-on-the-protocol" class="slide level2">
+<h2>Pitfall 1 · Distances should not depend on the protocol</h2>
+<p><strong>Perturbation</strong> <span class="math inline">\(x\oplus p=\mathcal{C}(x_1p_1,\ldots,x_Kp_K)\)</span>: multiply component-wise, then divide by the sum to return to the simplex.</p>
+<p>It models a <strong>feature-specific bias</strong> applied to every sample, e.g.&nbsp;feature 1 captured twice as efficiently: <span class="math inline">\(p=(2,1)\)</span>.</p>
+<div class="fragment">
+<p>Apply it to both compositions of the first pair:</p>
 <table class="caption-top">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 45%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>composition <span class="math inline">\(x\)</span></th>
+<th>composition <span class="math inline">\(y\)</span></th>
+<th style="text-align: right;">Euclidean</th>
+<th style="text-align: right;">Aitchison</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>before</td>
+<td><span class="math inline">\((0.01,\,0.99)\)</span></td>
+<td><span class="math inline">\((0.02,\,0.98)\)</span></td>
+<td style="text-align: right;">0.0141</td>
+<td style="text-align: right;">0.4973</td>
+</tr>
+<tr class="even">
+<td>after <span class="math inline">\(\oplus\,p\)</span></td>
+<td><span class="math inline">\((0.02,\,0.99)/1.01=(0.0198,\,0.9801)\)</span></td>
+<td><span class="math inline">\((0.04,\,0.98)/1.02=(0.0392,\,0.9607)\)</span></td>
+<td style="text-align: right;"><strong>0.0274</strong></td>
+<td style="text-align: right;"><strong>0.4973</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fragment">
+<p>The Euclidean distance <strong>nearly doubles</strong> because of the protocol; the Aitchison distance is <strong>unchanged</strong>, since <span class="math inline">\(\operatorname{CLR}(x\oplus p)=\operatorname{CLR}(x)+\operatorname{CLR}(p)\)</span> and the common <span class="math inline">\(\operatorname{CLR}(p)\)</span> cancels in the difference.</p>
+</div>
+<aside class="notes">
+<p>Feature-specific capture, amplification, and mapping biases act on sequencing data exactly as a common perturbation. A Euclidean analysis partly measures the protocol; a log-ratio analysis cancels it. Perturbed values are truncated to 4 decimals (exact: 0.980198…, 0.960784…), which is why each perturbed composition shows a sum of 0.9999.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="pitfall-2-closure-forces-the-covariances-to-balance" class="slide level2">
+<h2>Pitfall 2 · Closure forces the covariances to balance</h2>
+<p>Randomness is across samples; within every sample <span class="math inline">\(\sum_j\pi_{ij}=1\)</span>. Then</p>
+<p><span class="math display">\[
+\begin{aligned}
+\sum_{j=1}^K\operatorname{Cov}(\pi_j,\pi_k)
+&amp;\ \underset{\text{bilinearity}}{=}\
+\operatorname{Cov}\Big(\textstyle\sum_j\pi_j,\ \pi_k\Big)
+\ \underset{\sum_j\pi_j\,\equiv\,1}{=}\
+\operatorname{Cov}(1,\pi_k)=0\\[4pt]
+\Longrightarrow\quad
+\sum_{j\neq k}\operatorname{Cov}(\pi_j,\pi_k)
+&amp;\ =\ -\operatorname{Var}(\pi_k)\qquad(\text{split off the } j=k \text{ term}).
+\end{aligned}
+\]</span></p>
+<div class="fragment">
+<ul>
+<li><strong>Matrix form:</strong> <span class="math inline">\(\Sigma_\pi\mathbf 1=\mathbf 0\)</span>, so <span class="math inline">\(\Sigma_\pi\)</span> is <strong>singular</strong>.</li>
+<li><strong>Strength:</strong> with equal variances, the average correlation is <span class="math inline">\(\bar\rho=-1/(K-1)\)</span>; perfectly negative when <span class="math inline">\(K=2\)</span>, whatever the biology.</li>
+<li><strong>Intuition:</strong> proportions are a fixed budget. If one feature is above its average, the others must be below theirs by the same total amount.</li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>Dirichlet example.</strong> <span class="math inline">\(\operatorname{Cov}(\pi_j,\pi_k)=-\bar\pi_j\bar\pi_k/(1+\kappa)\)</span>: every covariance is negative and set by <strong>one</strong> concentration <span class="math inline">\(\kappa\)</span>, a very rigid dependence model.</p>
+</div>
+<aside class="notes">
+<p>Step by step: (1) covariance is bilinear, so the sum comes out; (2) the total is the constant 1 in every sample and a constant has zero covariance with anything; (3) the j=k term is Var(π_k), move it across. ρ̄ = −1/(K−1) follows from 0 = Var(Σ_j π_j) = Kσ² + K(K−1)ρ̄σ². Ask: “If independent gamma abundances are closed, what do you get?” Answer: Dirichlet. Independence on the absolute scale still produces negative correlation on the simplex.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="aitchisons-answer-work-with-log-ratios" class="slide level2">
+<h2>Aitchison’s answer: work with log-ratios</h2>
+<p>A log-ratio is invariant to scaling, <span class="math inline">\(\log\{(ta_j)/(ta_k)\}=\log(a_j/a_k)\)</span>; hence <span class="math inline">\(\log(\pi_j/\pi_k)=\log(a_j/a_k)\)</span>. It measures relative change, cancels common perturbations, and is unchanged when other features are dropped.</p>
+<p>Two ways to turn a composition into log-ratios. Example: <span class="math inline">\(\pi=(0.2,\ 0.3,\ 0.5)\)</span>.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment">
+<p><strong>ALR: compare to a reference feature</strong></p>
+<p><span class="math display">\[
+\operatorname{ALR}(\pi)_j=\log\frac{\pi_j}{\pi_K},\quad j=1,\ldots,K-1
+\]</span></p>
+<p>Reference = feature 3: <span class="math inline">\(\big(\log\tfrac{0.2}{0.5},\ \log\tfrac{0.3}{0.5}\big)=(-0.9162,\ -0.5108)\)</span></p>
+<p><span class="math inline">\(K-1\)</span> unconstrained numbers; <strong>depends on the reference</strong>.</p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment">
+<p><strong>CLR: compare to the geometric mean</strong></p>
+<p><span class="math display">\[
+\operatorname{CLR}(\pi)_j=\log\frac{\pi_j}{g(\pi)},\quad g(\pi)=\Big(\prod_k\pi_k\Big)^{1/K}
+\]</span></p>
+<p><span class="math inline">\(g=(0.2\cdot0.3\cdot0.5)^{1/3}=0.3107\)</span>: <span class="math inline">\((-0.4405,\ -0.0351,\ 0.4757)\)</span></p>
+<p><span class="math inline">\(K\)</span> numbers that <strong>sum to zero</strong>; no reference needed. <span class="math inline">\(\log g(\pi)\)</span> is the mean of <span class="math inline">\(\log\pi_k\)</span>, so CLR just <strong>centres the logs</strong>.</p>
+</div>
+</div></div>
+<div class="fragment">
+<p>In log-ratio coordinates, ordinary tools (means, distances, PCA, regression) behave sensibly. The Aitchison distance is just Euclidean distance on CLR vectors.</p>
+</div>
+<aside class="notes">
+<p>Both transforms will reappear in Part 3: we fit in ALR coordinates and report in CLR coordinates. ILR coordinates and the formal Aitchison geometry are in the backup slides.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="distributions-on-the-simplex" class="slide level2">
+<h2>Distributions on the simplex</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Dirichlet</strong> <span class="math inline">\(\pi\sim\operatorname{Dir}(\alpha)\)</span></p>
+<ul>
+<li>closure of independent <span class="math inline">\(\text{Gamma}(\alpha_j,1)\)</span></li>
+<li>one concentration <span class="math inline">\(\kappa=\sum_j\alpha_j\)</span></li>
+<li>covariance: always negative, no structure</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Logistic-normal</strong> (Aitchison &amp; Shen, 1980)</p>
+<ul>
+<li><span class="math inline">\(\operatorname{ALR}(\pi)\sim N_{K-1}(\mu,\Sigma)\)</span>, equivalently <span class="math inline">\(\pi=\operatorname{softmax}(\xi)\)</span>, <span class="math inline">\(\xi\sim N_K\)</span></li>
+<li>arbitrary covariance structure among log-ratios</li>
+<li>no closed-form moments on the simplex</li>
+</ul>
+</div></div>
+<div class="fragment">
+<p>In practice we combine them with a count layer:</p>
+<p><span class="math display">\[
+\underbrace{\xi_i\sim N(m,\Sigma)}_{\text{dependence}}\ \to\
+\underbrace{p_i\sim\operatorname{Dir}(\kappa\,\operatorname{softmax}(\xi_i))}_{\text{extra variation}}\ \to\
+\underbrace{y_i\sim\operatorname{Mult}(n_i,p_i)}_{\text{sampling}} .
+\]</span></p>
+<p>This Dirichlet–multinomial logistic-normal (<strong>DM-LN</strong>) model is our simulation engine later.</p>
+</div>
+</section>
+<section id="transform-then-regress-strengths-and-limitations" class="slide level2">
+<h2>Transform, then regress: strengths and limitations</h2>
+<p>Log-ratio methods (LinDA, ANCOM-BC2, ALDEx2) are widely used for good reasons: they respect compositional geometry, are fast, and plug into familiar regression tools.</p>
+<p>Some features of sequencing counts are harder to handle once the counts are transformed:</p>
+<ul>
+<li><strong>zeros</strong>: log-ratios are undefined at zero, so a pseudocount is needed and results can depend on it;</li>
+<li><strong>finite depth</strong>: the same observed proportion is far more precise at <span class="math inline">\(n_i=10^7\)</span> than at <span class="math inline">\(10^3\)</span>;</li>
+<li><strong>heteroskedasticity</strong>: variance depends on abundance and depth;</li>
+<li><strong>feature-specific overdispersion</strong>: some features are inherently more variable;</li>
+<li><strong>mechanism</strong>: the regression model is separate from the process that generated the counts.</li>
+</ul>
+<div class="fragment question">
+<p>Can we model counts directly while respecting compositional geometry?</p>
+</div>
+</section></section>
+<section>
+<section id="part-3-negative-binomial-softmax-regression" class="title-slide slide level1 center">
+<h1>Part 3 · Negative binomial softmax regression</h1>
+
+</section>
+<section id="the-nbsr-model" class="slide level2">
+<h2>The NBSR model</h2>
+<p>Samples <span class="math inline">\(i=1,\ldots,M\)</span>; features <span class="math inline">\(j=1,\ldots,K\)</span>; covariates <span class="math inline">\(x_i\in\mathbb{R}^P\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+y_{ij}\mid \pi_{ij},\phi_{ij} &amp;\sim \operatorname{NB}\big(n_i\,\pi_{ij},\ \phi_{ij}\big),\\
+\pi_i &amp;= \operatorname{softmax}(\eta_i),\qquad \eta_{ij}=x_i^\top\beta_j,
+\end{aligned}
+\]</span></p>
+<p>with <span class="math inline">\(\mu_{ij}=n_i\pi_{ij}\)</span> and <span class="math inline">\(\operatorname{Var}(y_{ij})=\mu_{ij}+\mu_{ij}^2/\phi_{ij}\)</span> (<span class="math inline">\(\phi\)</span> is a <strong>precision</strong>).</p>
+<div class="columns">
+<div class="column" style="width:33%;">
+<p><strong>NB likelihood</strong></p>
+<p>On the count scale: zeros need no pseudocount.</p>
+</div><div class="column" style="width:33%;">
+<p><strong>Softmax mean</strong></p>
+<p><span class="math inline">\(\pi_i\in\mathbb{S}^K\)</span>; features coupled through the normaliser.</p>
+</div><div class="column" style="width:33%;">
+<p><strong>Feature-wise precision</strong></p>
+<p>Each feature (and condition, sample) has its own overdispersion.</p>
+</div></div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>The likelihood is a product of NB densities. It does <strong>not</strong> constrain <span class="math inline">\(\sum_j y_{ij}=n_i\)</span> for each draw — only <span class="math inline">\(\sum_j\mathbb{E}[y_{ij}]=n_i\)</span>. A deliberate relaxation that buys feature-specific overdispersion.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="softmax-is-the-inverse-clr" class="slide level2">
+<h2>Softmax is the inverse CLR</h2>
+<p>Let <span class="math inline">\(\bar\eta_i=K^{-1}\sum_j\eta_{ij}\)</span> and <span class="math inline">\(\tilde\eta_i=\eta_i-\bar\eta_i\mathbf 1\)</span>. Then</p>
+<p><span class="math display">\[
+\operatorname{softmax}(\eta_i)=\operatorname{CLR}^{-1}(\tilde\eta_i),
+\qquad
+\operatorname{CLR}(\pi_i)_j=\eta_{ij}-\bar\eta_i .
+\]</span></p>
+<div class="fragment">
+<p><strong>NBSR is a count-scale log-ratio regression.</strong> The identifiable part of the linear predictor <em>is</em> the CLR of the fitted composition — but we never take a log of an observed count.</p>
+</div>
+<div class="fragment">
+<p>Adding the same constant to every <span class="math inline">\(\eta_{ij}\)</span> leaves <span class="math inline">\(\pi_i\)</span> unchanged: the composition cannot see that direction. This is the same <span class="math inline">\(\mathbf 1\)</span> direction as the singular covariance in Pitfall 2, and it is why the coefficients need a constraint (next slide).</p>
+</div>
+<aside class="notes">
+<p>If asked: the softmax Jacobian (matrix of first derivatives) is ∂π/∂ηᵀ = diag(π) − ππᵀ, with entries π_j(1{j=k} − π_k). Multiplying by 1 gives π − π(πᵀ1) = 0, so 1 is in its null space: rank K−1, the formal version of “a common shift in η doesn’t move π”.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="identifiability-two-coordinate-systems-for-one-model" class="slide level2">
+<h2>Identifiability: two coordinate systems for one model</h2>
+<p><span class="math inline">\(\operatorname{softmax}(\eta+c\mathbf 1)=\operatorname{softmax}(\eta)\)</span>, so <span class="math inline">\(\beta_j\mapsto\beta_j+\gamma\)</span> for all <span class="math inline">\(j\)</span> leaves the likelihood unchanged. We need <span class="math inline">\(P\)</span> constraints.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>ALR constraint</strong> <span class="math inline">\(\beta_K=0\)</span></p>
+<ul>
+<li><span class="math inline">\(K-1\)</span> free coefficient vectors</li>
+<li>standard multinomial-logit parameterisation</li>
+<li>convenient for optimisation &amp; sampling</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>CLR constraint</strong> <span class="math inline">\(\sum_j\beta_j=0\)</span></p>
+<ul>
+<li>symmetric in features</li>
+<li><span class="math inline">\(\eta_i\)</span> lies in zero-sum plane <span class="math inline">\(\Rightarrow\eta_i=\operatorname{CLR}(\pi_i)\)</span></li>
+<li>reference-free reporting</li>
+</ul>
+</div></div>
+<div class="fragment">
+<p>They parameterise the <strong>same mean model</strong>: <span class="math inline">\(\beta^{\rm CLR}_j=\beta^{\rm ALR}_j-\bar\beta^{\rm ALR}\)</span>, <span class="math inline">\(\ \bar\beta^{\rm ALR}=\frac1K\sum_k\beta_k^{\rm ALR}\)</span>.</p>
+<p><strong>Fit in ALR, report in CLR</strong>, applying the map to every posterior draw.</p>
+</div>
+<div class="fragment">
+<p>For a binary condition in column <span class="math inline">\(p\)</span> of <span class="math inline">\(x_i\)</span>, the reference-free contrast is</p>
+<p><span class="math display">\[
+\Delta^{\rm clr}_j=\operatorname{CLR}(\pi(1))_j-\operatorname{CLR}(\pi(0))_j=\beta_{jp}-\tfrac1K\textstyle\sum_k\beta_{kp},
+\]</span></p>
+<p>the change of feature <span class="math inline">\(j\)</span> <strong>relative to the geometric mean</strong> of the composition — linear in <span class="math inline">\(\beta\)</span>.</p>
+</div>
+<aside class="notes">
+<p>Subtle point worth raising for this audience: ALR and CLR are equivalent as likelihoods but <em>not</em> as Bayesian models under independent priors — an iid N(0, σ²) prior on ALR coefficients induces a slightly tighter prior on the reference feature’s CLR coefficient. The asymmetry is O(1/K).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="location-scale-and-shape" class="slide level2">
+<h2>Location, scale, and shape</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
 <col style="width: 33%">
 </colgroup>
 <thead>
@@ -707,45 +873,52 @@ NB(n_i\pi_{ij},\phi_j),
 <tr class="odd">
 <td><strong>Location</strong></td>
 <td>How does the expected composition change?</td>
-<td>Covariate effects (<span class="math inline">\(\beta_j\)</span>)</td>
+<td><span class="math inline">\(\beta_j\)</span> via softmax</td>
 </tr>
 <tr class="even">
 <td><strong>Scale</strong></td>
 <td>How does residual variability change?</td>
-<td>Dispersion (<span class="math inline">\(\phi_j\)</span>)</td>
+<td>precision <span class="math inline">\(\phi_{ij}\)</span></td>
 </tr>
 <tr class="odd">
 <td><strong>Shape / dependence</strong></td>
-<td>How do features vary together across samples?</td>
-<td>Latent factors (<span class="math inline">\(z_i^\top\gamma_j\)</span>)</td>
+<td>How do features co-vary beyond the closure?</td>
+<td>latent factors <span class="math inline">\(z_i^\top\gamma_j\)</span> (ongoing)</td>
 </tr>
 </tbody>
 </table>
 <div class="fragment">
-<p>Most genomic analyses focus primarily on <strong>location</strong>: which features increase or decrease on average.</p>
+<p>Most genomic analyses focus on <strong>location</strong>. Today: location <em>done carefully</em> (Part 5), scale as a <strong>regulariser</strong> (Part 4), and dependence as the open problem (Part 8).</p>
 </div>
-<div class="fragment">
-<p>Our goal is to model not only the mean composition, but also changes in variability and shared dependence.</p>
-</div>
+</section></section>
+<section>
+<section id="part-4-scale-abundance-dependent-dispersion" class="title-slide slide level1 center">
+<h1>Part 4 · Scale: abundance-dependent dispersion</h1>
+
 </section>
-<section id="why-has-statistical-genomics-focused-on-location" class="slide level2">
-<h2>Why has statistical genomics focused on location?</h2>
-<p>The standard differential-expression question is:</p>
-<blockquote>
-<p>Which genes/miRNAs/microbial taxa differ in average relative abundance?</p>
-</blockquote>
-<p>This emphasis is understandable:</p>
+<section id="what-the-precision-φ-measures" class="slide level2">
+<h2>What the precision φ measures</h2>
 <ul>
-<li>sample sizes are often modest;</li>
-<li>location effects are easier to estimate and interpret;</li>
-<li>power is limited for modeling higher-order distributional features;</li>
-<li>many standard methods treat dispersion mainly as a nuisance parameter.</li>
+<li><span class="math inline">\(p_i=\mathcal{C}(a_i)\)</span>: the <strong>realised composition</strong> of sample <span class="math inline">\(i\)</span> (the composition from Part 1). It varies between biological replicates: <span class="math inline">\(p_i\sim F\)</span>.</li>
+<li><span class="math inline">\(\pi_i=\mathbb{E}[p_i]\)</span>: the <strong>expected composition</strong> given the covariates. This is what NBSR models, <span class="math inline">\(\pi_i=\operatorname{softmax}(x_i^\top\beta)\)</span>.</li>
 </ul>
 <div class="fragment">
-<p>But disease may change more than the mean.</p>
+<p>Sequencing then counts molecules from <span class="math inline">\(p_i\)</span>: <span class="math inline">\(\ y_{ij}\mid p_{ij}\sim\text{Poisson}(n_ip_{ij})\)</span>. By the law of total variance,</p>
+<p><span class="math display">\[
+\operatorname{Var}(y_{ij})
+=\underbrace{n_i\pi_{ij}}_{\text{sequencing noise}}
++\underbrace{n_i^2\operatorname{Var}(p_{ij})}_{\text{biological variation}} .
+\]</span></p>
+</div>
+<div class="fragment">
+<p>Match to an NB with mean <span class="math inline">\(\mu_{ij}=n_i\pi_{ij}\)</span> and variance <span class="math inline">\(\mu_{ij}+\mu_{ij}^2/\phi_{ij}\)</span>:</p>
+<p><span class="math display">\[
+\frac{1}{\phi_{ij}}=\frac{\operatorname{Var}(p_{ij})}{\pi_{ij}^2}=\operatorname{CV}^2(p_{ij}).
+\]</span></p>
+<p><span class="math inline">\(1/\phi\)</span> = <strong>between-sample variability</strong> of the realised composition (small <span class="math inline">\(\phi\)</span> = variable feature).</p>
 </div>
 <aside class="notes">
-<p>Two groups can have similar expected composition but very different variability or dependence structures.</p>
+<p>Equivalently CV²(y) = 1/μ (technical) + 1/φ (biological), the “biological coefficient of variation” of McCarthy et al.&nbsp;(2012). Gamma mixing gives the NB exactly; for other F it is a two-moment match.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -758,276 +931,116 @@ NB(n_i\pi_{ij},\phi_j),
           display:block!important;
       }</style></aside>
 </section>
-<section id="location-changes-in-expected-composition" class="slide level2">
-<h2>Location: changes in expected composition</h2>
-<p>For a binary condition <span class="math inline">\(x_i\in \{0,1\}\)</span>,</p>
+<section id="the-dirichlet-case-motivates-the-model" class="slide level2">
+<h2>The Dirichlet case motivates the model</h2>
+<p>If <span class="math inline">\(p_i\sim\operatorname{Dir}(\kappa\pi_i)\)</span>, then <span class="math inline">\(\operatorname{CV}^2(p_{j})=\dfrac{1-\pi_j}{\pi_j(1+\kappa)}\)</span>, so</p>
 <p><span class="math display">\[
-\eta_{ij}
-=
-\beta_{0j}
-+
-x_i\beta_{1j},
-\qquad
-\pi_i=\operatorname{softmax}(\eta_i).
+\boxed{\ \log\phi_j=\operatorname{logit}(\pi_j)+\log(1+\kappa)\ }
 \]</span></p>
-<p>The coefficient <span class="math inline">\(\beta_{1j}\)</span> shifts the latent score of feature <span class="math inline">\(j\)</span> between conditions.</p>
+<p><strong>Precision is linear in logit-abundance with unit slope.</strong> Rare features are <em>intrinsically</em> noisier on the relative scale.</p>
 <div class="fragment">
-<p>Through the softmax, all feature-specific shifts jointly determine the change in expected composition.</p>
-</div>
-<div class="fragment">
-<p>Because sequencing is relative, only contrasts among feature effects are identified from the observed counts.</p>
-<p>More on how we will adjust the estimands later.</p>
+<p>A single concentration <span class="math inline">\(\kappa\)</span> ties every feature to the same curve. Real data need more flexibility (next slide).</p>
 </div>
 </section>
-<section id="why-model-scale" class="slide level2 scrollable">
-<h2>Why model scale?</h2>
-<p>Even within the same condition, biological samples do not have identical compositions.</p>
-<p>For condition <span class="math inline">\(g \in \{0,1\}\)</span>, suppose</p>
+<section id="the-nbsr-dispersion-model" class="slide level2">
+<h2>The NBSR dispersion model</h2>
+<p>NBSR generalises the Dirichlet relationship:</p>
 <p><span class="math display">\[
-\pi_i \mid x_i=g
-\sim
-F\left(\boldsymbol{\lambda}^{(g)}\right),
+\log\phi_{ij}=b_0+b_j+b_\pi\operatorname{logit}(\pi_{ij})+w_i^\top b_w .
 \]</span></p>
-<p>where <span class="math inline">\(\pi_i\)</span> is the latent composition of sample <span class="math inline">\(i\)</span>.</p>
-<p>The observed count is then generated conditionally on that composition. For example,</p>
-<p><span class="math display">\[
-Y_{ij} \mid \pi_{ij},n_i
-\sim
-\operatorname{Poisson}(n_i\pi_{ij}).
-\]</span></p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>term</th>
+<th>role</th>
+<th>Dirichlet value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(b_0\)</span></td>
+<td>global concentration</td>
+<td><span class="math inline">\(\log(1+\kappa)\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(b_j\)</span></td>
+<td>feature-specific departure (hierarchical, <span class="math inline">\(b_j\sim N(0,\sigma_b^2)\)</span>)</td>
+<td><span class="math inline">\(0\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(b_\pi\)</span></td>
+<td>mean–dispersion slope, prior <span class="math inline">\(N(1,0.1^2)\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(w_i^\top b_w\)</span></td>
+<td>sample or batch effects, e.g.&nbsp;one offset <span class="math inline">\(c_i\)</span> per sample</td>
+<td><span class="math inline">\(\log(1+\kappa_i)-\overline{\log(1+\kappa)}\)</span></td>
+</tr>
+</tbody>
+</table>
 <div class="fragment">
-<p>Observed count variation therefore has two sources:</p>
-<ol type="1">
-<li><strong>technical variability</strong>: repeated sequencing measurements of the same underlying composition would produce different finite-depth counts;</li>
-<li><strong>between-sample biological variability</strong>: the latent compositions <span class="math inline">\(\pi_i\)</span> differ across biological samples.</li>
-</ol>
+<p>Because <span class="math inline">\(\pi_{ij}\)</span> depends on the covariates, precision automatically differs <strong>between conditions</strong> as well as between features.</p>
 </div>
+<aside class="notes">
+<p>Setting b_pi = 0 and w = 0 recovers DESeq2-style per-feature dispersion.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="coefficient-of-variation" class="slide level2">
-<h2>Coefficient of variation</h2>
-<p>Using the law of total variance,</p>
-<p><span class="math display">\[
-\operatorname{CV}^2(Y_{ij}) = \underbrace{\frac{1}{\mu_{ij}}}_{\text{Technical CV}^2} + \underbrace{\phi_j}_{\text{Biological CV}^2}
-\]</span></p>
-<p>where <span class="math inline">\(\mu_{ij} = n_i \mathbb{E}[\pi_{ij}]\)</span> and <span class="math inline">\(\phi_j\)</span> is the squared coefficient of variation of the latent composition,</p>
-<div class="fragment">
-<p><span class="math display">\[
-\phi_j = \operatorname{CV}^2(\pi_{ij}) = \frac{\operatorname{Var}(\pi_{ij})}{\mathbb{E}[\pi_{ij}]^2}.
-\]</span></p>
-</div>
-<div class="fragment">
-<p>Thus, the dispersion parameter measures between-sample heterogeneity in the underlying composition, beyond finite sequencing noise.</p>
-</div>
-</section>
-<section id="a-concrete-example-the-dirichlet-distribution" class="slide level2">
-<h2>A concrete example: the Dirichlet distribution</h2>
-<p>Suppose the latent composition follows</p>
-<p><span class="math display">\[
-\pi_i\mid x_i=g
-\sim
-\operatorname{Dirichlet}
-\left(
-\lambda_1^{(g)},\ldots,\lambda_K^{(g)}
-\right).
-\]</span></p>
-<p>Let <span class="math inline">\(\lambda_0^{(g)} = \sum_{k} \lambda_{k}^{(g)}\)</span> and <span class="math inline">\(\bar{\lambda}_j^{(g)} = \lambda_j^{(g)} / \lambda_0^{(g)}\)</span>. Then,</p>
-<p><span class="math display">\[
-\phi_j^{(g)}
-=
-\operatorname{CV}^2(\pi_{ij} \mid x_i=g)
-=
-\frac{
-\left(1-\bar{\lambda}_j^{(g)}\right)
-}{
-\bar{\lambda}_j^{(g)}
-(\lambda_0^{(g)}+1)
-}.
-\]</span></p>
-<div class="fragment">
-<p>In general, for two conditions <span class="math inline">\(g \neq g'\)</span>, biological variability may differ across conditions:</p>
-<p><span class="math display">\[
-\phi_j^{(g)}
-\neq
-\phi_j^{(g')}.
-\]</span></p>
-</div>
-</section>
-<section id="modeling-condition-dependent-dispersion-improves-calibration" class="slide level2">
-<h2>Modeling condition-dependent dispersion improves calibration</h2>
-<p>If dispersion differs across conditions but is modeled as constant, standard errors can be misestimated and confidence or credible intervals may be poorly calibrated.</p>
-<div class="fragment">
-<p>This motivates modeling dispersion as a function of covariates:</p>
-<p><span class="math display">\[
-\log \phi_{ij} = w_{ij}^{\top} \alpha_j.
-\]</span></p>
-</div>
-<div class="fragment">
-<p>The scale covariates <span class="math inline">\(w_{ij}\)</span> may include,</p>
-<ul>
-<li>disease or treatment group;</li>
-<li>batch or other technical covariates;</li>
-<li>functions of the expected proportion <span class="math inline">\(\pi_{ij}\)</span> or expected count <span class="math inline">\(\mu_{ij}\)</span>.</li>
-</ul>
-<p>Thus, variability may depend on both sample characteristics and the abundance level of the feature.</p>
-</div>
-<div class="fragment">
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>The covariates governing variability need not be the same as those governing the mean composition.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="real-data-provide-justification-for-modeling-scale" class="slide level2">
-<h2>Real data provide justification for modeling scale</h2>
+<section id="real-data-dispersion-depends-on-condition" class="slide level2">
+<h2>Real data: dispersion depends on condition</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><img data-src="images/feature_to_label_miR-151b_151a-5p_props_dispersion.png"></p>
 </div><div class="column" style="width:50%;">
 <p><img data-src="images/feature_to_label_miR-146b-5p_props_dispersion.png"></p>
 </div></div>
-</section>
-<section id="location-scale-and-shape" class="slide level2">
-<h2>Location, scale, and shape</h2>
-<div class="columns">
-<div class="column" style="width:33%;">
-<p><strong>Location</strong></p>
-<p>How does the expected composition change?</p>
-<p><span class="math display">\[
-\beta_j
-\]</span> Covariates shift the mean relative abundance of each feature.</p>
-</div><div class="column" style="width:33%;">
-<p><strong>Scale</strong></p>
-<p>How does biological heterogeneity change?</p>
-<p><span class="math display">\[
-\phi_j
-\]</span></p>
-<p>Dispersion captures between-sample variability in the latent composition and may depend on covariates.</p>
-</div><div class="column" style="width:33%;">
-<p><strong>Shape / dependence</strong></p>
-<p>How do features co-vary beyond compositional constraints?</p>
-<p><span class="math display">\[
-z_i^\top\gamma_j
-\]</span></p>
-<p>Latent factors capture shared residual structure across features.</p>
-</div></div>
 <div class="fragment">
-<p>Genomic studies have traditionally focused on location. Our framework extends this perspective by modeling scale, while ongoing work introduces latent factors to capture dependence and distributional shape.</p>
+<p>If precision differs across conditions but is modelled as constant, standard errors are misestimated and intervals are miscalibrated.</p>
 </div>
 </section>
-<section id="shape-and-dependence-latent-factors" class="slide level2">
-<h2>Shape and dependence: latent factors</h2>
-<div class="columns">
-<div class="column" style="width:70%;">
+<section id="why-the-coupling-regularises-sparse-features" class="slide level2">
+<h2>Why the coupling regularises sparse features</h2>
+<p><strong>Fixed precision.</strong> For an observed zero, <span class="math inline">\(\ell(0;\mu,\phi)=-\phi\log(1+\mu/\phi)\)</span>, so</p>
 <p><span class="math display">\[
-\eta_{ij}
-=
-x_i^\top\beta_j
-+
-z_i^\top\gamma_j.
+\frac{\partial\ell(0)}{\partial\log\mu}=-\frac{\mu\phi}{\mu+\phi}\ \approx\ -\phi\qquad(\mu\gg\phi).
 \]</span></p>
-<p>Latent factors can capture shared residual variation due to:</p>
-<ul>
-<li>cell-type composition;</li>
-<li>tumor purity;</li>
-<li>immune infiltration;</li>
-<li>batch or sequencing center;</li>
-<li>sample quality;</li>
-<li>unmeasured disease subtypes.</li>
-</ul>
-</div><div class="column" style="width:30%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/ChenXiangyi.jpeg"></p>
-<figcaption>PhD student Xiangyi Chen is working on developing an efficient MCMC sampler for this problem.</figcaption>
-</figure>
+<p>Raising <span class="math inline">\(\log\mu\)</span> by <span class="math inline">\(\Delta\)</span> costs only <span class="math inline">\(\approx\phi\Delta\)</span> per zero. With small <span class="math inline">\(\phi\)</span>, <strong>many zeros barely resist a few large counts</strong>.</p>
+<div class="fragment">
+<p><strong>Abundance-dependent precision.</strong> For rare features <span class="math inline">\(\operatorname{logit}\pi\approx\log\pi\)</span>, so with <span class="math inline">\(b_\pi\approx1\)</span>, <span class="math inline">\(\phi=c\mu\)</span> with <span class="math inline">\(c\)</span> fixed. Then</p>
+<p><span class="math display">\[
+\ell(0;\mu,c\mu)=-c\mu\log\!\Big(1+\frac1c\Big),
+\qquad
+\text{loss from }\mu_0\to\mu_0e^\Delta = \phi_0\,(e^{\Delta}-1)\log\!\Big(1+\frac{\mu_0}{\phi_0}\Big).
+\]</span></p>
+<p>The penalty grows <strong>exponentially</strong> in <span class="math inline">\(\Delta\)</span> instead of linearly.</p>
 </div>
-</div></div>
-</section></section>
-<section>
-<section id="bayesian-inference" class="title-slide slide level1 center">
-<h1>Bayesian Inference</h1>
+<div class="fragment">
+<p>Example: <span class="math inline">\(\phi=0.05\)</span>, <span class="math inline">\(\mu_0=1\)</span>, <span class="math inline">\(m=10\)</span> zeros, <span class="math inline">\(\Delta=4\)</span>: <strong>1.97 nats</strong> (fixed) vs <strong>81.6 nats</strong> (coupled).</p>
+</div>
+<div class="fragment">
+<p>The model controls sparse features <strong>through its likelihood</strong>, rather than through a pseudocount, a prevalence filter, or a pseudocount-sensitivity filter.</p>
+</div>
+</section>
+<section id="regularisation-in-a-benchmark-replicate" class="slide level2">
+<h2>Regularisation in a benchmark replicate</h2>
 
-</section>
-<section id="posterior-sampling" class="slide level2">
-<h2>Posterior sampling</h2>
-<p>Let <span class="math inline">\(\theta = (\beta, \alpha)\)</span> denote all model parameters. The posterior distribution is,</p>
-<p><span class="math display">\[
-p(\theta \mid Y, X, W)
-=
-\frac{
-  p_{\ell}(Y | \theta, X, W)
-  \cdot
-  p_0(\theta).
-}{
-  m_0(Y | X, W)
-}.
-\]</span></p>
-<p>The denominator <span class="math inline">\(m_0\)</span> denotes the marginal likelihood, which is intractable:</p>
-<p><span class="math display">\[
-m_0(Y | X, W) = \int p_{\ell}(Y | \theta, X, W) \cdot p_0(d\theta).
-\]</span></p>
-<div class="fragment">
-<p>Two broad approaches are available:</p>
-<ul>
-<li><strong>Posterior sampling</strong>, such as Markov chain Monte Carlo (MCMC), provides full posterior inference but can be computationally expensive and requires convergence assessment.</li>
-<li><strong>Posterior approximation</strong>, such as the Laplace approximation, is usually much faster but relies on a local Gaussian approximation to the posterior.</li>
-</ul>
-</div>
-</section>
-<section id="laplace-approximation" class="slide level2 scrollable">
-<h2>Laplace approximation</h2>
-<p>The Laplace approximation replaces the posterior with a multivariate normal distribution centered at the posterior mode.</p>
-<div class="fragment">
-<ol type="1">
-<li>First optimize <span class="math display">\[
-\hat{\theta} = \operatorname{argmax}_{\theta} \log p(\theta | Y, X, W)
-\]</span></li>
-</ol>
-</div>
-<div class="fragment">
-<ol start="2" type="1">
-<li>Evaluate Hessian of the log-posterior at <span class="math inline">\(\hat{\theta}\)</span>, <span class="math display">\[
-H = \nabla_{\theta}^2 \log p(\theta | Y, X, W)\Big|_{\hat{\theta}}
-\]</span></li>
-</ol>
-</div>
-<div class="fragment">
-<ol start="3" type="1">
-<li>Then, <span class="math inline">\(\theta | Y, X, W \approx \operatorname{Normal}(\hat{\theta}, (-H)^{-1})\)</span>.</li>
-</ol>
-</div>
-<div class="fragment">
-<p>The approximation is most accurate when the posterior is unimodal and approximately symmetric near its mode.</p>
-</div>
-</section>
-<section id="computing-the-laplace-approximation" class="slide level2 scrollable">
-<h2>Computing the Laplace approximation</h2>
-<p>The Laplace approximation requires two main steps:</p>
-<ol type="1">
-<li>Optimize the log-posterior to obtain the posterior mode <span class="math inline">\(\hat{\theta}\)</span>;</li>
-<li>Evaluate the Hessian at <span class="math inline">\(\hat{\theta}\)</span> to estimate the posterior covariance.</li>
-</ol>
-<div class="fragment">
-<p>We use the automatic-differentiation framework PyTorch, which provides:</p>
-<ul>
-<li>gradients for posterior optimization;</li>
-<li>Hessian or Hessian-vector product calculations;</li>
-<li>efficient implementation on CPUs or GPUs.</li>
-</ul>
-<p><img data-src="images/what_is_pytorch_logo.png" style="width:30.0%"></p>
-</div>
-<aside class="notes">
-<p>We hand derived the gradients and the Hessian initially! The new version uses autograd as much as possible.</p>
-<p>Statistical modeling and analysis has become a lot easier thanks to the developments in the tools for deep learning. Now, we spend more time developing models and studying their properties under certain assumptions and less on implementation.</p>
+<img data-src="images/recomb/fig_rare_feature.png" style="width:78.0%" class="r-stretch quarto-figure-center"><p class="caption">Three null miRNAs, 10 control samples. Top: control-group log-likelihood vs.&nbsp;assumed proportion. Bottom: posteriors under an <em>oracle</em> fit (true dispersion, held fixed) and NBSR. Dashed: truth; dotted: posterior means.</p><aside class="notes">
+<p>Striking point: NBSR beats the oracle that knows the true dispersion for the rarest miRNA. The oracle’s likelihood is nearly flat to the right, so a couple of large counts drag its posterior up by ~2 log units. NBSR’s coupled precision gives the zeros teeth. The abundant miRNA (right) is unaffected.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1040,612 +1053,1686 @@ H = \nabla_{\theta}^2 \log p(\theta | Y, X, W)\Big|_{\hat{\theta}}
           display:block!important;
       }</style></aside>
 </section>
-<section id="inferential-target" class="slide level2">
-<h2>Inferential target</h2>
-<p>Recall, for feature <span class="math inline">\(j\)</span>, our target is the absolute log-fold change:</p>
-<p><span class="math display">\[
-\delta_j = \log a_j^{(1)} - \log a_j^{(0)}.
-\]</span></p>
-<p>But we can only estimate <span class="math display">\[
-\begin{aligned}
-d_j &amp;= \log \pi_j^{(1)} - \log \pi_j^{(0)} \\
-&amp;= \delta_j - \Delta_{\text{total}}.
-\end{aligned}
-\]</span></p>
+<section id="how-nbsr-compares-with-other-count-models" class="slide level2">
+<h2>How NBSR compares with other count models</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Couples features?</th>
+<th>Overdispersion</th>
+<th>Zeros</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Multinomial logistic</td>
+<td>yes (softmax)</td>
+<td>none — <span class="math inline">\(\operatorname{Var}\)</span> fixed by mean</td>
+<td>fine</td>
+</tr>
+<tr class="even">
+<td>Dirichlet–multinomial</td>
+<td>yes</td>
+<td><strong>one</strong> <span class="math inline">\(\kappa\)</span> shared by all features</td>
+<td>fine</td>
+</tr>
+<tr class="odd">
+<td>Log-ratio + Gaussian regression</td>
+<td>no (per feature)</td>
+<td>per feature</td>
+<td>pseudocount</td>
+</tr>
+<tr class="even">
+<td>DESeq2 / edgeR (NB GLM)</td>
+<td>no (normalisation offset)</td>
+<td>per feature</td>
+<td>fine</td>
+</tr>
+<tr class="odd">
+<td><strong>NBSR</strong></td>
+<td><strong>yes (softmax)</strong></td>
+<td><strong>per feature, per condition, per sample</strong></td>
+<td><strong>fine</strong></td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>NBSR = keep the softmax coupling of multinomial logistic regression, replace the likelihood with a feature-wise negative binomial. Closely related to the decoder of scVI (Lopez et al., 2018): softmax frequencies × library size in an NB.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="part-5-the-estimand-the-compositional-shift" class="title-slide slide level1 center">
+<h1>Part 5 · The estimand: the compositional shift</h1>
+
 </section>
-<section id="estimating-the-relative-abundance-effect" class="slide level2">
-<h2>Estimating the relative abundance effect</h2>
-<p>For <span class="math inline">\(g \in \{0, 1\}\)</span>, let <span class="math inline">\(x(g)\)</span> denote the covariate vector corresponding to condition <span class="math inline">\(g\)</span>. At the posterior mode,</p>
+<section id="from-clr-effects-to-absolute-effects" class="slide level2">
+<h2>From CLR effects to absolute effects</h2>
+<p>Centring removes the unobserved total — but leaves a <em>different</em> common term:</p>
 <p><span class="math display">\[
-\hat{\pi}_{j}^{(g)}
-=
-\frac{
-  \exp(\hat{\beta}_j^\top x(g))
-}{
-  \sum_{k} \exp(\hat{\beta}_k^{\top} x(g))
-}.
-\]</span></p>
-<p>So,</p>
-<p><span class="math display">\[
-\hat{d}_j = \log \hat{\pi}_j^{(1)} - \log \hat{\pi}_j^{(0)}.
+\Delta^{\rm clr}_j = r_j-\frac1K\sum_k r_k
+=(\delta_j+c_{\rm rel})-\frac1K\sum_k(\delta_k+c_{\rm rel})
+=\delta_j+\underbrace{(-\bar\delta)}_{c_{\rm CLR}} .
 \]</span></p>
 <div class="fragment">
-<p>We need to correct for the bias term: <span class="math inline">\(\Delta_{\text{total}}\)</span>.</p>
+<p><strong>Definition.</strong> The CLR compositional shift is the scalar <span class="math inline">\(c_{\rm CLR}\)</span> with <span class="math inline">\(\Delta^{\rm clr}_j=\delta_j+c_{\rm CLR}\)</span> for all <span class="math inline">\(j\)</span>.</p>
+</div>
+<div class="fragment">
+<p>The data identify <span class="math inline">\(\Delta^{\rm clr}\)</span>, but <strong>not</strong> <span class="math inline">\(\delta\)</span>: adding the same constant <span class="math inline">\(t\)</span> to every <span class="math inline">\(\delta_j\)</span> also raises <span class="math inline">\(\bar\delta\)</span> by <span class="math inline">\(t\)</span>, so <span class="math inline">\(\Delta^{\rm clr}_j=\delta_j-\bar\delta\)</span> is unchanged. Every <span class="math inline">\(\delta+t\mathbf 1\)</span> fits equally well.</p>
+<p>Biologically, that is multiplying every abundance by <span class="math inline">\(e^t\)</span>, a change in the total the sequencer cannot see (Part 1).</p>
+<p>To break it we need either</p>
+<ul>
+<li><strong>external scale information</strong> (spike-ins, flow cytometry, qPCR of total load), or</li>
+<li><strong>a structural assumption</strong> about <span class="math inline">\(\delta\)</span>.</li>
+</ul>
 </div>
 </section>
-<section id="bias-correction" class="slide level2">
-<h2>Bias correction</h2>
-<p>Suppose the absolute abundances under two conditions are</p>
+<section id="optional-how-spike-ins-fix-the-scale" class="slide level2">
+<h2>(Optional) How spike-ins fix the scale</h2>
+<p>Add the <strong>same known amount</strong> of a synthetic molecule to every sample before library prep. Its true abundance does not change between conditions.</p>
+<div class="fragment">
+<p>Treatment doubles A; B, C unchanged; spike-in S = 10 in both groups.</p>
+<div class="columns">
+<div class="column" style="width:45%;">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">A</th>
+<th style="text-align: right;">B</th>
+<th style="text-align: right;">C</th>
+<th style="text-align: right;">S</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>control</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="even">
+<td>treated</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">10</td>
+</tr>
+</tbody>
+</table>
+</div><div class="column" style="width:55%;">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>log fold change</th>
+<th style="text-align: right;">A</th>
+<th style="text-align: right;">B</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>relative (composition incl.&nbsp;S)</td>
+<td style="text-align: right;">0.4700</td>
+<td style="text-align: right;">−0.2231</td>
+</tr>
+<tr class="even">
+<td>ratio to spike-in</td>
+<td style="text-align: right;"><strong>0.6931</strong></td>
+<td style="text-align: right;"><strong>0</strong></td>
+</tr>
+<tr class="odd">
+<td>truth <span class="math inline">\(\delta\)</span></td>
+<td style="text-align: right;">0.6931</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+<div class="fragment">
+<p>The spike-in is a reference whose absolute level is <strong>known not to move</strong>, so log-ratios against it recover <span class="math inline">\(\delta\)</span> directly: it pins down the free constant <span class="math inline">\(t\)</span>.</p>
+<p><strong>Caveats:</strong> <span class="math inline">\(\delta\)</span> is “per unit the spike-in was added to” (per cell ≠ per µg RNA), and the spike-in must face the same capture and amplification biases as real features.</p>
+</div>
+<aside class="notes">
+<p>Relative: the sequenced composition includes S, so π_A = 10/40 → 20/50 and log(0.4/0.25) = log 1.6 = 0.4700; π_B = 10/40 → 10/50, log 0.8 = −0.2231. Ratio to spike-in: log{(y_A/y_S) treated / (y_A/y_S) control} = log(2/1) = log 2. Caveats: the spike-in must be added per the right unit (per cell vs per µg RNA gives a different δ), and it must go through the same capture and amplification as the real features. Flow cytometry or qPCR of total load work similarly, by measuring the total A_i directly.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-modal-null-assumption" class="slide level2">
+<h2>The modal-null assumption</h2>
+<p>Following LinDA (Zhou et al., 2022): the across-feature distribution of absolute effects has a <strong>unique mode at zero</strong>,</p>
 <p><span class="math display">\[
-(10, 10, 10, 10, 10) \quad \text{ and } \quad (20, 10, 10, 10, 10).
-\]</span> Only the first feature changes. Therefore, the true absolute log-fold changes are</p>
-<p><span class="math display">\[
-\delta = (\log 2, 0, 0, 0, 0).
+\operatorname{mode}_{1\le k\le K}(\delta_k)=0 .
 \]</span></p>
 <div class="fragment">
-<p>However, the corresponding compositions are</p>
+<p>Exact sparsity is sufficient but not necessary: unchanged features may scatter near zero, so long as they remain the densest group.</p>
+</div>
+<div class="fragment">
+<p>Because the mode is translation-equivariant,</p>
 <p><span class="math display">\[
-\left(\frac{1}{5}, \frac{1}{5}, \frac{1}{5}, \frac{1}{5}, \frac{1}{5}\right) \quad \text{ and } \quad \left(\frac{2}{6}, \frac{1}{6}, \frac{1}{6}, \frac{1}{6}, \frac{1}{6}\right).
+\operatorname{mode}_k(\Delta^{\rm clr}_k)=\operatorname{mode}_k(\delta_k)+c_{\rm CLR}=c_{\rm CLR},
+\]</span></p>
+<p>giving the estimator</p>
+<p><span class="math display">\[
+\Delta^{\rm adj}_j=\Delta^{\rm clr}_j-\widehat m,\qquad \widehat m=\operatorname{mode}_k\big(\Delta^{\rm clr}_k\big)\ \ \text{(Gaussian KDE)}.
 \]</span></p>
 </div>
 <div class="fragment">
-<p>and the compositional log-fold change is</p>
-<p><span class="math display">\[
-d = \left(\log \frac{10}{6},
-                   \log \frac{5}{6},
-                   \log \frac{5}{6},
-                   \log \frac{5}{6},
-                   \log \frac{5}{6}\right).
-\]</span></p>
-</div>
-<div class="fragment">
-<p>All unchanged features are shifted by the same amount.</p>
+<p>Compare: ANCOM-BC estimates the null centre of a 3-component Gaussian mixture by EM; ALDEx2 reports <span class="math inline">\(\Delta^{\rm clr}\)</span> and does not correct.</p>
 </div>
 </section>
-<section id="bias-correction-identifying-the-common-shift" class="slide level2">
-<h2>Bias correction: identifying the common shift</h2>
-<p>If most features are unchanged, then most <span class="math inline">\(\delta_j\)</span> values are zero:</p>
+<section id="what-happens-to-the-variance" class="slide level2">
+<h2>What happens to the variance?</h2>
 <p><span class="math display">\[
-d_j = \delta_j - \Delta_{\text{total}} = - \Delta_{\text{total}} .
+\operatorname{Var}(\Delta^{\rm adj}_j)
+=\operatorname{Var}(\Delta^{\rm clr}_j)
++\operatorname{Var}(\widehat m)
+-2\operatorname{Cov}(\Delta^{\rm clr}_j,\widehat m).
 \]</span></p>
-<p>Therefore, the dominant mode of the <span class="math inline">\(d_j\)</span> values estimates,</p>
-<p><span class="math display">\[
-\hat{b} = -\hat{\Delta}_{\text{total}} = \text{mode} \{\hat{d}_1, ..., \hat{d}_K\}.
-\]</span></p>
-<p>The bias corrected estimator is <span class="math inline">\(\hat{\delta}_j = \hat{d}_j - \hat{b}\)</span>.</p>
 <div class="fragment">
-<div class="callout callout-note callout-titled callout-style-default">
+<ul>
+<li><span class="math inline">\(\widehat m\)</span> is a <strong>non-smooth functional of the whole <span class="math inline">\(K\)</span>-vector</strong>, correlated with each component it corrects. No tidy delta method.</li>
+<li>LinDA argues the last two terms vanish as <span class="math inline">\(K,n\to\infty\)</span>; our earlier NBSR paper also treated <span class="math inline">\(\widehat m\)</span> as fixed.</li>
+</ul>
+</div>
+<div class="fragment question">
+<p>Is that safe? It depends on <em>which</em> features you ask about.</p>
+</div>
+<div class="fragment">
+<p><strong>Our solution:</strong> recompute <span class="math inline">\(\widehat m\)</span> <strong>inside every posterior draw</strong>. Both missing terms are then propagated automatically.</p>
+</div>
+<aside class="notes">
+<p>Discussion question for the class: for which features would you expect Cov(Δclr_j, m̂) to be large? Answer: very abundant, precisely estimated features — they have small own-variance, so the shift’s variance is comparable, and they influence the mode estimate. We’ll see this in the variance decomposition table.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="part-6-inference" class="title-slide slide level1 center">
+<h1>Part 6 · Inference</h1>
+
+</section>
+<section id="priors-and-the-per-draw-estimand" class="slide level2">
+<h2>Priors and the per-draw estimand</h2>
+<p><strong>Priors.</strong> <span class="math inline">\(\beta_{jp}\sim N(0,\sigma_{\beta p}^2)\)</span> under <span class="math inline">\(\beta_K=0\)</span>; <span class="math inline">\(b_0\sim N(0,1)\)</span>; <span class="math inline">\(b_j\sim N(0,\sigma_b^2)\)</span>, <span class="math inline">\(\sigma_b\sim N^+(0,0.5^2)\)</span>; <span class="math inline">\(b_\pi\sim N(1,0.1^2)\)</span>.</p>
+<div class="fragment">
+<p><strong>Empirical Bayes option</strong> for real data: fit with <span class="math inline">\(\sigma_{\beta p}=10\)</span>, then set <span class="math inline">\(\sigma_{\beta p}\)</span> by matching a zero-centred normal’s upper tail to the precision-weighted 0.95 quantile of <span class="math inline">\(|\hat\beta_{jp}|\)</span> (as in DESeq2), and refit.</p>
+</div>
+<div class="fragment">
+<p><strong>Per-draw estimand.</strong> For each posterior draw <span class="math inline">\(s\)</span>:</p>
+<p><span class="math display">\[
+\beta^{(s)}\ \xrightarrow{\ \text{centre}\ }\ \Delta^{{\rm clr},(s)}\ \xrightarrow{\ \text{KDE mode}\ }\ \widehat m^{(s)}\ \longrightarrow\ \Delta^{{\rm adj},(s)}_j=\Delta^{{\rm clr},(s)}_j-\widehat m^{(s)} .
+\]</span></p>
+<p>The posterior of <span class="math inline">\(\Delta^{\rm adj}_j\)</span> is the empirical distribution of <span class="math inline">\(\{\Delta^{{\rm adj},(s)}_j\}_s\)</span>.</p>
+</div>
+<div class="fragment">
+<p><strong>Gold standard:</strong> HMC (Stan, NUTS), with clean convergence diagnostics. <strong>But:</strong> 50 / 132 / 345 min per fit at <span class="math inline">\(n=10/20/40\)</span>.</p>
+</div>
+</section>
+<section id="laplace-approximation-with-gaussian-draws" class="slide level2 scrollable">
+<h2>Laplace approximation with Gaussian draws</h2>
+<ol type="1">
+<li>Optimise: <span class="math inline">\(\hat\beta=\arg\max_\beta\log p(\beta\mid Y)\)</span> (dispersion parameters at their mode).</li>
+<li>Hessian: <span class="math inline">\(-H=-\nabla^2_\beta\log p(\beta\mid Y)\big|_{\hat\beta}\)</span>, dimension <span class="math inline">\((K-1)P\)</span>.</li>
+<li><strong>Cholesky</strong>, never invert: <span class="math inline">\(-H=LL^\top\)</span>.</li>
+</ol>
+<div class="fragment">
+<p>Draw from the Gaussian with one triangular solve per draw:</p>
+<p><span class="math display">\[
+\beta^{(s)}=\hat\beta+L^{-\top}z^{(s)},\qquad z^{(s)}\sim N(0,I)\ \Rightarrow\ \beta^{(s)}\sim N\big(\hat\beta,(-H)^{-1}\big).
+\]</span></p>
+</div>
+<div class="fragment">
+<p>The same factor gives the delta-method variance of the (linear) CLR contrast exactly:</p>
+<p><span class="math display">\[
+\widehat{\operatorname{Var}}(\Delta^{\rm clr}_j)=q_j^\top(-H)^{-1}q_j=\|L^{-1}q_j\|^2,\qquad
+q_{j,(k,d)}=\mathbf 1\{d=p\}\big(\mathbf 1\{k=j\}-\tfrac1K\big).
+\]</span></p>
+</div>
+<div class="fragment">
+<p>Gradients and Hessian in matrix form in PyTorch: <strong>a fit takes ~2 minutes on one core</strong> vs.&nbsp;hours for HMC.</p>
+<p>Remaining approximations: Gaussian shape; dispersion held at its mode. The shift is treated exactly as in the sampler.</p>
+</div>
+<aside class="notes">
+<p>The Hessian is dense because the softmax couples all features: ∂²/∂β_j∂β_k ≠ 0 for j≠k. For K≈400, P=2 that’s ~800×800 — trivial. For K in the tens of thousands (genes) one would need structure (block-diagonal + low-rank, Woodbury) — a nice open computational problem.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="three-decision-rules-on-the-same-posterior" class="slide level2">
+<h2>Three decision rules on the same posterior</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rule</th>
+<th>Statistic</th>
+<th>Uses</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Local false sign rate</strong></td>
+<td><span class="math inline">\(\operatorname{lfsr}_j=\min(p^+_j,1-p^+_j)\)</span>, <span class="math inline">\(p^+_j=\frac1S\sum_s\mathbf 1\{\Delta^{{\rm adj},(s)}_j&gt;0\}\)</span></td>
+<td>full posterior shape</td>
+</tr>
+<tr class="even">
+<td><strong>Posterior-<span class="math inline">\(z\)</span> + BH</strong></td>
+<td><span class="math inline">\(z^{\rm post}_j=\overline{\Delta^{\rm adj}_j}/\operatorname{sd}(\Delta^{\rm adj}_j)\)</span></td>
+<td>first two moments, shift uncertainty included</td>
+</tr>
+<tr class="odd">
+<td><strong>Delta method + BH</strong> (earlier paper)</td>
+<td><span class="math inline">\(z^{\rm DM}_j=\widehat{\Delta}^{\rm adj}_j/\widehat{\operatorname{Var}}(\Delta^{\rm clr}_j)^{1/2}\)</span></td>
+<td>shift treated as <strong>fixed</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>If the marginal posterior is Gaussian, <span class="math inline">\(p^{\rm post}_j=2\,\operatorname{lfsr}_j\)</span>.</p>
+</div>
+<div class="fragment">
+<div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>Note</strong></p>
+<p><strong>Important</strong></p>
 </div>
 <div class="callout-content">
-<p>The key assumption is that most features are unchanged, so the mode of the compositional effects represents the common compositional shift.</p>
+<p>Under a <strong>continuous</strong> prior, there are no exact nulls in the posterior. A sign probability ranks features well, but a threshold on it is not a frequentist error rate.</p>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="real-data-applications-colon-cancer-cell-lines" class="slide level2">
-<h2>Real-data applications: Colon cancer cell lines</h2>
-
-<img data-src="images/density_log2_bias.png" class="r-stretch"></section>
-<section id="delta-method-inference" class="slide level2">
-<h2>Delta-method inference</h2>
-<p>First, consider inference for the uncorrected compositional effect: <span class="math inline">\(d_j =  \log \pi_j^{(1)} - \log \pi_j^{(0)}\)</span>.</p>
-<p>Under the Laplace approximation,</p>
-<p><span class="math display">\[
-\beta | Y, X, W \approx \operatorname{Normal}(\hat{\beta}, \Sigma_{\beta}),
-\]</span> where <span class="math inline">\(\Sigma_{\beta}\)</span> is the block matrix of <span class="math inline">\((-H)^{-1}\)</span> corresponding to <span class="math inline">\(\beta\)</span>.</p>
-<p>Using the delta method, we take <span class="math inline">\(g_j(\beta) = d_j\)</span>:</p>
-<p><span class="math display">\[
-d_j \approx \operatorname{Normal}(\hat{d}_j, V_j),
-\]</span> where <span class="math inline">\(V_j = \nabla g_j(\hat{\beta})^{\top} \Sigma_{\beta} \nabla g_j(\hat{\beta})\)</span>.</p>
-</section>
-<section id="variance-after-bias-correction" class="slide level2">
-<h2>Variance after bias correction</h2>
-<p>Recall that</p>
-<p><span class="math display">\[
-\hat{\delta}_j = \hat{d}_j - \hat{b}.
-\]</span></p>
-<p>Therefore,</p>
-<p><span class="math display">\[
-\operatorname{Var}(\hat{\delta}_j)
-=
-\operatorname{Var}(\hat{d}_j)
-+
-\operatorname{Var}(\hat{b})
--
-2 \operatorname{Cov}(\hat{d}_j, \hat{b}).
-\]</span></p>
+<section id="calibrating-the-lfsr-threshold" class="slide level2">
+<h2>Calibrating the lfsr threshold</h2>
+<p>miRNA benchmark, HMC posteriors, pooled over settings and replicates:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(n\)</span></th>
+<th>rule</th>
+<th style="text-align: right;">TP</th>
+<th style="text-align: right;">FP</th>
+<th style="text-align: right;">TPR</th>
+<th style="text-align: right;">FDR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td><span class="math inline">\(\operatorname{lfsr}\le0.025\)</span> (95% CI excludes 0)</td>
+<td style="text-align: right;">675</td>
+<td style="text-align: right;">476</td>
+<td style="text-align: right;">0.964</td>
+<td style="text-align: right;"><strong>0.414</strong></td>
+</tr>
+<tr class="even">
+<td></td>
+<td><span class="math inline">\(\operatorname{lfsr}\le0.01\)</span></td>
+<td style="text-align: right;">660</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">0.943</td>
+<td style="text-align: right;">0.162</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><span class="math inline">\(\operatorname{lfsr}\le0.001\)</span></td>
+<td style="text-align: right;">635</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.907</td>
+<td style="text-align: right;"><strong>0.008</strong></td>
+</tr>
+<tr class="even">
+<td>40</td>
+<td><span class="math inline">\(\operatorname{lfsr}\le0.025\)</span> (95% CI excludes 0)</td>
+<td style="text-align: right;">696</td>
+<td style="text-align: right;">988</td>
+<td style="text-align: right;">0.994</td>
+<td style="text-align: right;"><strong>0.587</strong></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><span class="math inline">\(\operatorname{lfsr}\le0.01\)</span></td>
+<td style="text-align: right;">692</td>
+<td style="text-align: right;">374</td>
+<td style="text-align: right;">0.989</td>
+<td style="text-align: right;">0.351</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><span class="math inline">\(\operatorname{lfsr}\le0.001\)</span></td>
+<td style="text-align: right;">687</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">0.981</td>
+<td style="text-align: right;"><strong>0.050</strong></td>
+</tr>
+</tbody>
+</table>
 <div class="fragment">
-<p>The latter two terms are difficult to derive analytically because <span class="math inline">\(\hat{b}\)</span> is the estimated mode of <span class="math inline">\(\hat{d}_j\)</span>’s – a nonlinear function of all feature-level effects.</p>
-</div>
-</section>
-<section id="a-simplified-variance-approximation" class="slide level2">
-<h2>A simplified variance approximation</h2>
-<p>We use a computationally convenient approximation,</p>
-<p><span class="math display">\[
-\operatorname{Var}(\hat{\delta}_j) \approx \operatorname{Var}(\hat{d}_j).
-\]</span></p>
-<div class="fragment">
-<p>Zhou et al.&nbsp;(2022) argue that, under suitable assumptions, these missing variance/covariance terms are small relative to the feature-specific variance.</p>
-<p>We treat this as a working approximation and assess its adequacy empirically.</p>
+<p>“The 95% credible interval excludes zero” declares a null feature in roughly <strong>half</strong> of its calls. With ~400 features, multiplicity bites even for Bayesians. We use <span class="math inline">\(\operatorname{lfsr}\le10^{-3}\)</span>.</p>
 </div>
 </section></section>
 <section>
-<section id="simulations-and-data-analysis" class="title-slide slide level1 center">
-<h1>Simulations and data analysis</h1>
+<section id="part-7-simulation-design-and-results" class="title-slide slide level1 center">
+<h1>Part 7 · Simulation design and results</h1>
 
 </section>
-<section id="simulation-goals" class="slide level2">
-<h2>Simulation goals</h2>
-<p>We evaluate whether the proposed method provides:</p>
-<ul>
-<li>false-discovery-rate control and adequate power;</li>
-<li>accurate effect and dispersion estimation;</li>
-<li>calibrated interval estimates;</li>
-<li>robustness to compositional shifts;</li>
-<li>adaptation to feature- and condition-specific dispersion.</li>
-</ul>
-<div class="fragment">
-<p>We compare NBSR with DESeq2, edgeR, and LinDA.</p>
-</div>
-</section>
-<section id="simulated-data-generating-framework" class="slide level2 scrollable">
-<h2>Simulated data generating framework</h2>
-<p>We simulate counts in two conditions, <span class="math inline">\(g \in \{0,1\}\)</span>.</p>
-<p>For sample <span class="math inline">\(i\)</span> in condition <span class="math inline">\(g\)</span>:</p>
-<ol type="1">
-<li>Sample a composition:</li>
-</ol>
+<section id="simulation-design-dm-ln-with-exact-ground-truth" class="slide level2">
+<h2>Simulation design: DM-LN with exact ground truth</h2>
+<p>For sample <span class="math inline">\(i\)</span> in condition <span class="math inline">\(g_i\)</span>, with unnormalised abundance vector <span class="math inline">\(\alpha(g)\)</span> and <span class="math inline">\(\kappa(g)=\sum_j\alpha_j(g)\)</span>:</p>
 <p><span class="math display">\[
-\pi_i \sim \text{Dirichlet}(\lambda^{(g)}).
-\]</span> 2. Sample the total number of reads, <span class="math inline">\(s_i = \lceil u_i \rho_i \rceil\)</span> where <span class="math inline">\(u_i \sim \operatorname{Uniform}(10^6, 10^8)\)</span> models the library size and <span class="math inline">\(\rho_i ~ \text{Uniform}(0, 0.5)\)</span> models the capture rate for miRNA molecules.</p>
-<ol start="3" type="1">
-<li>Generate sequencing counts <span class="math display">\[
-Y_i \sim \text{Multinomial}(s_i \pi_i).
-\]</span></li>
-</ol>
-</section>
-<section id="real-data-calibration" class="slide level2">
-<h2>Real data calibration</h2>
-<p>The baseline Dirichlet parameters <span class="math inline">\(\lambda\)</span> are estimated from real microRNAome datasets [McCall et al (2017)].</p>
-<p>We retain human miRNAs listed in MirGeneDB [Fromm et al (2022)]; samples with fewer than <span class="math inline">\(100{,}000\)</span> miRNA reads are excluded; the final analysis includes <span class="math inline">\(K=596\)</span> miRNAs.</p>
-<p>Dirichlet parameters are estimated separately for each cell type.</p>
-<div class="fragment">
-<p>This produces realistic differences in:</p>
-<ul>
-<li>baseline abundance;</li>
-<li>feature-specific variability;</li>
-<li>compositional competition;</li>
-<li>sparsity and dynamic range.</li>
-</ul>
-</div>
-</section>
-<section id="simulating-changes-in-abundances" class="slide level2 scrollable">
-<h2>Simulating changes in abundances</h2>
-<ol type="1">
-<li>Randomly select indices <span class="math inline">\(\mathcal{I} \in \{1, ..., K\}\)</span>;</li>
-<li>Sample <span class="math inline">\(f_j &gt; 0\)</span> for <span class="math inline">\(j \in \mathcal{I}\)</span>;</li>
-<li><span class="math inline">\(\lambda_j^{(1)} = f_j \lambda_j^{(0)}\)</span>.</li>
-</ol>
-<div class="fragment">
-<ul>
-<li>Categorize features into {HIGH, MED, LOW} based on <span class="math inline">\(\lambda_j^{(0)}\)</span>.</li>
-<li>Bound the fold change values <span class="math inline">\(f_j\)</span>; e.g., if <span class="math inline">\(\lambda_j^{(0)}\)</span> is highly abundant, it does not make sense for it to be increased twofold.</li>
-</ul>
-</div>
-</section>
-<section id="simulation-results-1-fdr-and-power" class="slide level2">
-<h2>Simulation results 1: FDR and power</h2>
-
-<img data-src="images/total_imbalanced_pval_10.png" class="r-stretch quarto-figure-center"><p class="caption">NBSR controls false discoveries across abundance levels.</p></section>
-<section id="simulation-results-2-heterogeneity-in-dispersion" class="slide level2">
-<h2>Simulation results 2: heterogeneity in dispersion</h2>
-
-<img data-src="images/biological_cv.png" class="r-stretch quarto-figure-center"><p class="caption">NBSR provides accurate estimates for the dispersion parameter.</p></section>
-<section id="simulation-results-3-effect-estimation" class="slide level2">
-<h2>Simulation results 3: effect estimation</h2>
-
-<img data-src="images/total_imbalanced_true_vs_est_log2fc_10.png" class="r-stretch quarto-figure-center"><p class="caption">Bias correction recovers feature-specific effects.</p></section>
-<section id="simulation-results-4-coverage" class="slide level2">
-<h2>Simulation results 4: coverage</h2>
-
-<img data-src="images/Coverage.png" class="r-stretch quarto-figure-center"><p class="caption">Modeling condition-dependent dispersion maintains coverage near the nominal level when biological variability differs across groups.</p></section>
-<section id="weaknesses-of-laplace-approximation" class="slide level2">
-<h2>Weaknesses of Laplace approximation</h2>
-<p>The Laplace approximation provides fast inference and good false-discovery-rate control.</p>
-<p>However, it can be conservative:</p>
-<ul>
-<li>credible intervals may be wider than those obtained from full posterior sampling;</li>
-<li>true differential features may therefore be missed;</li>
-<li>this leads to a higher false-negative rate and reduced power.</li>
-</ul>
-<div class="fragment">
-<div class="question">
-<p>How much efficiency do we lose by replacing full posterior sampling with a local Gaussian approximation?</p>
-</div>
-</div>
-</section>
-<section id="approximate-versus-sampling-based-inference" class="slide level2">
-<h2>Approximate versus sampling-based inference</h2>
-<p>The fast Laplace approach uses a delta-method approximation for the relative effect,</p>
-<p><span class="math display">\[
-d_j
-=
-\log\pi_j^{(1)}
--
-\log\pi_j^{(0)}.
-\]</span></p>
-<p>After estimating the common compositional shift (b),</p>
-<p><span class="math display">\[
-\hat\delta_j=\hat d_j-\hat b.
+\begin{aligned}
+\xi_i&amp;\sim N\big(m(g_i),\Sigma\big), &amp; \theta_i&amp;=\operatorname{softmax}(\xi_i),\\
+p_i&amp;\sim\operatorname{Dir}\big(\kappa(g_i)\,\theta_i\big), &amp; Y_i&amp;\sim\operatorname{Mult}(n_i,p_i),
+\end{aligned}
+\qquad m_j(g)=\log\alpha_j(g)-\tfrac12\Sigma_{jj}.
 \]</span></p>
 <div class="fragment">
-<p>The exact variance contains additional terms:</p>
-<p><span class="math display">\[
-\operatorname{Var}(\hat\delta_j)
-=
-\operatorname{Var}(\hat d_j)
-+
-\operatorname{Var}(\hat b)
--
-2\operatorname{Cov}(\hat d_j,\hat b).
-\]</span></p>
+<p>Effects imposed on <strong>absolute</strong> abundance, <span class="math inline">\(\alpha_j(1)=\alpha_j(0)e^{\delta_j}\)</span>, so <span class="math inline">\(\delta_j\)</span>, <span class="math inline">\(c_{\rm rel}=-\log\{\kappa(1)/\kappa(0)\}\)</span> and <span class="math inline">\(r_j\)</span> are all known exactly.</p>
 </div>
 <div class="fragment">
-<p>For computational convenience, our current Laplace procedure uses</p>
-<p><span class="math display">\[
-\operatorname{Var}(\hat\delta_j)
-\approx
-\operatorname{Var}(\hat d_j),
-\]</span></p>
-<p>and therefore does not fully propagate uncertainty from estimating the common shift.</p>
+<p><strong>Nesting.</strong> <span class="math inline">\(\Sigma=0\)</span>: Dirichlet–multinomial. <span class="math inline">\(\kappa\to\infty\)</span>: multinomial logistic-normal (fido/pibble; LinDA’s log-normal simulation). Conditional on <span class="math inline">\(\xi_i\)</span>: same count model as the Poisson-lognormal of ANCOM-BC2.</p>
+<p><strong>None of the fitted models — including NBSR — contains <span class="math inline">\(\Sigma\)</span>.</strong> The microbiome benchmark tests every method under misspecification.</p>
 </div>
 </section>
-<section id="full-posterior-sampling-produces-narrower-intervals" class="slide level2">
-<h2>Full posterior sampling produces narrower intervals</h2>
-
-<img data-src="images/CI_width.png" style="width:72.0%" class="r-stretch quarto-figure-center"><p class="caption">Each point represents one feature. Credible interval width from HMC (x-axis) and for Laplace approximation (y-axis).</p><div class="fragment">
-<p>Most points lie above the diagonal, indicating that the Laplace approximation produces wider credible intervals than HMC.</p>
-</div>
-</section>
-<section id="full-posterior-sampling-produces-narrower-intervals-1" class="slide level2">
-<h2>Full posterior sampling produces narrower intervals</h2>
-<p>For each posterior draw <span class="math inline">\(s\)</span>, HMC recomputes the common shift <span class="math inline">\(b\)</span> and the corrected effect</p>
-<p><span class="math display">\[
-\delta_j^{(s)}=d_j^{(s)}-b^{(s)}.
-\]</span></p>
-<p>It therefore propagates the uncertainty in <span class="math inline">\(b\)</span> and its dependence with <span class="math inline">\(d_j\)</span>, rather than dropping these terms.</p>
-</section>
-<section id="open-problems" class="slide level2">
-<h2>Open problems</h2>
-<p>This area has many open methodological questions:</p>
-<ul>
-<li>scalable Bayesian computation;</li>
-<li>longitudinal and spatial compositions;</li>
-<li>single-cell RNA-seq data;</li>
-<li>multimodal integration;</li>
-<li>causal interpretation of differential abundance.</li>
-</ul>
-</section>
-<section id="opportunities-for-students" class="slide level2">
-<h2>Opportunities for students</h2>
-<p>This project sits at the intersection of:</p>
+<section id="two-calibrated-benchmarks" class="slide level2">
+<h2>Two calibrated benchmarks</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
+<p><strong>miRNA</strong> (McCall et al., 2017)</p>
 <ul>
-<li>Bayesian modeling</li>
-<li>compositional data analysis</li>
-<li>high-dimensional statistics</li>
-<li>scientific computing</li>
+<li>CD4<span class="math inline">\(^+\)</span> T cells, 596 miRNAs → ~400 after filtering</li>
+<li>reads concentrated in a few features</li>
+<li><span class="math inline">\(\Sigma=0\)</span> (Dirichlet–multinomial)</li>
+<li>LOW / MED / HIGH: perturb 20 / 10 / 5 features by baseline abundance</li>
+<li>depth <span class="math inline">\(\approx10^7\)</span>; <span class="math inline">\(n\in\{10,20,40\}\)</span> per group</li>
 </ul>
 </div><div class="column" style="width:50%;">
+<p><strong>Microbiome</strong> (Baxter et al., 2016)</p>
 <ul>
-<li>computational biology</li>
-<li>cancer genomics</li>
-<li>microbiome research</li>
-<li>software development</li>
+<li>172 healthy stool samples, 249 genera</li>
+<li>diffuse, sparse; median depth 9,000</li>
+<li><span class="math inline">\(\Sigma=LL^\top+\operatorname{diag}(d)\)</span> from a Poisson-lognormal fit</li>
+<li>ALL25, ALL50 (all up), BAL50 (25 up / 25 down)</li>
+<li><span class="math inline">\(n\in\{40,80,160,320\}\)</span> per group</li>
 </ul>
 </div></div>
-<div class="bigcenter">
-<p>Students can contribute to new theory, computation, software, and biomedical applications.</p>
+<div class="fragment">
+<p><strong>A multivariate aside:</strong> <span class="math inline">\(L\)</span> comes from the top <strong>5 eigenpairs</strong> of the latent covariance restricted to the 53 prevalent genera (53% of the trace); the 196 rare genera have zero loadings. A low-rank-plus-diagonal factor model — exactly the structure a latent-factor NBSR would estimate.</p>
 </div>
+</section>
+<section id="mirna-benchmark-power-fdr-and-accuracy" class="slide level2">
+<h2>miRNA benchmark: power, FDR, and accuracy</h2>
+<p>Pooled over 60 replicates per <span class="math inline">\(n\)</span>. TPR, realised FDR (%), and RMSE of <span class="math inline">\(\hat\delta\)</span>. <strong>Orange = FDR above 5%.</strong></p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th style="text-align: right;">TPR</th>
+<th style="text-align: right;">FDR</th>
+<th style="text-align: right;">err</th>
+<th style="text-align: right;">TPR</th>
+<th style="text-align: right;">FDR</th>
+<th style="text-align: right;">err</th>
+<th style="text-align: right;">TPR</th>
+<th style="text-align: right;">FDR</th>
+<th style="text-align: right;">err</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td style="text-align: right;"><span class="math inline">\(n=10\)</span></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><span class="math inline">\(n=20\)</span></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><span class="math inline">\(n=40\)</span></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td><strong>NBSR HMC, lfsr</strong></td>
+<td style="text-align: right;">90.7</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: right;"><strong>.15</strong></td>
+<td style="text-align: right;">96.0</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: right;"><strong>.11</strong></td>
+<td style="text-align: right;">98.1</td>
+<td style="text-align: right;">5.0</td>
+<td style="text-align: right;"><strong>.09</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>NBSR Laplace, post. <span class="math inline">\(z\)</span></strong></td>
+<td style="text-align: right;">91.7</td>
+<td style="text-align: right;">4.2</td>
+<td style="text-align: right;">.16</td>
+<td style="text-align: right;">96.7</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;"><strong>.11</strong></td>
+<td style="text-align: right;">98.1</td>
+<td style="text-align: right;">2.6</td>
+<td style="text-align: right;"><strong>.09</strong></td>
+</tr>
+<tr class="even">
+<td>NBSR Laplace, delta</td>
+<td style="text-align: right;">92.6</td>
+<td style="text-align: right;"><span style="color:#be5a00">5.7</span></td>
+<td style="text-align: right;">.16</td>
+<td style="text-align: right;">96.7</td>
+<td style="text-align: right;">2.6</td>
+<td style="text-align: right;">.11</td>
+<td style="text-align: right;">98.1</td>
+<td style="text-align: right;">3.0</td>
+<td style="text-align: right;">.09</td>
+</tr>
+<tr class="odd">
+<td>LinDA</td>
+<td style="text-align: right;">52.1</td>
+<td style="text-align: right;">4.9</td>
+<td style="text-align: right;">.26</td>
+<td style="text-align: right;">69.4</td>
+<td style="text-align: right;"><span style="color:#be5a00">18.5</span></td>
+<td style="text-align: right;">.28</td>
+<td style="text-align: right;">82.7</td>
+<td style="text-align: right;"><span style="color:#be5a00">25.0</span></td>
+<td style="text-align: right;">.20</td>
+</tr>
+<tr class="even">
+<td>ANCOM-BC2 w/ filter</td>
+<td style="text-align: right;">23.7</td>
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">.25</td>
+<td style="text-align: right;">45.0</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">.23</td>
+<td style="text-align: right;">63.3</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">.21</td>
+</tr>
+<tr class="odd">
+<td>ANCOM-BC2 no filter</td>
+<td style="text-align: right;">52.0</td>
+<td style="text-align: right;"><span style="color:#be5a00">24.9</span></td>
+<td style="text-align: right;">.25</td>
+<td style="text-align: right;">73.7</td>
+<td style="text-align: right;"><span style="color:#be5a00">70.7</span></td>
+<td style="text-align: right;">.23</td>
+<td style="text-align: right;">84.4</td>
+<td style="text-align: right;"><span style="color:#be5a00">76.4</span></td>
+<td style="text-align: right;">.21</td>
+</tr>
+<tr class="even">
+<td>ALDEx2</td>
+<td style="text-align: right;">47.9</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">.31</td>
+<td style="text-align: right;">71.0</td>
+<td style="text-align: right;"><span style="color:#be5a00">9.8</span></td>
+<td style="text-align: right;">.28</td>
+<td style="text-align: right;">80.6</td>
+<td style="text-align: right;">1.2</td>
+<td style="text-align: right;">.23</td>
+</tr>
+<tr class="odd">
+<td>DESeq2</td>
+<td style="text-align: right;">88.9</td>
+<td style="text-align: right;"><span style="color:#be5a00">61.8</span></td>
+<td style="text-align: right;">.20</td>
+<td style="text-align: right;">94.1</td>
+<td style="text-align: right;"><span style="color:#be5a00">62.5</span></td>
+<td style="text-align: right;">.16</td>
+<td style="text-align: right;">96.6</td>
+<td style="text-align: right;"><span style="color:#be5a00">68.3</span></td>
+<td style="text-align: right;">.14</td>
+</tr>
+<tr class="even">
+<td>edgeR QLF</td>
+<td style="text-align: right;">90.4</td>
+<td style="text-align: right;"><span style="color:#be5a00">82.5</span></td>
+<td style="text-align: right;">.18</td>
+<td style="text-align: right;">95.9</td>
+<td style="text-align: right;"><span style="color:#be5a00">87.5</span></td>
+<td style="text-align: right;">.14</td>
+<td style="text-align: right;">98.0</td>
+<td style="text-align: right;"><span style="color:#be5a00">89.0</span></td>
+<td style="text-align: right;">.11</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Three groups: (1) count-based DESeq2/edgeR — powerful but no compositional correction, so every “unchanged” miRNA looks down → FDR 60–90%. (2) Transform-based compositional methods — controlled-ish FDR but low power and pseudocount sensitivity; ANCOM-BC2’s filter trades away true positives. (3) NBSR — power of the count methods, FDR of the compositional ones, lowest RMSE at every n. The ALDEx2/LinDA FDR spike at n=20 is dominated by one replicate with four very shallow treated libraries (50–60% zeros); NBSR made no false call there.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="ranking-precisionrecall" class="slide level2">
+<h2>Ranking: precision–recall</h2>
+
+<img data-src="images/recomb/fig_ranking_mirna_pr.png" style="width:100.0%" class="r-stretch quarto-figure-center"><p class="caption">Each method ranks features by its own test statistic. NBSR HMC: blue solid; NBSR Laplace: orange dot-dash; count-based methods: purple; compositional methods: teal. Dashed line: 95% precision.</p><div class="fragment">
+<p>At <span class="math inline">\(n=10\)</span>, NBSR recovers <strong>92%</strong> (HMC) / <strong>91%</strong> (Laplace) of perturbed features at 95% precision, vs.&nbsp;<strong>75%</strong> for the best published method.</p>
+</div>
+</section>
+<section id="hmc-vs.-laplace-what-does-the-approximation-cost" class="slide level2">
+<h2>HMC vs.&nbsp;Laplace: what does the approximation cost?</h2>
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(n\)</span></th>
+<th>method</th>
+<th style="text-align: right;">coverage (perturbed)</th>
+<th style="text-align: right;">coverage (null)</th>
+<th style="text-align: right;">TP</th>
+<th style="text-align: right;">FP</th>
+<th style="text-align: right;">FDR</th>
+<th style="text-align: right;">perfect rankings (of 60)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td>HMC</td>
+<td style="text-align: right;">0.971</td>
+<td style="text-align: right;">0.979</td>
+<td style="text-align: right;">635</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.008</td>
+<td style="text-align: right;">31</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Laplace</td>
+<td style="text-align: right;">0.931</td>
+<td style="text-align: right;">0.975</td>
+<td style="text-align: right;">643</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">0.046</td>
+<td style="text-align: right;">31</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td>HMC</td>
+<td style="text-align: right;">0.963</td>
+<td style="text-align: right;">0.969</td>
+<td style="text-align: right;">672</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">41</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Laplace</td>
+<td style="text-align: right;">0.953</td>
+<td style="text-align: right;">0.970</td>
+<td style="text-align: right;">677</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">0.029</td>
+<td style="text-align: right;">39</td>
+</tr>
+<tr class="odd">
+<td>40</td>
+<td>HMC</td>
+<td style="text-align: right;">0.933</td>
+<td style="text-align: right;">0.959</td>
+<td style="text-align: right;">687</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">0.050</td>
+<td style="text-align: right;">46</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Laplace</td>
+<td style="text-align: right;">0.940</td>
+<td style="text-align: right;">0.965</td>
+<td style="text-align: right;">687</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">47</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<ul>
+<li><strong>Rankings and point estimates agree</strong> at every <span class="math inline">\(n\)</span>.</li>
+<li>At <span class="math inline">\(n=10\)</span> the Laplace posterior of a perturbed feature is <strong>narrower</strong>: variance ratio 0.90 / 0.83 / 0.79 of HMC’s (HIGH / MED / LOW) → lower coverage, more FPs.</li>
+<li>The gap closes by <span class="math inline">\(n=40\)</span> (0.97 / 0.96 / 0.93). Null features are unaffected (1.03).</li>
+<li>~2 min on 1 core vs.&nbsp;50–345 min on 4 cores.</li>
+</ul>
+</div>
+</section>
+<section id="where-does-the-shifts-uncertainty-matter" class="slide level2 smaller">
+<h2>Where does the shift’s uncertainty matter?</h2>
+<p>Each entry divided by <span class="math inline">\(\operatorname{Var}_{\rm HMC}(\Delta^{\rm adj}_j)\)</span> for the same feature, averaged over perturbed features:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 22%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>setting</th>
+<th><span class="math inline">\(n\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(\operatorname{Var}(\widehat m)\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(2\operatorname{Cov}(\Delta^{\rm clr}_j,\widehat m)\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(\operatorname{Var}(\Delta^{\rm clr}_j)\)</span> (fixed shift)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>HIGH</td>
+<td>10</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">0.78</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>20</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">0.62</td>
+<td style="text-align: right;">0.80</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>40</td>
+<td style="text-align: right;">0.91</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">0.87</td>
+</tr>
+<tr class="even">
+<td>MED</td>
+<td>10</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">0.92</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>20</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.92</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>40</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">0.28</td>
+<td style="text-align: right;">0.94</td>
+</tr>
+<tr class="odd">
+<td>LOW</td>
+<td>10</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.03</td>
+<td style="text-align: right;">0.99</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>20</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.99</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>40</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.99</td>
+</tr>
+<tr class="even">
+<td>null</td>
+<td>all</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.04</td>
+<td style="text-align: right;">0.99</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<ul>
+<li>For null and rare features, <span class="math inline">\(\operatorname{Var}(\widehat m)\)</span> and <span class="math inline">\(2\operatorname{Cov}\)</span> nearly <strong>cancel</strong> — a fixed shift costs ~1%.</li>
+<li>For the <strong>most abundant</strong> features, the shift’s variance is <em>most</em> of the total; fixing it understates variance by 13–22%.</li>
+<li>LinDA’s asymptotics concern a large, diffuse panel. On the miRNA panel, five HIGH features dominate the composition with posteriors far tighter than the bulk that sets the mode.</li>
+</ul>
+</div>
+<aside class="notes">
+<p>Answer to the earlier discussion question. The omitted terms shrink with the size of the panel K, not with the sample size n: with K fixed, Var(m̂) and Var(Δclr_j) both fall like 1/n, so their ratio tends to a constant — and that constant is largest for precisely estimated features.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="is-the-shift-itself-well-estimated" class="slide level2">
+<h2>Is the shift itself well estimated?</h2>
+
+<img data-src="images/recomb/fig_shift_posterior.png" style="width:88.0%" class="r-stretch quarto-figure-center"><p class="caption">Posterior of the compositional shift (mode over all features) minus the true shift; one curve per replicate.</p><aside class="notes">
+<p>Optional. Small positive bias at n=10 in the miRNA benchmark that vanishes by n=40; the microbiome ALL50 case at n=40 shows the largest bias (+0.09) and still covers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="microbiome-benchmark-under-misspecification" class="slide level2">
+<h2>Microbiome benchmark under misspecification</h2>
+<p>ALL50 (50 genera increased), each method at its stated rule. Cells: TPR / FDR (%). NBSR = Laplace fit with per-sample precision offsets <span class="math inline">\(c_i\)</span> (explained two slides ahead).</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th style="text-align: right;"><span class="math inline">\(n=40\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(n=80\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(n=160\)</span></th>
+<th style="text-align: right;"><span class="math inline">\(n=320\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>NBSR, lfsr</strong></td>
+<td style="text-align: right;">17.9 / 3.3</td>
+<td style="text-align: right;">35.8 / 2.5</td>
+<td style="text-align: right;">62.4 / 0.0</td>
+<td style="text-align: right;">83.4 / 0.6</td>
+</tr>
+<tr class="even">
+<td><strong>NBSR, post. <span class="math inline">\(z\)</span></strong></td>
+<td style="text-align: right;">17.1 / 1.7</td>
+<td style="text-align: right;">39.4 / 2.7</td>
+<td style="text-align: right;">68.2 / 1.6</td>
+<td style="text-align: right;">87.7 / 2.9</td>
+</tr>
+<tr class="odd">
+<td>NBSR, delta (fixed shift)</td>
+<td style="text-align: right;">26.3 / <span style="color:#be5a00">6.8</span></td>
+<td style="text-align: right;">47.8 / <span style="color:#be5a00">5.2</span></td>
+<td style="text-align: right;">72.0 / 3.6</td>
+<td style="text-align: right;">88.6 / <span style="color:#be5a00">5.1</span></td>
+</tr>
+<tr class="even">
+<td>LinDA</td>
+<td style="text-align: right;">20.7 / <span style="color:#be5a00">7.6</span></td>
+<td style="text-align: right;">37.4 / <span style="color:#be5a00">7.9</span></td>
+<td style="text-align: right;">56.4 / <span style="color:#be5a00">8.4</span></td>
+<td style="text-align: right;">75.5 / <span style="color:#be5a00">15.9</span></td>
+</tr>
+<tr class="odd">
+<td>ALDEx2</td>
+<td style="text-align: right;">8.3 / 1.2</td>
+<td style="text-align: right;">20.7 / 1.0</td>
+<td style="text-align: right;">35.5 / <span style="color:#be5a00">5.6</span></td>
+<td style="text-align: right;">49.8 / <span style="color:#be5a00">18.4</span></td>
+</tr>
+<tr class="even">
+<td>ANCOM-BC2 w/ filter</td>
+<td style="text-align: right;">2.9 / 0.0</td>
+<td style="text-align: right;">8.2 / 0.0</td>
+<td style="text-align: right;">19.2 / 0.0</td>
+<td style="text-align: right;">33.9 / 0.0</td>
+</tr>
+<tr class="odd">
+<td>ANCOM-BC2 no filter</td>
+<td style="text-align: right;">8.8 / <span style="color:#be5a00">72.2</span></td>
+<td style="text-align: right;">16.7 / <span style="color:#be5a00">62.7</span></td>
+<td style="text-align: right;">27.1 / <span style="color:#be5a00">53.9</span></td>
+<td style="text-align: right;">42.7 / <span style="color:#be5a00">42.8</span></td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p><strong>Power at a matched realised FDR of 5%</strong> (ALL50): NBSR 0.23 / 0.48 / 0.75 / <strong>0.89</strong> · LinDA 0.13 / 0.35 / 0.53 / 0.63 · ALDEx2 0.05 / 0.23 / 0.23 / 0.24. NBSR has the lowest fold-change RMSE in every setting (0.53 → 0.24 vs.&nbsp;≥ 0.64 for others at <span class="math inline">\(n=320\)</span>).</p>
+</div>
+</section>
+<section id="why-fdr-can-rise-with-n" class="slide level2">
+<h2>Why FDR can <em>rise</em> with <span class="math inline">\(n\)</span></h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p>In ALL50 the CLR shift is about <span class="math inline">\(-0.21\)</span>:</p>
+<ul>
+<li><strong>ALDEx2</strong> tests <span class="math inline">\(\Delta^{\rm clr}_j=0\)</span> with no correction → null genera sit at <span class="math inline">\(-0.21\)</span> at every <span class="math inline">\(n\)</span>.</li>
+<li><strong>LinDA</strong>’s mode correction leaves a smaller residual bias.</li>
+</ul>
+<div class="fragment">
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>A bias that stays fixed while the standard error shrinks like <span class="math inline">\(n^{-1/2}\)</span> turns into false discoveries as <span class="math inline">\(n\)</span> grows. More data makes a biased test <em>worse</em>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p>NBSR’s null estimates average near zero at every <span class="math inline">\(n\)</span>.</p>
+</div>
+</div><div class="column" style="width:45%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/recomb/fig_foldchange_ALL50.png" height="700"></p>
+<figcaption>Estimated vs.&nbsp;true log fold change, ALL50, all genera × 20 replicates.</figcaption>
+</figure>
+</div>
+</div></div>
+</section>
+<section id="per-sample-precision-offsets-a-multivariate-trick" class="slide level2 scrollable">
+<h2>Per-sample precision offsets: a multivariate trick</h2>
+<p><span class="math display">\[
+\log\phi_{ij}=b_0+b_j+b_\pi\operatorname{logit}(\pi_{ij})+c_i,\qquad \textstyle\sum_i c_i=0 .
+\]</span></p>
+<div class="fragment">
+<ul>
+<li><span class="math inline">\(n\)</span> extra parameters, but <strong>each <span class="math inline">\(c_i\)</span> is informed by all <span class="math inline">\(K\)</span> counts</strong> of sample <span class="math inline">\(i\)</span> → cheaply identified.</li>
+<li><span class="math inline">\(c_i\)</span> does not enter the mean, so it cannot absorb the compositional shift; it changes <strong>how much each sample is trusted</strong> (NB weight <span class="math inline">\(\propto(\mu+\mu^2/\phi)^{-1}\)</span>).</li>
+</ul>
+</div>
+<div class="fragment">
+<p>Two sources of gain:</p>
+<ol type="1">
+<li><strong>Between-group concentration.</strong> When genera increase, <span class="math inline">\(\kappa(1)&gt;\kappa(0)\)</span>; a single <span class="math inline">\(b_0\)</span> cannot represent both. Centred sample indicators span the centred treatment indicator, so the <span class="math inline">\(c_i\)</span> absorb <span class="math inline">\(\log\{\kappa(1)/\kappa(0)\}\)</span>.</li>
+<li><strong>Within-group heterogeneity.</strong> Fitted <span class="math inline">\(c_i\)</span> track each sample’s share of zeros → down-weighting of poorly fit samples.</li>
+</ol>
+</div>
+</section>
+<section id="per-sample-offsets-effect-on-the-benchmark" class="slide level2">
+<h2>Per-sample offsets: effect on the benchmark</h2>
+<p><strong>Effect on the microbiome benchmark</strong> (posterior-<span class="math inline">\(z\)</span> + BH, <span class="math inline">\(n=320\)</span>; TPR / FDR %, and mean bias of null estimates):</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>case</th>
+<th style="text-align: right;">base model</th>
+<th style="text-align: right;">with <span class="math inline">\(c_i\)</span></th>
+<th style="text-align: right;">null bias: base → with <span class="math inline">\(c_i\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ALL25</td>
+<td style="text-align: right;">85 / <span style="color:#be5a00">5.6</span></td>
+<td style="text-align: right;">86 / 2.9</td>
+<td style="text-align: right;"><span class="math inline">\(+0.030\to+0.009\)</span></td>
+</tr>
+<tr class="even">
+<td>ALL50</td>
+<td style="text-align: right;">82 / <span style="color:#be5a00">10.0</span></td>
+<td style="text-align: right;">88 / 2.9</td>
+<td style="text-align: right;"><span class="math inline">\(+0.013\to+0.004\)</span></td>
+</tr>
+<tr class="odd">
+<td>BAL50</td>
+<td style="text-align: right;">81 / 1.5</td>
+<td style="text-align: right;">82 / 1.6</td>
+<td style="text-align: right;"><span class="math inline">\(+0.012\to+0.002\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The offsets remove the excess FDR in the unbalanced cases, at no cost in BAL50.</p>
+</section>
+<section id="real-data-with-partial-ground-truth-selex" class="slide level2">
+<h2>Real data with partial ground truth: SELEX</h2>
+<p>Selective-growth experiment (McMurrough et al., 2014): 1,600 enzyme variants, 7 selected vs.&nbsp;7 non-selected. Selection can only <strong>increase</strong> an active variant ⇒ <strong>a “down” call contradicts the mechanism</strong>. 27 variants independently characterised.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 41%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th style="text-align: right;">of the 27</th>
+<th style="text-align: right;">others up</th>
+<th style="text-align: right;">others <strong>down</strong></th>
+<th style="text-align: right;">5+5: of 27</th>
+<th style="text-align: right;">5+5: down</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>NBSR, lfsr <span class="math inline">\(\le10^{-3}\)</span></strong></td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">183</td>
+<td style="text-align: right;"><strong>0</strong></td>
+<td style="text-align: right;">22.2</td>
+<td style="text-align: right;"><strong>0.0</strong></td>
+</tr>
+<tr class="even">
+<td><strong>NBSR, post. <span class="math inline">\(z\)</span></strong></td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">198</td>
+<td style="text-align: right;"><strong>0</strong></td>
+<td style="text-align: right;">22.5</td>
+<td style="text-align: right;"><strong>0.0</strong></td>
+</tr>
+<tr class="odd">
+<td>NBSR, delta</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">324</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">24.6</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td>LinDA</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">355</td>
+<td style="text-align: right;">382</td>
+<td style="text-align: right;">20.6</td>
+<td style="text-align: right;">324.9</td>
+</tr>
+<tr class="odd">
+<td>ALDEx2</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">11.4</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr class="even">
+<td>ANCOM-BC2</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">6.7</td>
+<td style="text-align: right;">2.0</td>
+</tr>
+<tr class="odd">
+<td>DESeq2</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">1,448</td>
+<td style="text-align: right;">21.4</td>
+<td style="text-align: right;">1,335.0</td>
+</tr>
+<tr class="even">
+<td>edgeR LRT</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">1,219</td>
+<td style="text-align: right;">24.4</td>
+<td style="text-align: right;">1,117.7</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>When a few variants grow, the proportion of every other variant falls. A method that ignores composition reads that fall as a decrease.</p>
+</div>
+</section>
+<section id="a-null-built-from-real-data" class="slide level2">
+<h2>A null built from real data</h2>
+<p>Label permutations in two stool studies (Baxter CRC: 172 vs.&nbsp;120; Schubert <em>C. difficile</em>: 154 vs.&nbsp;93). Every call is a false positive.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th style="text-align: right;">Baxter <span class="math inline">\(n=80\)</span>: mean FP (% runs with any call)</th>
+<th style="text-align: right;">Schubert <span class="math inline">\(n=80\)</span></th>
+<th style="text-align: right;">raw <span class="math inline">\(p&lt;0.05\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>NBSR</strong></td>
+<td style="text-align: right;">0.0 (2)</td>
+<td style="text-align: right;">0.0 (2)</td>
+<td style="text-align: right;">0.017</td>
+</tr>
+<tr class="even">
+<td>LinDA</td>
+<td style="text-align: right;">0.1 (6)</td>
+<td style="text-align: right;">0.1 (8)</td>
+<td style="text-align: right;">0.035</td>
+</tr>
+<tr class="odd">
+<td>ALDEx2</td>
+<td style="text-align: right;">0.0 (2)</td>
+<td style="text-align: right;">0.0 (0)</td>
+<td style="text-align: right;">0.006</td>
+</tr>
+<tr class="even">
+<td>ANCOM-BC2</td>
+<td style="text-align: right;">0.0 (0)</td>
+<td style="text-align: right;">0.0 (0)</td>
+<td style="text-align: right;"><span style="color:#be5a00">0.322</span></td>
+</tr>
+<tr class="odd">
+<td>DESeq2</td>
+<td style="text-align: right;">0.8 (42)</td>
+<td style="text-align: right;">0.3 (24)</td>
+<td style="text-align: right;">0.043</td>
+</tr>
+<tr class="even">
+<td>edgeR QLF</td>
+<td style="text-align: right;">42.6 (100)</td>
+<td style="text-align: right;">36.7 (100)</td>
+<td style="text-align: right;"><span style="color:#be5a00">0.238</span></td>
+</tr>
+<tr class="odd">
+<td>edgeR LRT</td>
+<td style="text-align: right;">3.2 (94)</td>
+<td style="text-align: right;">3.2 (86)</td>
+<td style="text-align: right;"><span style="color:#be5a00">0.158</span></td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>NBSR, LinDA, ALDEx2 essentially silent on real-data nulls. ANCOM-BC2’s raw p-values are badly non-uniform; its sensitivity filter hides that.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="summary-of-evidence" class="slide level2">
+<h2>Summary of evidence</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Methodology</strong></p>
+<ul>
+<li>NBSR = count-scale log-ratio regression (softmax <span class="math inline">\(=\operatorname{CLR}^{-1}\)</span>)</li>
+<li>abundance-dependent precision regularises sparse, zero-heavy features through the likelihood</li>
+<li>shift recomputed per draw → its variance and covariance propagate</li>
+<li>Cholesky-Laplace with Gaussian draws: minutes, not hours</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Empirical</strong></p>
+<ul>
+<li>miRNA: highest power at controlled FDR, lowest RMSE at every <span class="math inline">\(n\)</span></li>
+<li>Laplace reproduces HMC rankings; slightly narrow at <span class="math inline">\(n=10\)</span></li>
+<li>microbiome (misspecified): highest power at matched FDR, lowest RMSE</li>
+<li>SELEX: no mechanism-contradicting calls</li>
+</ul>
+</div></div>
 </section></section>
 <section>
-<section id="phd-opportunities-at-the-university-of-rochester" class="title-slide slide level1 center">
-<h1>PhD Opportunities at the University of Rochester</h1>
+<section id="part-8-shape-and-dependence-open-problems" class="title-slide slide level1 center">
+<h1>Part 8 · Shape and dependence: open problems</h1>
 
 </section>
-<section id="phd-in-statistics" class="slide level2">
-<h2>PhD in Statistics</h2>
-<p>Department of Biostatistics and Computational Biology</p>
-<ul>
-<li>rigorous training in statistical theory and methodology</li>
-<li>close faculty mentorship in a small, collaborative program</li>
-<li>direct collaboration with biomedical and health-science researchers</li>
-<li>opportunities in statistical genomics, computational biology, and data science</li>
-<li>optional concentration in Bioinformatics and Computational Biology</li>
-</ul>
-<div class="fragment">
-<p>The program is housed within the School of Medicine and Dentistry, connecting methodological research directly to substantive scientific problems.</p>
+<section id="latent-factors-on-the-simplex" class="slide level2">
+<h2>Latent factors on the simplex</h2>
+<div class="columns">
+<div class="column" style="width:70%;">
+<p><span class="math display">\[
+\eta_{ij}=x_i^\top\beta_j+z_i^\top\gamma_j,\qquad z_i\in\mathbb{R}^q,\ q\ll K .
+\]</span></p>
+<p>In CLR coordinates, <span class="math inline">\(\operatorname{Cov}(\operatorname{CLR}\pi_i\mid x_i)\approx \tilde\Gamma\tilde\Gamma^\top\)</span> with <span class="math inline">\(\tilde\Gamma=(I-\tfrac1K\mathbf 1\mathbf 1^\top)\Gamma\)</span>: a <strong>factor model on the Aitchison simplex</strong>, fitted on the count scale.</p>
+<p>Captures shared residual variation from cell-type mix, tumour purity, immune infiltration, batch, unmeasured subtypes.</p>
+<p><strong>Why it matters here:</strong> the microbiome benchmark’s covariance <span class="math inline">\(\Sigma=LL^\top+\operatorname{diag}(d)\)</span> is exactly what every current method — NBSR included — ignores.</p>
+</div><div class="column" style="width:30%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/ChenXiangyi.jpeg"></p>
+<figcaption>Xiangyi Chen (PhD student) is developing the latent-factor extension and its sampler.</figcaption>
+</figure>
 </div>
+</div></div>
+<aside class="notes">
+<p>Classical factor-analysis issues all reappear: rotational non-identifiability of (z, γ), choosing q, and posterior multimodality — plus the compositional 1-direction. Questions for the class: how would you identify Γ? What does the softmax do to the interpretation of a loading?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="where-our-graduates-go" class="slide level2">
-<h2>Where our graduates go</h2>
-<p>Graduates pursue careers in:</p>
+<section id="further-open-problems" class="slide level2">
+<h2>Further open problems</h2>
 <ul>
-<li>universities and academic medical centers;</li>
-<li>pharmaceutical and biotechnology companies;</li>
-<li>government and public-health organizations;</li>
-<li>healthcare and biomedical research institutions.</li>
+<li><strong>The modal-null assumption.</strong> When does it fail (large coordinated programs, a dominant feature changing)? How should external scale information (spike-ins, total load) enter?</li>
+<li><strong>Exact nulls and Bayesian FDR.</strong> A continuous prior gives no posterior mass at <span class="math inline">\(\delta_j=0\)</span>; spike-and-slab or regularised-horseshoe priors around the <em>unknown shift</em> rather than around the ALR reference.</li>
+<li><strong>Scalable computation.</strong> <span class="math inline">\((K-1)P\)</span>-dimensional dense Hessians for <span class="math inline">\(K\sim 2\times10^4\)</span> genes; block + low-rank structure; variational alternatives.</li>
+<li><strong>Beyond two groups.</strong> Longitudinal and spatial compositions, single-cell pseudo-bulk, multimodal integration.</li>
+<li><strong>Causal reading</strong> of differential abundance under compositional measurement.</li>
 </ul>
-<p><a href="https://www.urmc.rochester.edu/education/graduate/phd/statistics/alumni/currentpositions">Link</a></p>
-</section>
-<section id="funding-and-program-structure" class="slide level2">
-<h2>Funding and program structure</h2>
-<p>All admitted Statistics PhD students receive:</p>
-<ul>
-<li>full tuition support</li>
-<li>individual health-insurance coverage</li>
-<li>a 10-month stipend of <strong>$29,250 for 2026–2027</strong>
-<ul>
-<li>opportunities for summer support or external internships</li>
-</ul></li>
-<li>funding regardless of citizenship status</li>
-</ul>
-<div class="fragment">
-<p><strong>Years 1–2:</strong> Funding is provided by the School of Medicine and Dentistry.</p>
-<p><strong>Year 3 onward:</strong> The department supports students through collaborative biomedical research, training grants, and methodological research grants.</p>
-</div>
-<div class="fragment">
-<p>Students are matched with projects based on mutual research interests and are not required to secure their own academic-year funding.</p>
-</div>
-<div class="fragment">
-<p>The program generally takes 4–6 years, with most students completing the degree in five years. Up to 30 graduate credits may be transferred, subject to approval.</p>
-</div>
-</section>
-<section id="applying-to-the-statistics-phd-program" class="slide level2">
-<h2>Applying to the Statistics PhD program</h2>
-<h3 id="important-dates">Important dates</h3>
-<ul>
-<li><strong>November 15, 2026:</strong> Submit by this date for an automatic application-fee waiver</li>
-<li><strong>December 1, 2026:</strong> Priority application deadline</li>
-<li><strong>December 15, 2026:</strong> Final Statistics PhD application deadline</li>
-</ul>
-<h3 id="what-the-admissions-committee-values">What the Admissions Committee values</h3>
-<ul>
-<li>mathematical/statistical preparation</li>
-<li>letters of recommendation</li>
-<li>statement of purpose</li>
-<li>research experience, when available</li>
-</ul>
-<div class="fragment">
-<p>The <strong>GRE is not considered</strong>, even if submitted.</p>
-</div>
-<div class="fragment">
-<p>Most international applicants must submit TOEFL, IELTS, or Duolingo scores. Waivers are available in specified circumstances.</p>
-</div>
 </section>
 <section id="thank-you" class="slide level2">
 <h2>Thank you</h2>
 <div class="bigcenter">
-<div class="columns">
-<div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/rochester_phd_stat.png"></p>
-<figcaption>Rochester PhD program</figcaption>
-</figure>
-</div>
-</div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/nbsr_paper.png"></p>
-<figcaption>NBSR paper</figcaption>
-</figure>
-</div>
-</div></div>
-</div>
-<div class="bigcenter">
 <p>Questions?</p>
 </div>
 <p><strong>Seong-Hwan Jun</strong><br>
+University of Rochester Medical Center<br>
 Email: <code>seonghwan_jun@urmc.rochester.edu</code></p>
+<p>Software: <a href="https://github.com/junseonghwan/nbsr">github.com/junseonghwan/nbsr</a></p>
+<p>Acknowledgement: computing resources of the Empire AI Consortium.</p>
 </section>
-<section id="bibliography" class="slide level2">
-<h2>Bibliography</h2>
-<p>van Nood, E. et al.&nbsp;Duodenal infusion of donor feces for recurrent Clostridium difficile. N. Engl. J. Med. 368, 407–415 (2013).</p>
-<p>Zhou, H., He, K., Chen, J. &amp; Zhang, X. LinDA: linear models for differential abundance analysis of microbiome compositional data. Genome Biol. 23, 95 (2022).</p>
-<p>McCall, M. N. et al.&nbsp;Toward the human cellular microRNAome. Genome Res. 27, 1769–1781 (2017).</p>
-<p>Fromm, B. et al.&nbsp;MirGeneDB 2.1: toward a complete sampling of all major animal phyla. Nucleic Acids Res. 50, D204–D210 (2022).</p>
+<section id="references" class="slide level2 smaller">
+<h2>References</h2>
+<ul>
+<li>Aitchison, J. (1986). <em>The Statistical Analysis of Compositional Data.</em> Chapman &amp; Hall.</li>
+<li>Aitchison, J. &amp; Shen, S. M. (1980). Logistic-normal distributions. <em>Biometrika</em> 67, 261–272.</li>
+<li>Pearson, K. (1897). On a form of spurious correlation … <em>Proc. R. Soc. Lond.</em> 60, 489–498.</li>
+<li>Zhou, H., He, K., Chen, J. &amp; Zhang, X. (2022). LinDA. <em>Genome Biol.</em> 23, 95.</li>
+<li>Lin, H. &amp; Peddada, S. D. (2020; 2024). ANCOM-BC / ANCOM-BC2. <em>Nat. Commun.</em>; <em>Nat. Methods</em>.</li>
+<li>Fernandes, A. D. et al.&nbsp;(2014). ALDEx2. <em>Microbiome</em> 2, 15.</li>
+<li>Love, M. I., Huber, W. &amp; Anders, S. (2014). DESeq2. <em>Genome Biol.</em> 15, 550.</li>
+<li>Robinson, M. D., McCarthy, D. J. &amp; Smyth, G. K. (2010). edgeR. <em>Bioinformatics</em> 26, 139–140.</li>
+<li>Stephens, M. (2017). False discovery rates: a new deal. <em>Biostatistics</em> 18, 275–294.</li>
+<li>Silverman, J. D. et al.&nbsp;(2022). Bayesian multinomial logistic normal models (fido). <em>JMLR</em> 23.</li>
+<li>Lopez, R. et al.&nbsp;(2018). Deep generative modeling for single-cell transcriptomics (scVI). <em>Nat. Methods</em> 15, 1053–1058.</li>
+<li>McCall, M. N. et al.&nbsp;(2017). Toward the human cellular microRNAome. <em>Genome Res.</em> 27, 1769–1781.</li>
+<li>Baxter, N. T. et al.&nbsp;(2016). <em>Genome Med.</em> 8, 37 · Schubert, A. M. et al.&nbsp;(2014). <em>mBio</em> 5 · McMurrough, T. A. et al.&nbsp;(2014). <em>PNAS</em> 111.</li>
+<li>van Nood, E. et al.&nbsp;(2013). <em>N. Engl. J. Med.</em> 368, 407–415.</li>
+</ul>
 </section></section>
 <section>
 <section id="backup-slides" class="title-slide slide level1 center">
 <h1>Backup slides</h1>
 
 </section>
-<section id="backup-negative-binomial-parameterization" class="slide level2">
-<h2>Backup: negative binomial parameterization</h2>
-<p><span class="math display">\[
-y_{ij}\mid \pi_{ij},\phi_j\sim \operatorname{NB}(n_i\pi_{ij},\phi_j),
-\]</span></p>
-<p><span class="math display">\[
-E(y_{ij})=\mu_{ij},
-\qquad
-\operatorname{Var}(y_{ij})=\mu_{ij}+\phi_j\mu_{ij}^2.
-\]</span></p>
-</section>
-<section id="ratios-are-natural-quantities" class="slide level2">
-<h2>Ratios are natural quantities</h2>
-<p>A basic log-ratio is</p>
-<p><span class="math display">\[
-\log \frac{\pi_j}{\pi_k}.
-\]</span></p>
-<p>Interpretation:</p>
-<div class="bigcenter">
-<p>How abundant is feature <span class="math inline">\(j\)</span> relative to feature <span class="math inline">\(k\)</span>?</p>
-</div>
-<p>Log-ratios turn multiplicative comparisons into additive quantities suitable for regression.</p>
-</section>
-<section id="alr-clr-and-ilr-at-a-glance" class="slide level2">
-<h2>ALR, CLR, and ILR at a glance</h2>
-<div class="columns">
-<div class="column" style="width:33%;">
-<p><strong>ALR</strong></p>
-<p><span class="math display">\[
-\log\frac{\pi_j}{\pi_K}
-\]</span></p>
-<p>Uses a reference feature.</p>
-</div><div class="column" style="width:33%;">
-<p><strong>CLR</strong></p>
-<p><span class="math display">\[
-\log\frac{\pi_j}{g(\pi)}
-\]</span></p>
-<p>Uses the geometric mean.</p>
-</div><div class="column" style="width:33%;">
-<p><strong>ILR</strong></p>
-<p>Orthonormal log-contrast coordinates.</p>
-</div></div>
-</section>
-<section id="alr-clr-and-ilr-at-a-glance-1" class="slide level2">
-<h2>ALR, CLR, and ILR at a glance</h2>
+<section id="backup-ilr-coordinates-and-aitchison-geometry" class="slide level2">
+<h2>Backup: ILR coordinates and Aitchison geometry</h2>
 <table class="caption-top">
 <colgroup>
-<col style="width: 6%">
-<col style="width: 17%">
-<col style="width: 32%">
-<col style="width: 44%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Transformation</th>
+<th>Transform</th>
 <th>Definition</th>
-<th>Advantages</th>
-<th>Limitations</th>
+<th>Lives in</th>
+<th>Properties</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><strong>ALR</strong></td>
-<td><span class="math inline">\(\displaystyle \log\frac{\pi_j}{\pi_K}\)</span></td>
-<td>Easy to compute and fit using standard regression methods; directly interpretable relative to a chosen reference <span class="math inline">\(K\)</span></td>
-<td>Results depend on the reference; an unstable or changing reference affects every coordinate</td>
+<td><span class="math inline">\(\log(\pi_j/\pi_K)\)</span>, <span class="math inline">\(j&lt;K\)</span></td>
+<td><span class="math inline">\(\mathbb{R}^{K-1}\)</span></td>
+<td>unconstrained, but reference-dependent</td>
 </tr>
 <tr class="even">
 <td><strong>CLR</strong></td>
-<td><span class="math inline">\(\displaystyle \log\frac{\pi_j}{g(\pi)}\)</span></td>
-<td>Symmetric across features; does not require a single reference feature</td>
-<td>Coordinates sum to zero; covariance matrix is singular; interpretation is relative to the geometric mean</td>
+<td><span class="math inline">\(\log(\pi_j/g(\pi))\)</span></td>
+<td>zero-sum hyperplane in <span class="math inline">\(\mathbb{R}^K\)</span></td>
+<td>symmetric; covariance singular</td>
 </tr>
 <tr class="odd">
 <td><strong>ILR</strong></td>
-<td><span class="math inline">\(\displaystyle z = V^\top \log \pi\)</span></td>
-<td>Orthonormal and nonredundant; well suited for standard multivariate methods</td>
-<td>Coordinates depend on the chosen basis; often less directly interpretable biologically</td>
+<td><span class="math inline">\(V^\top\log\pi\)</span>, <span class="math inline">\(V^\top V=I_{K-1}\)</span>, <span class="math inline">\(V^\top\mathbf 1=0\)</span></td>
+<td><span class="math inline">\(\mathbb{R}^{K-1}\)</span></td>
+<td>orthonormal; basis-dependent</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Aitchison geometry.</strong> Perturbation <span class="math inline">\(\pi\oplus\nu=\mathcal{C}(\pi_1\nu_1,\ldots,\pi_K\nu_K)\)</span>, powering <span class="math inline">\(t\odot\pi=\mathcal{C}(\pi_1^t,\ldots,\pi_K^t)\)</span>, and inner product <span class="math inline">\(\langle\pi,\nu\rangle_A=\langle\operatorname{CLR}\pi,\operatorname{CLR}\nu\rangle\)</span> make <span class="math inline">\(\mathbb{S}^K\)</span> a <span class="math inline">\((K-1)\)</span>-dimensional Euclidean vector space; CLR and ILR are isometries.</p>
+<p><span class="math inline">\(VV^\top = I_K-\tfrac1K\mathbf 1\mathbf 1^\top\)</span>: CLR is the ILR coordinates expressed back in <span class="math inline">\(\mathbb{R}^K\)</span>.</p>
+</section>
+<section id="backup-the-arithmetic-mean-is-not-the-centre" class="slide level2 smaller">
+<h2>Backup: the arithmetic mean is not the centre</h2>
+<div class="columns">
+<div class="column" style="width:52%;">
+<p>The natural centre of a set of compositions is the <strong>closed geometric mean</strong>:</p>
+<p><span class="math display">\[
+\operatorname{cen}(\pi_1,\ldots,\pi_n)=\mathcal{C}\Big(\exp\Big\{\tfrac1n\textstyle\sum_i\log\pi_{i1}\Big\},\ \ldots\Big),
+\]</span></p>
+<p>the arithmetic mean in log-ratio coordinates, mapped back.</p>
+<div class="fragment">
+<p><strong>Example.</strong> Average <span class="math inline">\((0.01,\,0.99)\)</span> and <span class="math inline">\((0.0001,\,0.9999)\)</span>:</p>
+<ul>
+<li>arithmetic: first feature <span class="math inline">\(=0.005\)</span>, pulled toward the larger value;</li>
+<li>geometric centre: first feature <span class="math inline">\(\approx0.001\)</span>, the midpoint on the log-ratio scale (each is <span class="math inline">\(10\times\)</span> away).</li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>Curvature.</strong> A straight line in log-ratio space is a <strong>curve</strong> on the simplex. The arithmetic mean of a curved cloud can fall off the data.</p>
+<p><strong>Consequence for PCA:</strong> on raw proportions, abundant features dominate the total variance and curvature wastes components → use CLR-PCA (Aitchison, 1983).</p>
+</div>
+</div><div class="column" style="width:48%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/coda/coda_mean_curvature.png" style="width:100.0%"></p>
+<figcaption>Logistic-normal sample on <span class="math inline">\(\mathbb{S}^3\)</span>. A straight line in log-ratio space (dashed) is curved on the simplex; the arithmetic mean (×) sits off it.</figcaption>
+</figure>
+</div>
+</div></div>
+</section>
+<section id="backup-spurious-correlation-can-have-either-sign" class="slide level2">
+<h2>Backup: spurious correlation can have either sign</h2>
+<p>Absolute abundances <span class="math inline">\(a=(a_1,\,a_2,\,X)\)</span>: <span class="math inline">\(a_1,a_2\)</span> nearly constant and independent; <span class="math inline">\(X\)</span> a highly variable “bloom” feature. Then</p>
+<p><span class="math display">\[
+\pi_1=\frac{a_1}{a_1+a_2+X},\qquad \pi_2=\frac{a_2}{a_1+a_2+X}
+\]</span></p>
+<p>share a random denominator, so <span class="math inline">\(\pi_1\)</span> and <span class="math inline">\(\pi_2\)</span> rise and fall <strong>together</strong>.</p>
+
+<img data-src="images/coda/coda_three_correlations.png" style="width:100.0%" class="r-stretch quarto-figure-center"><p class="caption">Same 300 simulated samples, three answers. Left: absolute abundances. Middle: proportions in the full composition. Right: after dropping feature 3 and re-closing.</p><div class="fragment">
+<p>Pearson (1897): ratios with a common denominator are correlated. <strong>“Negative bias” describes the average, not any particular pair.</strong></p>
+</div>
+<aside class="notes">
+<p>Middle panel: correlation +0.85 from nothing but the shared denominator. The right panel is the subcompositional-incoherence example (later backup slide). Real-data analogue: a single dominant taxon (e.g.&nbsp;a Bacteroides or Proteobacteria bloom) makes all the minor taxa look positively co-abundant.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="backup-the-variation-matrix" class="slide level2">
+<h2>Backup: the variation matrix</h2>
+<p><strong>Aitchison’s variation matrix</strong></p>
+<p><span class="math display">\[
+T_{jk}=\operatorname{Var}\Big\{\log\frac{\pi_j}{\pi_k}\Big\}.
+\]</span></p>
+<ul>
+<li>unaffected by closure: <span class="math inline">\(\log(\pi_j/\pi_k)=\log(a_j/a_k)\)</span>;</li>
+<li><span class="math inline">\(T_{jk}=0\)</span> ⟺ features <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span> are <strong>proportional</strong> across samples;</li>
+<li>unchanged when features are dropped and re-closed (subcompositional coherence).</li>
+</ul>
+<div class="fragment">
+<p><strong>Consequences for multivariate practice</strong></p>
+<ul>
+<li><strong>Correlation networks</strong> on proportions are unreliable → SparCC, SPIEC-EASI, proportionality (<span class="math inline">\(\rho_p\)</span>) were built to address this.</li>
+<li><strong>Methods needing an invertible covariance</strong> (Gaussian graphical models, Mahalanobis distance, LDA) fail on <span class="math inline">\(\Sigma_\pi\)</span>. CLR does not fully fix this: <span class="math inline">\(\operatorname{Cov}(\operatorname{CLR}\pi)\mathbf 1=\mathbf 0\)</span> too. Work in ILR coordinates, or with <span class="math inline">\(T\)</span>.</li>
+<li><strong>Dependence models must be specified on log-ratios</strong> — the motivation for the logistic-normal, and for latent factors later in the talk.</li>
+</ul>
+</div>
+<aside class="notes">
+<p>Relation between T and the CLR covariance Γ: T_jk = Γ_jj + Γ_kk − 2Γ_jk, the same identity that links a distance matrix to a Gram matrix in classical MDS. Good link to the multivariate course.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="backup-subcompositional-incoherence" class="slide level2">
+<h2>Backup: subcompositional incoherence</h2>
+<p>A <strong>subcomposition</strong> keeps features <span class="math inline">\(S\subset\{1,\ldots,K\}\)</span> and re-closes: <span class="math inline">\(\pi_S=\mathcal{C}(\pi_j:\ j\in S)\)</span>.</p>
+<p>A method is <strong>subcompositionally coherent</strong> if its conclusions about the features in <span class="math inline">\(S\)</span> do not depend on whether the other features were measured.</p>
+<div class="fragment">
+<p>Same simulated data as the spurious-correlation slide, features 1 and 2:</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>analysis</th>
+<th style="text-align: right;"><span class="math inline">\(\operatorname{corr}(\cdot_1,\cdot_2)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>absolute abundances</td>
+<td style="text-align: right;"><span class="math inline">\(+0.04\)</span></td>
+</tr>
+<tr class="even">
+<td>full composition <span class="math inline">\(\{1,2,3\}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(+0.85\)</span></td>
+</tr>
+<tr class="odd">
+<td>subcomposition <span class="math inline">\(\{1,2\}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(-1.00\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\log(\pi_1/\pi_2)\)</span> in either</td>
+<td style="text-align: right;">identical (difference <span class="math inline">\(&lt;10^{-15}\)</span>)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fragment">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>quantity</th>
+<th>coherent?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>correlation / covariance of proportions</td>
+<td>✗</td>
+</tr>
+<tr class="even">
+<td>Euclidean distance, arithmetic mean</td>
+<td>✗</td>
+</tr>
+<tr class="odd">
+<td>CLR coordinate <span class="math inline">\(\log(\pi_j/g(\pi))\)</span></td>
+<td>✗ — <span class="math inline">\(g(\pi)\)</span> depends on the panel</td>
+</tr>
+<tr class="even">
+<td>pairwise log-ratios, variation matrix <span class="math inline">\(T_{jk}\)</span>, ILR balances within <span class="math inline">\(S\)</span></td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="backup-every-sequencing-dataset-is-a-subcomposition" class="slide level2 smaller">
+<h2>Backup: every sequencing dataset is a subcomposition</h2>
+<p>What decides which features are in the panel?</p>
+<ul>
+<li><strong>Assay:</strong> small RNA-seq captures short RNAs only; 16S captures only taxa matching the primers.</li>
+<li><strong>Annotation:</strong> which miRNAs are in MirGeneDB; which genera the taxonomy resolves.</li>
+<li><strong>Filtering:</strong> prevalence filters, minimum-count filters, dropping unannotated reads.</li>
+</ul>
+<div class="fragment">
+<p>An incoherent analysis gives answers that depend on these <strong>arbitrary choices</strong>.</p>
+</div>
+<div class="fragment">
+<p><strong>An honest caveat for NBSR.</strong> The CLR contrast <span class="math inline">\(\Delta^{\rm clr}_j\)</span> is measured against the geometric mean <em>of the panel</em>, so it is <strong>not</strong> coherent: drop features and it moves. This is one reason we target the absolute effect <span class="math inline">\(\delta_j\)</span> instead:</p>
+<ul>
+<li><span class="math inline">\(\delta_j=\log\{a_j(1)/a_j(0)\}\)</span> is a property of feature <span class="math inline">\(j\)</span> alone;</li>
+<li>the mode-based shift correction recovers it <strong>approximately coherently</strong>, provided the unchanged features remain the mode of the retained panel.</li>
+</ul>
+</div>
+<div class="fragment question">
+<p>Could a prevalence filter that mostly removes null features threaten the modal-null assumption?</p>
+</div>
+<aside class="notes">
+<p>Answer sketch: yes in principle. If filtering preferentially removes nulls (rare features are mostly null), the null mode becomes less dominant relative to perturbed features. In practice the null group usually remains the largest, but this is exactly why NBSR avoids prevalence filtering and handles rare features through the dispersion model instead.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="backup-negative-binomial-parameterisation" class="slide level2">
+<h2>Backup: negative binomial parameterisation</h2>
+<p><span class="math display">\[
+y\sim\operatorname{NB}(\mu,\phi):\quad
+p(y)=\frac{\Gamma(y+\phi)}{\Gamma(\phi)\,y!}\Big(\frac{\phi}{\mu+\phi}\Big)^{\phi}\Big(\frac{\mu}{\mu+\phi}\Big)^{y},
+\]</span></p>
+<p><span class="math display">\[
+\mathbb{E}y=\mu,\qquad \operatorname{Var}y=\mu+\mu^2/\phi,\qquad
+I(\log\mu)=\frac{\mu\phi}{\mu+\phi}=\Big(\frac1\mu+\frac1\phi\Big)^{-1}.
+\]</span></p>
+<p>The Fisher information on the log scale is capped by <span class="math inline">\(\min(\mu,\phi)\)</span>: deeper sequencing cannot average away between-sample variability.</p>
+</section>
+<section id="backup-alr-clr-gradient" class="slide level2">
+<h2>Backup: ALR → CLR gradient</h2>
+<p>With <span class="math inline">\(\beta=(\beta_1^\top,\ldots,\beta_{K-1}^\top)^\top\)</span> and <span class="math inline">\(\beta_K=0\)</span>,</p>
+<p><span class="math display">\[
+\Delta^{\rm clr}_j=
+\begin{cases}
+\beta_{jp}-\frac1K\sum_{r&lt;K}\beta_{rp}, &amp; j&lt;K,\\
+-\frac1K\sum_{r&lt;K}\beta_{rp}, &amp; j=K,
+\end{cases}
+\qquad
+q_{j,(k,d)}=\mathbf 1\{d=p\}\Big(\mathbf 1\{k=j\}-\frac1K\Big).
+\]</span></p>
+<p>Linear in <span class="math inline">\(\beta\)</span>, so the delta-method variance is exact within the Gaussian approximation.</p>
+</section>
+<section id="backup-simulation-perturbations" class="slide level2">
+<h2>Backup: simulation perturbations</h2>
+<p><strong>miRNA.</strong> LOW: 20 features with <span class="math inline">\(\alpha_j\in(1,10]\)</span>, <span class="math inline">\(u_j\sim U[0.5,5]\)</span>; MED: 10 with <span class="math inline">\(\alpha_j\in[10,50)\)</span>, <span class="math inline">\(u_j\sim U[0.25,2.5]\)</span>; HIGH: 5 with <span class="math inline">\(\alpha_j&gt;50\)</span>, <span class="math inline">\(u_j\sim U[0.125,1.25]\)</span>; <span class="math inline">\(\delta_j=u_j\log2\)</span>. Library size <span class="math inline">\(\lceil U(10^6,10^8)\cdot U(0,0.5)\rceil\)</span>. <span class="math inline">\(c_{\rm rel}\approx-0.12,-0.16,-0.22\)</span>.</p>
+<p><strong>Microbiome.</strong> Fold changes log-uniform: HIGH 1.25–2, MED 1.5–4, LOW 2–8. ALL25: 5/10/10 genera; ALL50: 10/20/20; BAL50: 10/20/20 half up, half down. <span class="math inline">\(\kappa(0)=100\)</span>. Library sizes resampled from the 172 controls (764–100,046 reads).</p>
+</section>
+<section id="backup-microbiome-power-at-matched-fdr-0.05" class="slide level2">
+<h2>Backup: microbiome, power at matched FDR = 0.05</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>case</th>
+<th>method</th>
+<th style="text-align: right;"><span class="math inline">\(n=40\)</span></th>
+<th style="text-align: right;">80</th>
+<th style="text-align: right;">160</th>
+<th style="text-align: right;">320</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ALL25</td>
+<td>NBSR w/ <span class="math inline">\(c_i\)</span>, post. <span class="math inline">\(z\)</span></td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;"><strong>0.57</strong></td>
+<td style="text-align: right;">0.74</td>
+<td style="text-align: right;"><strong>0.88</strong></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>LinDA</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">0.44</td>
+<td style="text-align: right;">0.66</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ALDEx2</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: right;">0.38</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">0.45</td>
+</tr>
+<tr class="even">
+<td>ALL50</td>
+<td>NBSR w/ <span class="math inline">\(c_i\)</span>, post. <span class="math inline">\(z\)</span></td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;"><strong>0.48</strong></td>
+<td style="text-align: right;"><strong>0.75</strong></td>
+<td style="text-align: right;"><strong>0.89</strong></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>LinDA</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.63</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>ALDEx2</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">0.24</td>
+</tr>
+<tr class="odd">
+<td>BAL50</td>
+<td>NBSR w/ <span class="math inline">\(c_i\)</span>, post. <span class="math inline">\(z\)</span></td>
+<td style="text-align: right;"><strong>0.34</strong></td>
+<td style="text-align: right;"><strong>0.52</strong></td>
+<td style="text-align: right;">0.72</td>
+<td style="text-align: right;"><strong>0.86</strong></td>
+</tr>
+<tr class="even">
+<td></td>
+<td>LinDA</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.66</td>
+<td style="text-align: right;">0.79</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ALDEx2</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.63</td>
+<td style="text-align: right;">0.74</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="backup-clr-definition" class="slide level2">
-<h2>Backup: CLR definition</h2>
-<p>For <span class="math inline">\(\pi\in S^K\)</span>, define</p>
-<p><span class="math display">\[
-CLR(\pi)_j
-=
-\log\frac{\pi_j}{g(\pi)},
-\qquad
-g(\pi)=\left(\prod_{k=1}^K \pi_k\right)^{1/K}.
-\]</span></p>
-</section>
-<section id="backup-softmax-and-inverse-clr" class="slide level2">
-<h2>Backup: softmax and inverse CLR</h2>
-<p><span class="math display">\[
-\operatorname{softmax}(\eta)_j
-=
-\frac{\exp(\eta_j)}{\sum_k\exp(\eta_k)}.
-\]</span></p>
-<p>Let <span class="math inline">\(\tilde\eta=\eta-\bar\eta\mathbf{1}\)</span>. Then</p>
-<p><span class="math display">\[
-\operatorname{softmax}(\eta)=CLR^{-1}(\tilde\eta).
-\]</span></p>
-</section>
-<section id="backup-alr-to-clr-centering" class="slide level2">
-<h2>Backup: ALR-to-CLR centering</h2>
-<p>Under an ALR reference constraint, <span class="math inline">\(\beta_K=0\)</span>. The reference-free CLR coefficient is</p>
-<p><span class="math display">\[
-\beta_j^{CLR}
-=
-\beta_j^{ALR}
--
-\frac{1}{K}\sum_{k=1}^K\beta_k^{ALR}.
-\]</span></p>
-</section>
-<section id="backup-direct-clr-contrast" class="slide level2">
-<h2>Backup: direct CLR contrast</h2>
-<p>For a binary condition without interactions,</p>
-<p><span class="math display">\[
-\Delta_j^{CLR}
-=
-\beta_j
--
-\frac{1}{K}\sum_{k=1}^K\beta_k.
-\]</span></p>
-<p>This is invariant to the ALR reference.</p>
-</section>
-<section id="posterior-bias-correction" class="slide level2 scrollable">
-<h2>Posterior bias correction</h2>
-<p>For each posterior draw <span class="math inline">\(s\)</span>:</p>
-<ol type="1">
-<li>calculate <span class="math inline">\(\Delta_j^{CLR,(s)}\)</span>;</li>
-<li>estimate the global center <span class="math inline">\(m_b^{(s)}\)</span>;</li>
-<li>compute</li>
-</ol>
-<p><span class="math display">\[
-\Delta_j^{adj,(s)}
-=
-\Delta_j^{CLR,(s)}-m_b^{(s)};
-\]</span></p>
-<ol start="4" type="1">
-<li>summarize across posterior draws.</li>
-</ol>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>The uncertainty in the bias correction is propagated automatically.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="simulation-scenarios" class="slide level2 scrollable">
-<h2>Simulation scenarios</h2>
-<p>Two cases:</p>
-<ol type="1">
-<li><p>Total abundance conserved. Swap parameters between low- and high-abundance features; increases are balanced by corresponding decreases; considers sample sizes <span class="math inline">\(N \in \{3, 5, 10, 20\}\)</span> per group.</p></li>
-<li><p>Total abundance imbalanced.</p></li>
-</ol>
-<ul>
-<li>Multiply selected parameters by randomly sampled fold change values;</li>
-<li>Perturb <span class="math inline">\(5, 10, 20\)</span> features from high, medium, and low abundance groups;</li>
-<li>Sample sizes <span class="math inline">\(N \in \{3, 5, 10\}\)</span> per group.</li>
-</ul>
-</section>
-<section id="real-data-applications-tcga-mirna-seq-data" class="slide level2">
-<h2>Real-data applications: TCGA miRNA-seq data</h2>
+<section id="backup-real-data-applications-earlier-paper" class="slide level2">
+<h2>Backup: real-data applications (earlier paper)</h2>
+
+<img data-src="images/density_log2_bias.png" style="width:70.0%" class="r-stretch quarto-figure-center"><p class="caption">Colon cancer cell lines: density of log fold changes and the estimated compositional shift.</p></section>
+<section id="backup-tcga-mirna-seq" class="slide level2">
+<h2>Backup: TCGA miRNA-seq</h2>
 
 <img data-src="images/tcga_fig.png" class="r-stretch"></section>
-<section id="real-data-applications-cd8t-vs-cd19b-cells" class="slide level2">
-<h2>Real-data applications: CD8T vs CD19B cells</h2>
+<section id="backup-cd8-t-vs-cd19-b-cells" class="slide level2">
+<h2>Backup: CD8 T vs CD19 B cells</h2>
 
 
 <img data-src="images/CD8_CD19_top30.png" class="r-stretch"></section></section>
